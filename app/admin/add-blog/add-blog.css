@@ -1,0 +1,381 @@
+/* ---------- General Page Layout ---------- */
+.cf-add-blog-container {
+    padding: 32px;
+    background: #f9fafb;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Header ---------- */
+.cf-add-blog-header {
+    margin-bottom: 32px;
+}
+
+.cf-add-blog-header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.cf-add-blog-header p {
+    color: #64748b;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* ---------- Card ---------- */
+.cf-blog-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 32px 36px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    border: 1px solid #f1f5f9;
+    margin-bottom: 24px;
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.cf-blog-card:hover {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
+    transform: translateY(-1px);
+}
+
+.cf-blog-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+}
+
+.cf-blog-section-icon {
+    width: 24px;
+    height: 24px;
+    color: #3b82f6;
+}
+
+/* ---------- Form Layout ---------- */
+.cf-blog-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.cf-blog-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.cf-blog-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.cf-blog-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.cf-blog-label.required::after {
+    content: " *";
+    color: #ef4444;
+}
+
+.cf-blog-input,
+.cf-blog-select,
+.cf-blog-textarea {
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.25s ease;
+    width: 100%;
+}
+
+.cf-blog-input:focus,
+.cf-blog-select:focus,
+.cf-blog-textarea:focus {
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+.cf-blog-textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.cf-blog-hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* ---------- Thumbnail Upload ---------- */
+.cf-blog-upload-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: all 0.25s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cf-blog-upload-box:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.cf-blog-upload-box.has-file {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.cf-blog-upload-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cf-blog-upload-icon-wrapper svg {
+    width: 28px;
+    height: 28px;
+    color: #3b82f6;
+}
+
+.cf-blog-upload-title {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cf-blog-upload-subtitle {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.cf-blog-upload-formats {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 8px;
+}
+
+.cf-blog-file-preview {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #475569;
+}
+
+.cf-blog-thumbnail-preview {
+    margin-top: 16px;
+    display: none;
+}
+
+.cf-blog-thumbnail-preview img {
+    width: 100%;
+    height: 240px;
+    /* fixed height to make it square-ish */
+    aspect-ratio: 1 / 1;
+    /* forces perfect square */
+    border-radius: 12px;
+    object-fit: cover;
+    /* prevents stretching */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ---------- Status & Toggles ---------- */
+.cf-blog-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.cf-blog-toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 22px;
+}
+
+.cf-blog-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cf-blog-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.3s;
+    border-radius: 22px;
+}
+
+.cf-blog-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cf-blog-toggle-switch input:checked+.cf-blog-toggle-slider {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cf-blog-toggle-switch input:checked+.cf-blog-toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.cf-blog-toggle-label {
+    font-size: 14px;
+    color: #334155;
+    font-weight: 500;
+}
+
+.cf-blog-toggle-description {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ---------- Buttons ---------- */
+.cf-blog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.cf-blog-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cf-blog-btn-cancel {
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.cf-blog-btn-cancel:hover {
+    background: #f8fafc;
+}
+
+.cf-blog-btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+}
+
+.cf-blog-btn-primary {
+    background: #6fa3f8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(111, 163, 248, 0.3);
+}
+
+.cf-blog-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(111, 163, 248, 0.4);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .cf-add-blog-container {
+        padding: 20px;
+    }
+
+    .cf-blog-card {
+        padding: 24px;
+    }
+
+    .cf-blog-actions {
+        flex-direction: column;
+    }
+
+    .cf-blog-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ---------- Notifications ---------- */
+.cf-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+.cf-notification.success {
+    background: #10b981;
+}
+
+.cf-notification.error {
+    background: #ef4444;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

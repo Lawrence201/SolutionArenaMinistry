@@ -1,0 +1,1172 @@
+/* Events Management Styles */
+
+.cf-em-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.cf-em-header-content h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+}
+
+.cf-em-header-content p {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.cf-em-header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cf-em-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.cf-em-btn svg {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+.cf-em-btn-secondary {
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.cf-em-btn-secondary:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.cf-em-btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.cf-em-btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.cf-em-btn:hover svg {
+    stroke: #2563eb;
+}
+
+.cf-em-alerts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.cf-em-alert-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 16px;
+}
+
+.cf-em-alert-card.cf-em-warning {
+    border-left-color: #f59e0b;
+}
+
+.cf-em-alert-card.cf-em-success {
+    border-left-color: #10b981;
+}
+
+.cf-em-alert-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.cf-em-alert-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.cf-em-alert-content p {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.cf-em-content-grid {
+    height: 750px;
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 24px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.cf-em-calendar-section {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cf-em-calendar-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+
+.cf-em-calendar-header p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.cf-em-calendar {
+    margin-bottom: 24px;
+}
+
+.cf-em-calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.cf-em-calendar-nav button {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.cf-em-calendar-nav button:hover {
+    background: #f1f5f9;
+}
+
+.cf-em-calendar-month {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.cf-em-calendar-day-header {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    padding: 8px 0;
+}
+
+.cf-em-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.cf-em-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #374151;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.cf-em-calendar-day:hover {
+    background: #f3f4f6;
+}
+
+.cf-em-calendar-day.cf-em-today {
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+.cf-em-calendar-day.cf-em-inactive {
+    color: transparent;
+    cursor: default;
+    background: transparent !important;
+}
+
+.cf-em-calendar-day.cf-em-selected {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.cf-em-calendar-day.cf-em-today.cf-em-has-event::after {
+    background: white;
+}
+
+.cf-em-calendar-day.cf-em-selected.cf-em-has-event::after {
+    background: #1e40af;
+}
+
+.cf-em-calendar-day.cf-em-has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 6px;
+    height: 6px;
+    background: #2563eb;
+    border-radius: 50%;
+}
+
+.cf-em-birthday-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 10px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.cf-em-calendar-day.cf-em-has-event.cf-em-has-birthday::after {
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.cf-em-calendar-day[data-tooltip] {
+    position: relative;
+}
+
+.cf-em-calendar-day[data-tooltip]:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 16px;
+    background: rgba(30, 41, 59, 0.95);
+    color: white;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: pre-line;
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 300px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    pointer-events: none;
+}
+
+.cf-em-calendar-day[data-tooltip]:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+    border: 6px solid transparent;
+    border-top-color: rgba(30, 41, 59, 0.95);
+    z-index: 1001;
+}
+
+.cf-em-upcoming-section {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 24px;
+    margin-top: 12px;
+}
+
+.cf-em-upcoming-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 16px;
+}
+
+.cf-em-upcoming-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cf-em-upcoming-item {
+    display: flex;
+    gap: 12px;
+    align-items: start;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cf-em-upcoming-item:hover {
+    background: #f1f5f9;
+}
+
+.cf-em-upcoming-dot {
+    width: 8px;
+    height: 8px;
+    background: #2563eb;
+    border-radius: 50%;
+    margin-top: 6px;
+}
+
+.cf-em-upcoming-details h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.cf-em-upcoming-details p {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.cf-em-events-section {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: 1300px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.cf-em-events-controls {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 0;
+    background: white;
+    z-index: 100;
+    flex-shrink: 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.cf-em-search-bar {
+    position: relative;
+    width: 250px;
+}
+
+.cf-em-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.cf-em-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.cf-em-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.cf-em-tab {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #f3f4f6;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cf-em-tab:hover {
+    background: #e5e7eb;
+}
+
+.cf-em-tab.cf-em-active {
+    background: #2563eb;
+    color: white;
+}
+
+.cf-em-event-list {
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 8px;
+    scroll-behavior: smooth;
+}
+
+.cf-em-event-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cf-em-event-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+}
+
+.cf-em-event-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+    margin-bottom: 16px;
+}
+
+.cf-em-event-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.cf-em-event-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.cf-em-event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cf-em-event-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent);
+}
+
+.cf-em-event-content {
+    padding: 20px;
+}
+
+.cf-em-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+}
+
+.cf-em-event-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.cf-em-event-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.cf-em-event-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cf-em-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cf-em-badge.cf-em-service {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.cf-em-badge.cf-em-ministry {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.cf-em-badge.cf-em-study {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.cf-em-badge.cf-em-outreach {
+    background: #fce7f3;
+    color: #9f1239;
+}
+
+.cf-em-badge.cf-em-retreat {
+    background: #e9d5ff;
+    color: #6b21a8;
+}
+
+.cf-em-badge.cf-em-confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.cf-em-badge.cf-em-needs-volunteers {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.cf-em-badge.cf-em-needs-planning {
+    background: #fecaca;
+    color: #991b1b;
+}
+
+.cf-em-event-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.cf-em-event-btn {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cf-em-event-btn:hover {
+    background: #f8fafc;
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.cf-em-event-description {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.cf-em-event-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.cf-em-event-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.cf-em-detail-icon {
+    font-size: 16px;
+    color: #94a3b8;
+}
+
+.cf-em-event-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.cf-em-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.cf-em-progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Modal Styles */
+.cf-em-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.cf-em-modal.cf-em-show {
+    display: flex;
+}
+
+.cf-em-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Metric Card Styles */
+.cf-event-metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin: 32px 0;
+}
+
+.cf-event-metric-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.cf-event-metric-card:hover {
+    border-color: #d1d5db;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cf-metric-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.cf-metric-content {
+    flex: 1;
+}
+
+.cf-metric-content h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: #111827;
+}
+
+.cf-metric-content p {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 4px 0;
+    font-weight: 500;
+}
+
+.cf-metric-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #f9fafb;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.cf-metric-total {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.cf-metric-upcoming {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.cf-metric-service {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+/* Birthday Section Styles */
+.cf-birthday-section {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    margin: 30px 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cf-birthday-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.cf-birthday-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cf-birthday-title svg {
+    color: #667eea;
+}
+
+.cf-birthday-title h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.cf-birthday-month-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cf-month-nav-btn {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cf-month-nav-btn:hover {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.cf-month-nav-btn:hover svg {
+    color: white;
+}
+
+.cf-month-select {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2d3748;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.cf-birthday-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f7fafc;
+}
+
+.cf-birthday-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 15px;
+    font-weight: 500;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cf-birthday-tab:hover,
+.cf-birthday-tab.active {
+    color: #667eea;
+    background: #f7fafc;
+}
+
+.cf-birthday-tab.active {
+    border-bottom-color: #667eea;
+}
+
+.cf-tab-count {
+    background: #e2e8f0;
+    color: #4a5568;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cf-birthday-tab.active .cf-tab-count {
+    background: #667eea;
+    color: white;
+}
+
+.cf-birthday-table-container {
+    position: relative;
+    min-height: 200px;
+}
+
+.cf-birthday-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cf-birthday-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.cf-birthday-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #2d3748;
+}
+
+.cf-birthday-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.cf-birthday-name {
+    font-weight: 500;
+}
+
+.cf-birthday-group {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cf-birthday-group.dunamis {
+    background: #ebf4ff;
+    color: #3182ce;
+}
+
+.cf-birthday-group.kabod {
+    background: #fef5e7;
+    color: #d97706;
+}
+
+.cf-birthday-group.judah {
+    background: #f0fdf4;
+    color: #059669;
+}
+
+.cf-birthday-group.karis {
+    background: #fdf2f8;
+    color: #db2777;
+}
+
+.cf-birthday-action-btn {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cf-birthday-loading,
+.cf-birthday-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.cf-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f7fafc;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1028px) {
+    .cf-em-content-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+/* Event Detail Modal Styles from Legacy */
+.cf-em-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.cf-em-modal-close:hover {
+    background: #f1f5f9;
+}
+
+.cf-em-event-detail-section {
+    margin-bottom: 24px;
+}
+
+.cf-em-event-detail-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 12px;
+}
+
+.cf-em-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.cf-em-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cf-em-detail-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.cf-em-detail-value {
+    font-size: 14px;
+    color: #1e293b;
+    word-break: break-all;
+}
+
+.cf-em-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.cf-em-stat-box {
+    text-align: center;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.cf-em-stat-box-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.cf-em-stat-box-label {
+    font-size: 13px;
+    color: #64748b;
+}
+
+
+/* Birthday Status Badges */
+.cf-birthday-status {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cf-birthday-status.celebrated {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.cf-birthday-status.upcoming {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+/* AI Insights CSS from legacy style.css */
+.insights-section {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+}
+
+.insights-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.insights-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.insights-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.insights-header img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+/* Reusing cf-em-alerts-grid for layout or using legacy grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 20px;
+}
+
+.insight-card {
+    padding: 18px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border-left: 4px solid #3b82f6;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.insight-card:hover {
+    background: #f1f5f9;
+    transform: translateY(-3px);
+}
+
+.insight-card.success {
+    border-left-color: #10b981;
+}
+
+.insight-card.warning {
+    border-left-color: #f59e0b;
+}
+
+.insight-card.warnings {
+    border-left-color: #ef4444;
+}
+
+.insight-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+}
+
+.insight-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    line-height: 1.4;
+}
+

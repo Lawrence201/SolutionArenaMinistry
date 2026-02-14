@@ -1,0 +1,869 @@
+/* ========================================
+   Record Donation Page Styles
+   Cloned from PHP record_donations.html
+   ======================================== */
+
+/* ---------- Toast Notification ---------- */
+.toast-notification {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    min-width: 320px;
+    max-width: 480px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 2147483647 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast-notification.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.toast-notification.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.toast-content svg {
+    flex-shrink: 0;
+}
+
+.toast-content span {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.toast-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ---------- Page Header ---------- */
+.cf-donation-header {
+    margin-bottom: 12px;
+}
+
+.cf-donation-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f1724;
+    margin: 0 0 6px 0;
+}
+
+.cf-donation-header p {
+    font-size: 14px;
+    color: #6B7280;
+    margin: 0;
+}
+
+/* ---------- Layout Container ---------- */
+.zorp_mainwrap {
+    width: 100%;
+    padding-top: 8px;
+    display: block;
+}
+
+/* ---------- Main Layout Grid ---------- */
+.rray_layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 22px;
+}
+
+/* ---------- Card ---------- */
+.rray_cardbox {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(17, 24, 39, 0.06);
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.03);
+}
+
+.rray_cardtop {
+    padding: 18px 22px;
+    border-bottom: 1px solid #EEF2FF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rray_titline {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0f1724;
+}
+
+.rray_subtext {
+    font-size: 13px;
+    color: #6B7280;
+    margin-top: 4px;
+}
+
+.rray_cardmain {
+    padding: 22px;
+}
+
+/* ---------- Tab group (pill tabs) ---------- */
+.rrap_tabgroup {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.rrap_tabitem {
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #374151;
+    font-weight: 700;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    box-shadow: 0 1px 4px rgba(12, 18, 30, 0.03);
+    font-size: 13px;
+}
+
+.rrap_tabitem:hover {
+    transform: translateY(-3px);
+}
+
+.rrap_tabitem.active {
+    background: linear-gradient(90deg, #4b8cf7, #3b7de8);
+    color: white;
+    box-shadow: 0 8px 28px rgba(92, 64, 216, 0.18);
+    border: none;
+}
+
+/* ---------- Form grids ---------- */
+.rray_gridlay {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.rray_grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.rray_flexrow {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* ---------- Field groups & inputs ---------- */
+.rrap_fieldgrp {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rrap_fldlab {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.rrap_fldinp,
+.rrap_fldsel,
+.rrap_fldtxt {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #E6E9F2;
+    background: #FFFFFF;
+    font-size: 14px;
+    color: #0b1220;
+    transition: box-shadow .18s ease, border-color .18s ease, transform .12s ease;
+    font-family: inherit;
+}
+
+.rrap_fldtxt {
+    min-height: 92px;
+    resize: vertical;
+}
+
+.rrap_fldinp:focus,
+.rrap_fldsel:focus,
+.rrap_fldtxt:focus {
+    outline: none;
+    border-color: #4b8cf7;
+    box-shadow: 0 6px 22px rgba(75, 140, 247, 0.12);
+    transform: translateY(-1px);
+}
+
+.rrap_fldinp::placeholder,
+.rrap_fldtxt::placeholder {
+    color: #9CA3AF;
+}
+
+/* compact helper inline */
+.rrap_inln {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ---------- Section titles ---------- */
+.rray_sectit {
+    font-size: 13px;
+    font-weight: 800;
+    color: #6B7280;
+    margin: 18px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+/* ---------- Upload zone ---------- */
+.rray_uploadz {
+    border: 1px dashed #E6E9F2;
+    border-radius: 12px;
+    padding: 18px;
+    background: linear-gradient(180deg, #FBFCFF, #F7F8FE);
+    text-align: center;
+    color: #6B7280;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .12s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.rray_uploadz:hover {
+    background: #F3F5FF;
+    border-color: #C7D2FE;
+    transform: translateY(-2px);
+}
+
+.rray_uploadz.dragover {
+    background: #EEF2FF;
+    border-color: #4b8cf7;
+    color: #4b8cf7;
+}
+
+/* accepted helper */
+.rrap_helper {
+    font-size: 12px;
+    color: #6B7280;
+    margin-top: 6px;
+}
+
+/* ---------- Buttons ---------- */
+.rray_btnarea {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.rrap_btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid #E6E9F2;
+    background: #fff;
+    color: #111827;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .18s ease;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.rrap_btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.rrap_btnprim {
+    background: linear-gradient(90deg, #4b8cf7 0%, #3b7de8 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 10px 30px rgba(92, 64, 216, 0.12);
+}
+
+.rrap_btnprim:hover {
+    transform: translateY(-4px);
+}
+
+.rrap_btnprim:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* warning button */
+.rrap_btnwarn {
+    background: #F59E0B;
+    color: #111827;
+    border: none;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.12);
+}
+
+.rrap_btnwarn:hover {
+    transform: translateY(-3px);
+}
+
+/* ---------- Summary Sidebar ---------- */
+.rray_sumside {
+    position: sticky;
+    top: 22px;
+    align-self: start;
+}
+
+.rray_sumrow {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #111827;
+}
+
+.rray_divline {
+    height: 1px;
+    background: #EEF2FF;
+    margin: 16px 0;
+}
+
+.rray_sumtot {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    font-weight: 800;
+    font-size: 16px;
+    border-top: 1px dashed #EEF2FF;
+    margin-top: 8px;
+}
+
+/* ---------- Badges ---------- */
+.rrap_badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.rrap_bdggrn {
+    background: #ECFDF5;
+    color: #065F46;
+}
+
+.rrap_bdgyel {
+    background: #FFFAEB;
+    color: #92400E;
+}
+
+/* ---------- Autocomplete Dropdown ---------- */
+.member-autocomplete-container {
+    position: relative;
+}
+
+.member-suggestions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.member-suggestion-item {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+}
+
+.member-suggestion-item:hover {
+    background: #f9fafb;
+}
+
+.member-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+}
+
+.member-avatar-initials {
+    width: 36px;
+    height: 36px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+}
+
+.member-contact {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.no-results {
+    padding: 12px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* ---------- Modal Styles ---------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-large {
+    max-width: 700px;
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 2px solid #EEF2FF;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 24px;
+}
+
+.modal-header button {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-header button:hover {
+    background: #f3f4f6;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-footer div {
+    display: flex;
+    gap: 12px;
+}
+
+/* ---------- Records List ---------- */
+.records-list {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+}
+
+.record-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: white;
+}
+
+.record-item:hover {
+    background: #f9fafb;
+}
+
+.record-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.record-info {
+    flex: 1;
+}
+
+.record-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.record-id {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.record-amount {
+    text-align: right;
+}
+
+.record-amount .amount {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 16px;
+}
+
+.record-amount .date {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ---------- Receipt Preview ---------- */
+.receipt-preview {
+    padding: 32px !important;
+}
+
+/* ---------- Muted and helper text ---------- */
+.muted {
+    color: #6B7280;
+    font-weight: 600;
+}
+
+.kicker {
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.amount-strong {
+    font-weight: 900;
+    color: #0B1220;
+    font-size: 16px;
+}
+
+/* ---------- Hidden utility ---------- */
+.hidden {
+    display: none !important;
+}
+
+/* ---------- Accessibility focus outlines ---------- */
+.rrap_tabitem:focus,
+.rrap_fldinp:focus,
+.rrap_fldsel:focus,
+.rrap_fldtxt:focus {
+    outline: 3px solid rgba(124, 90, 240, 0.14);
+    outline-offset: 2px;
+}
+
+/* ---------- Responsive Styles ---------- */
+@media (max-width: 1024px) {
+
+    .rray_gridlay,
+    .rray_grid3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .zorp_mainwrap {
+        padding: 18px;
+    }
+
+    .rray_layout {
+        grid-template-columns: 1fr;
+    }
+
+    .rrap_tabitem {
+        padding: 9px 12px;
+    }
+
+    .rray_sumside {
+        position: static;
+    }
+}
+
+/* ---------- Receipt Modal Styles ---------- */
+.receipt-modal-content {
+    max-width: 500px;
+    border-radius: 4px;
+}
+
+.receipt-preview {
+    font-family: 'Courier New', Courier, monospace;
+    /* Monospace for receipt feel */
+    color: #000;
+    padding: 30px;
+    background: #fff;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.church-logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    /* Maintain aspect ratio */
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.receipt-header h1 {
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    letter-spacing: 0.5px;
+    color: #000;
+}
+
+.receipt-header p {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    border-bottom: 1px solid #000;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+
+.receipt-divider {
+    border-top: 2px dashed #000;
+    margin: 20px 0;
+}
+
+.receipt-member-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.receipt-member-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #000;
+    filter: grayscale(100%);
+    /* Force B&W */
+}
+
+.receipt-member-details h3 {
+    margin: 0 0 2px;
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.receipt-member-details p {
+    margin: 0;
+    font-size: 12px;
+    color: #000;
+}
+
+.receipt-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.receipt-row .label {
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.receipt-row .value {
+    font-weight: 400;
+}
+
+.receipt-row.total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px solid #000;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.receipt-footer {
+    text-align: center;
+    margin-top: 30px;
+    border-top: 1px solid #000;
+    padding-top: 15px;
+}
+
+.receipt-footer p {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.receipt-footer .small {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Print Overrides */
+@media print {
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body {
+        margin: 1cm;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    .receipt-modal-content,
+    .receipt-modal-content * {
+        visibility: visible;
+        color: #000 !important;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: white;
+        padding: 0;
+        display: block;
+    }
+
+    .receipt-modal-content {
+        box-shadow: none;
+        max-width: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .receipt-member-photo {
+        filter: grayscale(100%) !important;
+    }
+}

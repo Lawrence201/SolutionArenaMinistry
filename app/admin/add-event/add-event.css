@@ -1,0 +1,333 @@
+/* ---------- General Page Layout ---------- */
+.cf-add-event-container {
+    padding: 32px;
+    background: #f9fafb;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+.cf-add-event-header {
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.cf-add-event-header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.cf-add-event-header p {
+    color: #64748b;
+    font-size: 15px;
+}
+
+/* ---------- Form Card ---------- */
+.cf-form-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 36px 40px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    border: 1px solid #f1f5f9;
+    margin-bottom: 28px;
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.cf-form-card:hover {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
+    transform: translateY(-1px);
+}
+
+/* ---------- Section Titles ---------- */
+.cf-form-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+/* ---------- Form Layout ---------- */
+.cf-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+    margin-bottom: 20px;
+}
+
+.cf-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.cf-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* ---------- Labels ---------- */
+.cf-form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.cf-form-label.required::after {
+    content: " *";
+    color: #ef4444;
+}
+
+/* ---------- Inputs ---------- */
+.cf-form-input,
+.cf-form-select,
+.cf-form-textarea {
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.25s ease;
+    width: 100%;
+}
+
+.cf-form-input:focus,
+.cf-form-select:focus,
+.cf-form-textarea:focus {
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+.cf-form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+.cf-form-hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* ---------- Checkbox Group ---------- */
+.cf-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.cf-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.cf-checkbox-label {
+    font-size: 14px;
+    color: #334155;
+    cursor: pointer;
+}
+
+/* ---------- Volunteers ---------- */
+.cf-volunteers-section {
+    background: #f1f5f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.cf-volunteer-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cf-volunteer-item:last-child {
+    margin-bottom: 0;
+}
+
+.cf-volunteer-item input {
+    flex: 1;
+}
+
+/* ---------- Add Role Button ---------- */
+.cf-add-volunteer-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #3b82f6;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.cf-add-volunteer-btn:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+}
+
+/* ---------- Image Upload ---------- */
+.cf-image-upload {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: all 0.25s ease;
+}
+
+.cf-image-upload:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: scale(1.02);
+}
+
+.cf-upload-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    color: #94a3b8;
+}
+
+.cf-upload-text {
+    font-size: 15px;
+    color: #475569;
+    font-weight: 500;
+}
+
+.cf-upload-subtext {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* ---------- Tags Input ---------- */
+.cf-tag-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    min-height: 45px;
+}
+
+.cf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.cf-tag-remove {
+    cursor: pointer;
+    color: #64748b;
+    font-weight: bold;
+}
+
+.cf-tag-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    background: transparent;
+    min-width: 120px;
+}
+
+/* ---------- Buttons ---------- */
+.cf-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.cf-btn {
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+.cf-btn-cancel {
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.cf-btn-cancel:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.cf-btn-draft {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.cf-btn-draft:hover {
+    background: #e2e8f0;
+}
+
+.cf-btn-primary {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.cf-btn-primary:hover {
+    background: #2563eb;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+}
+
+.cf-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* ---------- Responsive Design ---------- */
+@media (max-width: 768px) {
+    .cf-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cf-form-actions {
+        flex-direction: column;
+    }
+
+    .cf-btn {
+        width: 100%;
+    }
+
+    .cf-form-card {
+        padding: 24px;
+    }
+
+    .cf-add-event-header h1 {
+        font-size: 26px;
+    }
+}
