@@ -1,0 +1,271 @@
+/* Birthday Section Styles */
+.birthday-section {
+    padding: 60px 0;
+    background-color: #f9fafb;
+    position: relative;
+    overflow: hidden;
+    margin-top: 30px;
+        /* adjust this value as needed */
+}
+
+.birthday-header {
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto 50px;
+    padding: 0 20px;
+}
+
+.birthday-header img {
+    height: 100px;
+    width: auto;
+    margin-bottom: 20px;
+}
+
+.birthday-header h2 {
+   
+    font-size: 50px;
+    color: #111111;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.birthday-header p {
+    font-family: 'Poppins', sans-serif;
+    color: #666;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Birthday Grid Container - Centered Single Column/Row */
+.birthday-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Centers elements vertically if needed, but mainly for single column align */
+    gap: 40px;
+    padding: 0 20px;
+    max-width: 1000px;
+    /* Constraints width for nice landscape look */
+    margin: 0 auto;
+}
+
+/* Landscape Birthday Card */
+.birthday-card {
+    display: flex;
+    flex-direction: row;
+    /* Landscape layout */
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    /* Softer, deeper shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 100%;
+    position: relative;
+    min-height: 350px;
+    /* Ensure substantial height */
+}
+
+.birthday-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+/* Left Image Section */
+.b-card-image {
+    width: 45%;
+    /* Landscape proportion */
+    position: relative;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    flex-shrink: 0;
+    /* Prevent shrinking */
+}
+
+.b-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.birthday-card:hover .b-card-image img {
+    transform: scale(1.05);
+    /* Gentle zoom */
+}
+
+/* Date Badge */
+.b-date-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    /* Moved to left for better visibility on landscape */
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 30px;
+    color: #ecb111;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    backdrop-filter: blur(5px);
+}
+
+/* Right Content Section */
+.b-card-content {
+    width: 55%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center content vertically */
+    align-items: center;
+    /* Center content horizontally */
+    text-align: center;
+    /* Center text */
+    background: linear-gradient(135deg, #ffffff 0%, #fcfcfc 100%);
+}
+
+.b-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    /* Larger title */
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.b-card-msg {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 25px;
+    font-style: italic;
+    max-width: 90%;
+    /* Reading width */
+}
+
+.b-card-name {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    font-weight: 600;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    width: 60%;
+    /* Divider width */
+}
+
+/* Empty State */
+.no-birthdays {
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border-radius: 12px;
+    color: #888;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ============================
+   📱 Tablets (max-width: 992px)
+   ============================ */
+@media (max-width: 992px) {
+    .birthday-header h2 {
+        font-size: 40px;
+    }
+
+    .birthday-card {
+        min-height: 300px;
+    }
+
+    .b-card-content {
+        padding: 30px;
+    }
+
+    .b-card-title {
+        font-size: 24px;
+    }
+}
+
+/* ============================
+   📱 Mobile (max-width: 768px)
+   ============================ */
+@media (max-width: 768px) {
+    .birthday-header img {
+        height: 80px;
+    }
+
+    .birthday-header h2 {
+        font-size: 32px;
+    }
+
+    .birthday-header p {
+        font-size: 14px;
+    }
+
+    .birthday-card {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .b-card-image {
+        width: 100%;
+        height: 250px;
+    }
+
+    .b-card-content {
+        width: 100%;
+        padding: 25px;
+    }
+
+    .b-card-title {
+        font-size: 22px;
+    }
+
+    .b-card-msg {
+        font-size: 15px;
+        max-width: 100%;
+    }
+
+    .b-card-name {
+        width: 80%;
+        padding-top: 15px;
+    }
+}
+
+/* ============================
+   📱 Extra Small Mobile (max-width: 480px)
+   ============================ */
+@media (max-width: 480px) {
+    .birthday-header h2 {
+        font-size: 26px;
+    }
+
+    .birthday-card {
+        border-radius: 15px;
+    }
+
+    .b-card-image {
+        height: 200px;
+    }
+
+    .b-card-content {
+        padding: 20px;
+    }
+
+    .b-card-title {
+        font-size: 20px;
+    }
+
+    .b-card-msg {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+}

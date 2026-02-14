@@ -1,0 +1,295 @@
+/* Church Group Selection Cards */
+.cuttin-ministry-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.xax-ministry-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.xax-ministry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+.xax-ministry-card.selected {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.cuttin-ministry-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.xax-ministry-card:hover .cuttin-ministry-icon {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
+
+.cuttin-ministry-icon svg {
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
+/* DUNAMIS - Lightning Bolt (Electric Blue/Purple) */
+.xax-ministry-card:nth-child(1) .cuttin-ministry-icon svg {
+    stroke: #6366f1;
+    filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.3));
+}
+
+.xax-ministry-card:nth-child(1):hover .cuttin-ministry-icon svg {
+    stroke: #4f46e5;
+    filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.5));
+    transform: scale(1.1);
+}
+
+/* Kabod - Globe (Golden/Amber) */
+.xax-ministry-card:nth-child(2) .cuttin-ministry-icon svg {
+    stroke: #f59e0b;
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.3));
+}
+
+.xax-ministry-card:nth-child(2):hover .cuttin-ministry-icon svg {
+    stroke: #d97706;
+    filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.5));
+    transform: scale(1.1);
+}
+
+/* Judah - Music Note (Vibrant Pink/Rose) */
+.xax-ministry-card:nth-child(3) .cuttin-ministry-icon svg {
+    stroke: #ec4899;
+    filter: drop-shadow(0 2px 8px rgba(236, 72, 153, 0.3));
+}
+
+.xax-ministry-card:nth-child(3):hover .cuttin-ministry-icon svg {
+    stroke: #db2777;
+    filter: drop-shadow(0 4px 12px rgba(236, 72, 153, 0.5));
+    transform: scale(1.1);
+}
+
+/* Karis - Heart (Warm Red/Coral) */
+.xax-ministry-card:nth-child(4) .cuttin-ministry-icon svg {
+    stroke: #ef4444;
+    filter: drop-shadow(0 2px 8px rgba(239, 68, 68, 0.3));
+}
+
+.xax-ministry-card:nth-child(4):hover .cuttin-ministry-icon svg {
+    stroke: #dc2626;
+    filter: drop-shadow(0 4px 12px rgba(239, 68, 68, 0.5));
+    transform: scale(1.1);
+}
+
+.xax-ministry-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Progress Indicator Styles */
+.xax-progress-container {
+    padding: 0 24px;
+    margin-bottom: 24px;
+}
+
+.cuttin-progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 20px 0;
+}
+
+.xax-progress-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.cuttin-progress-line-fill {
+    height: 100%;
+    background: #3b82f6;
+    transition: width 0.3s ease;
+}
+
+.xax-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.cuttin-step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+}
+
+.xax-step.active .cuttin-step-circle {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.xax-step.completed .cuttin-step-circle {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+}
+
+.cuttin-step-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.xax-step.active .cuttin-step-label {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+/* Photo Upload Styling */
+.cuttin-photo-upload {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.xax-photo-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.cuttin-photo-placeholder {
+    font-size: 48px;
+    color: #cbd5e1;
+}
+
+.xax-file-input-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.xax-file-input-label:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.cuttin-form-helper {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Info Card */
+.cuttin-info-card {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.xax-info-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0 0 8px 0;
+}
+
+.xax-info-card-text {
+    font-size: 13px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Form Section Visibility */
+.cuttin-form-section {
+    display: none;
+}
+
+.cuttin-form-section.active {
+    display: block;
+}
+
+/* Checkbox and Radio Styling */
+.cuttin-checkbox-group,
+.cuttin-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.xax-checkbox-item,
+.xax-radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.xax-checkbox-item input[type="checkbox"],
+.xax-radio-item input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.xax-checkbox-item label,
+.xax-radio-item label {
+    cursor: pointer;
+    font-size: 14px;
+    color: #334155;
+}

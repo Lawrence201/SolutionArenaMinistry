@@ -1,0 +1,38 @@
+﻿app/admin/add-member/success/page.tsx(43,13): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(47,29): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(48,28): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(49,24): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(50,24): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(51,25): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(52,25): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(53,32): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(54,33): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(55,29): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(56,26): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(57,23): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(58,25): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(59,31): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(60,34): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(61,33): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(62,35): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(63,34): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(64,33): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(65,35): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(66,24): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(67,33): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(68,34): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(69,37): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(70,29): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(73,35): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(73,59): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(73,85): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/admin/add-member/success/page.tsx(74,36): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(74,61): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(74,88): error TS7006: Parameter 'd' implicitly has an 'any' type.
+app/admin/add-member/success/page.tsx(77,9): error TS2304: Cannot find name 'memberData'.
+app/admin/add-member/success/page.tsx(85,9): error TS2304: Cannot find name 'setShowModal'.
+app/admin/add-member/success/page.tsx(89,9): error TS2304: Cannot find name 'setShowModal'.
+app/admin/add-member/success/page.tsx(132,25): error TS2304: Cannot find name 'showModal'.
+app/admin/visitors/VisitorsClient.tsx(5,20): error TS2307: Cannot find module '@/components/Admin/Layout' or its corresponding type declarations.
+utils/exportUtils.ts(109,21): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+utils/exportUtils.ts(114,21): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.

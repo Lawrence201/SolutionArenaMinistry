@@ -1,0 +1,1398 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ActivityLog {
+  activity_id   Int          @id @default(autoincrement())
+  activity_type ActivityType
+  title         String       @db.VarChar(255)
+  description   String
+  icon_type     String?      @default("default") @db.VarChar(50)
+  related_id    Int?
+  created_by    String?      @db.VarChar(100)
+  created_at    DateTime     @default(now()) @db.Timestamp(0)
+
+  @@map("activity_log")
+}
+
+model AdminAccount {
+  admin_id       Int       @id @default(autoincrement())
+  admin_name     String    @db.VarChar(100)
+  admin_email    String    @unique @db.VarChar(100)
+  admin_password String    @db.VarChar(255)
+  created_at     DateTime  @default(now()) @db.Timestamp(0)
+  last_login     DateTime? @db.Timestamp(0)
+
+  @@map("admin_accounts")
+}
+
+model Attendance {
+  attendance_id Int              @id @default(autoincrement())
+  member_id     Int?
+  visitor_id    Int?
+  service_id    String           @db.VarChar(36)
+  check_in_date DateTime         @db.Date
+  check_in_time DateTime         @db.Time(0)
+  status        AttendanceStatus
+  created_at    DateTime         @default(now()) @db.Timestamp(0)
+  updated_at    DateTime         @default(now()) @updatedAt @db.Timestamp(0)
+  member        Member?          @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+  visitor       Visitor?         @relation(fields: [visitor_id], references: [visitor_id], onDelete: Cascade)
+
+  @@map("attendance")
+}
+
+model AttendanceToken {
+  id         Int         @id @default(autoincrement())
+  service_id String      @db.VarChar(50)
+  token_hash String      @db.VarChar(255)
+  status     TokenStatus @default(active)
+  created_at DateTime    @default(now()) @db.Timestamp(0)
+
+  @@index([service_id, status], map: "service_status")
+  @@map("attendance_tokens")
+}
+
+model Blog {
+  id                Int        @id @default(autoincrement())
+  title             String     @db.VarChar(255)
+  slug              String     @unique @db.VarChar(255)
+  author            String     @db.VarChar(150)
+  author_image_path String?    @db.VarChar(255)
+  category          String?    @db.VarChar(100)
+  tags              String?    @db.VarChar(255)
+  excerpt           String
+  content           String
+  thumbnail_path    String?    @db.VarChar(255)
+  status            BlogStatus @default(published)
+  is_featured       Boolean    @default(false)
+  published_at      DateTime?  @db.Timestamp(0)
+  created_at        DateTime   @default(now()) @db.Timestamp(0)
+  updated_at        DateTime   @default(now()) @updatedAt @db.Timestamp(0)
+  views             Int        @default(0)
+  blogViews         BlogView[]
+  comments          Comment[]
+
+  @@map("blogs")
+}
+
+model BlogView {
+  id        Int      @id @default(autoincrement())
+  blog_id   Int
+  user_id   Int
+  viewed_at DateTime @default(now()) @db.Timestamp(0)
+  blog      Blog     @relation(fields: [blog_id], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([blog_id, user_id], map: "unique_view")
+  @@map("blog_views")
+}
+
+model BudgetSetting {
+  id            Int      @id @default(autoincrement())
+  setting_name  String   @unique @db.VarChar(100)
+  setting_value Decimal  @default(0.00) @db.Decimal(10, 2)
+  description   String?
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("budget_settings")
+}
+
+model Comment {
+  id         Int       @id @default(autoincrement())
+  blog_id    Int
+  user_id    Int
+  parent_id  Int?
+  content    String
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  updated_at DateTime  @default(now()) @updatedAt @db.Timestamp(0)
+  blog       Blog      @relation(fields: [blog_id], references: [id])
+  parent     Comment?  @relation("CommentReplies", fields: [parent_id], references: [id])
+  replies    Comment[] @relation("CommentReplies")
+  user       User      @relation(fields: [user_id], references: [id])
+
+  @@map("comments")
+}
+
+model CommunicationSetting {
+  setting_id    Int                       @id @default(autoincrement())
+  setting_key   String                    @unique @db.VarChar(100)
+  setting_value String?
+  setting_type  CommunicationSettingType? @default(general)
+  description   String?
+  updated_at    DateTime                  @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("communication_settings")
+}
+
+model ContentCalendar {
+  id             Int           @id @default(autoincrement())
+  title          String        @db.VarChar(255)
+  description    String?
+  content_type   ContentType
+  platforms      Json
+  scheduled_date DateTime      @db.Date
+  scheduled_time DateTime?     @db.Time(0)
+  content        String?
+  media_paths    Json?
+  status         ContentStatus @default(planned)
+  post_ids       Json?
+  created_by     Int?
+  approved_by    Int?
+  approved_at    DateTime?     @db.Timestamp(0)
+  created_at     DateTime      @default(now()) @db.Timestamp(0)
+  updated_at     DateTime      @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("content_calendar")
+}
+
+model Department {
+  department_id     Int                @id @default(autoincrement())
+  department_name   DepartmentName
+  description       String?
+  draftDepartments  DraftDepartment[]
+  memberDepartments MemberDepartment[]
+
+  @@map("departments")
+}
+
+model Draft {
+  draft_id           Int               @id @default(autoincrement())
+  first_name         String?           @db.VarChar(50)
+  last_name          String?           @db.VarChar(50)
+  date_of_birth      DateTime?         @db.Date
+  gender             Gender?
+  marital_status     MaritalStatus?
+  occupation         String?           @db.VarChar(100)
+  phone              String?           @db.VarChar(20)
+  email              String?           @db.VarChar(100)
+  address            String?           @db.VarChar(255)
+  city               String?           @db.VarChar(100)
+  region             String?           @db.VarChar(100)
+  status             MemberStatus?
+  church_group       ChurchGroup?
+  leadership_role    LeadershipRole?
+  baptism_status     BaptismStatus?
+  spiritual_growth   SpiritualGrowth?
+  membership_type    MembershipType?
+  notes              String?
+  photo_path         String?           @db.VarChar(255)
+  emergency_name     String?           @db.VarChar(100)
+  emergency_phone    String?           @db.VarChar(20)
+  emergency_relation String?           @db.VarChar(50)
+  send_welcome_email Boolean?          @default(false)
+  notify_pastor      Boolean?          @default(false)
+  create_account     Boolean?          @default(false)
+  created_at         DateTime          @default(now()) @db.Timestamp(0)
+  updated_at         DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+  departments        DraftDepartment[]
+  ministries         DraftMinistry[]
+
+  @@map("drafts")
+}
+
+model DraftDepartment {
+  draft_id      Int
+  department_id Int
+  department    Department @relation(fields: [department_id], references: [department_id], onDelete: Cascade)
+  draft         Draft      @relation(fields: [draft_id], references: [draft_id], onDelete: Cascade)
+
+  @@id([draft_id, department_id])
+  @@map("draft_departments")
+}
+
+model DraftMinistry {
+  draft_id    Int
+  ministry_id Int
+  draft       Draft    @relation(fields: [draft_id], references: [draft_id], onDelete: Cascade)
+  ministry    Ministry @relation(fields: [ministry_id], references: [ministry_id], onDelete: Cascade)
+
+  @@id([draft_id, ministry_id])
+  @@map("draft_ministries")
+}
+
+model EmailLog {
+  email_id        Int         @id @default(autoincrement())
+  message_id      Int?
+  recipient_email String      @db.VarChar(255)
+  subject         String      @db.VarChar(255)
+  message_content String
+  status          EmailStatus @default(pending)
+  opened_at       DateTime?   @db.Timestamp(0)
+  clicked_at      DateTime?   @db.Timestamp(0)
+  bounce_reason   String?
+  error_message   String?
+  sent_at         DateTime?   @db.Timestamp(0)
+  created_at      DateTime    @default(now()) @db.Timestamp(0)
+
+  @@map("email_logs")
+}
+
+model EmergencyContact {
+  emergency_id       Int     @id @default(autoincrement())
+  member_id          Int
+  emergency_name     String? @db.VarChar(100)
+  emergency_phone    String? @db.VarChar(20)
+  emergency_relation String? @db.VarChar(50)
+  member             Member  @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+
+  @@map("emergency_contacts")
+}
+
+model Event {
+  id                    Int                  @id @default(autoincrement())
+  name                  String               @db.VarChar(255)
+  type                  EventType
+  type_other            String?
+  category              EventCategory
+  category_other        String?
+  description           String
+  start_date            DateTime             @db.Date
+  start_time            DateTime             @db.Time(0)
+  end_date              DateTime             @db.Date
+  end_time              DateTime             @db.Time(0)
+  is_recurring          Boolean?             @default(false)
+  location              String               @db.VarChar(255)
+  room_building         String?              @db.VarChar(255)
+  full_address          String?
+  is_virtual            Boolean?             @default(false)
+  virtual_link          String?              @db.VarChar(255)
+  max_capacity          Int
+  registration_deadline DateTime?            @db.Date
+  require_registration  Boolean?             @default(false)
+  open_to_public        Boolean?             @default(false)
+  volunteers_needed     Int?                 @default(0)
+  contact_person        String?              @db.VarChar(255)
+  contact_email         String?              @db.VarChar(255)
+  contact_phone         String?              @db.VarChar(50)
+  contact_person_image  String?              @db.VarChar(255)
+  age_group             AgeGroup?            @default(All)
+  special_notes         String?
+  image_path            String?              @db.VarChar(255)
+  ad_image_1            String?              @db.VarChar(255)
+  ad_image_2            String?              @db.VarChar(255)
+  ad_video_1            String?              @db.VarChar(255)
+  ad_video_2            String?              @db.VarChar(255)
+  status                EventStatus?         @default(Published)
+  created_at            DateTime             @default(now()) @db.Timestamp(0)
+  updated_at            DateTime             @default(now()) @updatedAt @db.Timestamp(0)
+  tags                  EventTag[]
+  volunteerRoles        EventVolunteerRole[]
+
+  @@map("events")
+}
+
+model EventTag {
+  id       Int    @id @default(autoincrement())
+  event_id Int
+  tag      String @db.VarChar(100)
+  event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, tag], map: "unique_event_tag")
+  @@map("event_tags")
+}
+
+model EventVolunteerRole {
+  id              Int    @id @default(autoincrement())
+  event_id        Int
+  role_name       String @db.VarChar(255)
+  quantity_needed Int
+  event           Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@map("event_volunteer_roles")
+}
+
+model Expense {
+  expense_id      Int             @id @default(autoincrement())
+  transaction_id  String          @unique @db.VarChar(50)
+  date            DateTime        @db.Date
+  category        ExpenseCategory
+  custom_category String?         @db.VarChar(100)
+  description     String          @db.VarChar(255)
+  vendor_payee    String?         @db.VarChar(100)
+  amount          Decimal         @db.Decimal(10, 2)
+  payment_method  PaymentMethod
+  notes           String?
+  status          ExpenseStatus   @default(Pending)
+  receipt_url     String?         @db.VarChar(255)
+  approved_by     String?         @db.VarChar(100)
+  approval_date   DateTime?       @db.Date
+  created_at      DateTime        @default(now()) @db.Timestamp(0)
+  updated_at      DateTime        @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("expenses")
+}
+
+model FinancialSummary {
+  summary_id              Int      @id @default(autoincrement())
+  month                   Int
+  year                    Int
+  total_offerings         Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_tithes            Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_project_offerings Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_welfare           Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_income            Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_expenses          Decimal? @default(0.00) @db.Decimal(12, 2)
+  net_balance             Decimal? @default(0.00) @db.Decimal(12, 2)
+  created_at              DateTime @default(now()) @db.Timestamp(0)
+  updated_at              DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@unique([month, year], map: "unique_month_year")
+  @@map("financial_summary")
+}
+
+model GalleryAlbum {
+  id           Int             @id @default(autoincrement())
+  album_name   String          @db.VarChar(255)
+  event_date   DateTime        @db.Date
+  category     GalleryCategory
+  description  String?
+  tags         String?         @db.VarChar(500)
+  photographer String?         @db.VarChar(100)
+  cover_image  String?         @db.VarChar(255)
+  media_count  Int?            @default(0)
+  view_count   Int?            @default(0)
+  status       GalleryStatus?  @default(published)
+  created_at   DateTime        @default(now()) @db.Timestamp(0)
+  updated_at   DateTime        @default(now()) @updatedAt @db.Timestamp(0)
+  created_by   Int?
+  media        GalleryMedia[]
+  views        GalleryView[]
+
+  @@map("gallery_albums")
+}
+
+model GalleryLike {
+  id         Int          @id @default(autoincrement())
+  media_id   Int
+  user_id    Int?
+  ip_address String?      @db.VarChar(45)
+  liked_at   DateTime     @default(now()) @db.Timestamp(0)
+  media      GalleryMedia @relation(fields: [media_id], references: [id], onDelete: Cascade)
+
+  @@unique([media_id, user_id], map: "unique_like")
+  @@map("gallery_likes")
+}
+
+model GalleryMedia {
+  id             Int           @id @default(autoincrement())
+  album_id       Int
+  media_type     MediaType
+  file_name      String        @db.VarChar(255)
+  file_path      String        @db.VarChar(500)
+  file_size      BigInt?
+  file_extension String?       @db.VarChar(10)
+  thumbnail_path String?       @db.VarChar(500)
+  title          String?       @db.VarChar(255)
+  caption        String?
+  width          Int?
+  height         Int?
+  duration       Int?
+  mime_type      String?       @db.VarChar(100)
+  upload_order   Int?          @default(0)
+  likes_count    Int?          @default(0)
+  view_count     Int?          @default(0)
+  is_featured    Boolean?      @default(false)
+  uploaded_at    DateTime      @default(now()) @db.Timestamp(0)
+  likes          GalleryLike[]
+  album          GalleryAlbum  @relation(fields: [album_id], references: [id], onDelete: Cascade)
+  views          GalleryView[]
+
+  @@map("gallery_media")
+}
+
+model GalleryView {
+  id         Int           @id @default(autoincrement())
+  album_id   Int?
+  media_id   Int?
+  user_id    Int?
+  ip_address String?       @db.VarChar(45)
+  user_agent String?       @db.VarChar(255)
+  viewed_at  DateTime      @default(now()) @db.Timestamp(0)
+  album      GalleryAlbum? @relation(fields: [album_id], references: [id], onDelete: Cascade)
+  media      GalleryMedia? @relation(fields: [media_id], references: [id], onDelete: Cascade)
+
+  @@map("gallery_views")
+}
+
+model GeneratedReport {
+  id               Int       @id @default(autoincrement())
+  report_type      String    @db.VarChar(50)
+  generated_at     DateTime? @default(now()) @db.Timestamp(0)
+  confidence_score Int?      @default(98)
+  summary_text     String?
+  file_path        String?   @db.VarChar(255)
+
+  @@map("generated_reports")
+}
+
+model HashtagPerformance {
+  id                  Int       @id @default(autoincrement())
+  hashtag             String    @db.VarChar(100)
+  platform            String    @db.VarChar(50)
+  usage_count         Int?      @default(1)
+  total_reach         Int?      @default(0)
+  total_engagement    Int?      @default(0)
+  avg_engagement_rate Decimal?  @default(0.00) @db.Decimal(5, 2)
+  last_used_at        DateTime? @db.Timestamp(0)
+  created_at          DateTime  @default(now()) @db.Timestamp(0)
+  updated_at          DateTime  @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@unique([hashtag, platform], map: "hashtag_platform")
+  @@map("hashtag_performance")
+}
+
+model LoginAttempt {
+  id           Int       @id @default(autoincrement())
+  ip_address   String    @db.VarChar(45)
+  attempt_time DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([ip_address, attempt_time], map: "ip_address")
+  @@map("login_attempts")
+}
+
+model Member {
+  member_id            Int                   @id @default(autoincrement())
+  first_name           String                @db.VarChar(50)
+  last_name            String                @db.VarChar(50)
+  date_of_birth        DateTime?             @db.Date
+  gender               Gender?
+  marital_status       MaritalStatus?
+  occupation           String?               @db.VarChar(100)
+  phone                String                @db.VarChar(20)
+  email                String                @unique @db.VarChar(100)
+  address              String?               @db.VarChar(255)
+  city                 String?               @db.VarChar(100)
+  region               String?               @db.VarChar(100)
+  status               MemberStatus?         @default(Active)
+  church_group         ChurchGroup?
+  leadership_role      LeadershipRole?       @default(None)
+  baptism_status       BaptismStatus?
+  spiritual_growth     SpiritualGrowth?
+  membership_type      MembershipType?
+  notes                String?
+  photo_path           String?               @db.VarChar(255)
+  created_at           DateTime              @default(now()) @db.Timestamp(0)
+  updated_at           DateTime              @default(now()) @updatedAt @db.Timestamp(0)
+  birthday_thumb       String?               @db.VarChar(255)
+  birthday_title       String?               @db.VarChar(255)
+  birthday_message     String?
+  attendance           Attendance[]
+  emergencyContacts    EmergencyContact[]
+  memberDepartments    MemberDepartment[]
+  memberMinistries     MemberMinistry[]
+  messageGroupMembers  MessageGroupMember[]
+  messageRecipients    MessageRecipient[]
+  tithes               Tithe[]
+  welcomeActions       WelcomeAction[]
+  welfareContributions WelfareContribution[]
+
+  @@map("members")
+}
+
+model MemberDepartment {
+  member_id     Int
+  department_id Int
+  department    Department @relation(fields: [department_id], references: [department_id], onDelete: Cascade)
+  member        Member     @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+
+  @@id([member_id, department_id])
+  @@map("member_departments")
+}
+
+model MemberMinistry {
+  member_id   Int
+  ministry_id Int
+  member      Member   @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+  ministry    Ministry @relation(fields: [ministry_id], references: [ministry_id], onDelete: Cascade)
+
+  @@id([member_id, ministry_id])
+  @@map("member_ministries")
+}
+
+model Message {
+  message_id        Int                @id @default(autoincrement())
+  message_type      MessageType?       @default(general)
+  title             String             @db.VarChar(255)
+  content           String
+  delivery_channels Json?
+  status            ContentStatus?     @default(draft)
+  created_by        Int?
+  created_at        DateTime           @default(now()) @db.Timestamp(0)
+  scheduled_at      DateTime?          @db.Timestamp(0)
+  sent_at           DateTime?          @db.Timestamp(0)
+  total_recipients  Int?               @default(0)
+  total_sent        Int?               @default(0)
+  total_failed      Int?               @default(0)
+  total_opened      Int?               @default(0)
+  total_clicked     Int?               @default(0)
+  recipients        MessageRecipient[]
+  scheduledMessages ScheduledMessage[]
+
+  @@map("messages")
+}
+
+model MessageGroup {
+  group_id        Int                  @id @default(autoincrement())
+  group_name      String               @unique @db.VarChar(255)
+  group_type      GroupType?           @default(static)
+  description     String?
+  filter_criteria Json?
+  created_by      Int?
+  created_at      DateTime             @default(now()) @db.Timestamp(0)
+  updated_at      DateTime             @default(now()) @updatedAt @db.Timestamp(0)
+  members         MessageGroupMember[]
+
+  @@map("message_groups")
+}
+
+model MessageGroupMember {
+  id        Int          @id @default(autoincrement())
+  group_id  Int
+  member_id Int
+  added_at  DateTime     @default(now()) @db.Timestamp(0)
+  group     MessageGroup @relation(fields: [group_id], references: [group_id], onDelete: Cascade)
+  member    Member       @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+
+  @@unique([group_id, member_id], map: "group_member")
+  @@map("message_group_members")
+}
+
+model MessageRecipient {
+  recipient_id     Int             @id @default(autoincrement())
+  message_id       Int
+  member_id        Int?
+  recipient_type   RecipientType?  @default(member)
+  recipient_name   String?         @db.VarChar(255)
+  recipient_email  String?         @db.VarChar(255)
+  recipient_phone  String?         @db.VarChar(20)
+  delivery_channel DeliveryChannel
+  delivery_status  EmailStatus?    @default(pending)
+  sent_at          DateTime?       @db.Timestamp(0)
+  opened_at        DateTime?       @db.Timestamp(0)
+  clicked_at       DateTime?       @db.Timestamp(0)
+  error_message    String?
+  created_at       DateTime        @default(now()) @db.Timestamp(0)
+  member           Member?         @relation(fields: [member_id], references: [member_id])
+  message          Message         @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
+
+  @@map("message_recipients")
+}
+
+model MessageTemplate {
+  template_id   Int          @id @default(autoincrement())
+  template_name String       @db.VarChar(255)
+  template_type MessageType? @default(general)
+  subject       String?      @db.VarChar(255)
+  content       String
+  variables     Json?
+  created_by    Int?
+  is_active     Boolean?     @default(true)
+  created_at    DateTime     @default(now()) @db.Timestamp(0)
+  updated_at    DateTime     @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("message_templates")
+}
+
+model Ministry {
+  ministry_id      Int              @id @default(autoincrement())
+  ministry_name    MinistryName
+  description      String?
+  draftMinistries  DraftMinistry[]
+  memberMinistries MemberMinistry[]
+
+  @@map("ministries")
+}
+
+model Offering {
+  offering_id       Int            @id @default(autoincrement())
+  transaction_id    String         @unique @db.VarChar(50)
+  date              DateTime       @db.Date
+  service_type      ServiceType
+  service_time      DateTime?      @db.Time(0)
+  amount_collected  Decimal        @db.Decimal(10, 2)
+  collection_method PaymentMethod
+  counted_by        String?        @db.VarChar(100)
+  notes             String?
+  status            ExpenseStatus? @default(Pending)
+  receipt_url       String?        @db.VarChar(255)
+  created_at        DateTime       @default(now()) @db.Timestamp(0)
+  updated_at        DateTime       @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("offerings")
+}
+
+model ProjectOffering {
+  project_offering_id Int            @id @default(autoincrement())
+  transaction_id      String         @unique @db.VarChar(50)
+  date                DateTime       @db.Date
+  service_type        ServiceType
+  service_time        DateTime?      @db.Time(0)
+  project_name        String         @db.VarChar(100)
+  amount_collected    Decimal        @db.Decimal(10, 2)
+  collection_method   PaymentMethod
+  counted_by          String?        @db.VarChar(100)
+  notes               String?
+  status              ExpenseStatus? @default(Pending)
+  receipt_url         String?        @db.VarChar(255)
+  created_at          DateTime       @default(now()) @db.Timestamp(0)
+  updated_at          DateTime       @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("project_offerings")
+}
+
+model ReceivedEmail {
+  email_id        Int       @id @default(autoincrement())
+  message_id      String?   @unique @db.VarChar(255)
+  from_address    String    @db.VarChar(255)
+  from_name       String?   @db.VarChar(255)
+  to_address      String?   @db.VarChar(255)
+  subject         String?   @db.VarChar(500)
+  body_text       String?
+  body_html       String?
+  received_date   DateTime? @db.Timestamp(0)
+  is_read         Boolean?  @default(false)
+  has_attachments Boolean?  @default(false)
+  folder          String?   @default("INBOX") @db.VarChar(50)
+  created_at      DateTime  @default(now()) @db.Timestamp(0)
+
+  @@index([received_date])
+  @@index([is_read])
+  @@index([from_address])
+  @@map("received_emails")
+}
+
+model ScheduledMessage {
+  schedule_id    Int            @id @default(autoincrement())
+  message_id     Int
+  scheduled_time DateTime       @db.Timestamp(0)
+  recurrence     Recurrence?    @default(none)
+  recurrence_end DateTime?      @db.Date
+  status         ContentStatus? @default(pending)
+  last_run       DateTime?      @db.Timestamp(0)
+  next_run       DateTime?      @db.Timestamp(0)
+  created_at     DateTime       @default(now()) @db.Timestamp(0)
+  message        Message        @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
+
+  @@map("scheduled_messages")
+}
+
+model Sermon {
+  id                    Int               @id @default(autoincrement())
+  sermon_title          String            @db.VarChar(255)
+  sermon_speaker        String            @db.VarChar(150)
+  sermon_date           DateTime          @db.Date
+  sermon_series         String?           @db.VarChar(100)
+  sermon_series_other   String?
+  sermon_description    String
+  video_file            String?           @db.VarChar(255)
+  video_type            VideoType?        @default(file)
+  audio_file            String?           @db.VarChar(255)
+  pdf_file              String?           @db.VarChar(255)
+  sermon_image          String?           @db.VarChar(255)
+  sermon_duration       Int?
+  sermon_category       String?           @db.VarChar(100)
+  sermon_category_other String?
+  tags                  Json?
+  is_featured           Boolean?          @default(false)
+  allow_downloads       Boolean?          @default(true)
+  is_published          Boolean?          @default(true)
+  enable_comments       Boolean?          @default(true)
+  view_count            Int?              @default(0)
+  download_count        Int?              @default(0)
+  like_count            Int?              @default(0)
+  share_count           Int?              @default(0)
+  created_at            DateTime          @default(now()) @db.Timestamp(0)
+  updated_at            DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+  published_at          DateTime?         @db.Timestamp(0)
+  analytics             SermonAnalytics[]
+  comments              SermonComment[]
+  scriptures            SermonScripture[]
+
+  @@map("sermons")
+}
+
+model SermonAnalytics {
+  id          Int              @id @default(autoincrement())
+  sermon_id   Int
+  action_type SermonActionType
+  user_ip     String?          @db.VarChar(45)
+  user_agent  String?
+  created_at  DateTime         @default(now()) @db.Timestamp(0)
+  sermon      Sermon           @relation(fields: [sermon_id], references: [id], onDelete: Cascade)
+
+  @@map("sermon_analytics")
+}
+
+model SermonCategory {
+  id                   Int      @id @default(autoincrement())
+  category_name        String   @unique @db.VarChar(100)
+  category_slug        String   @unique @db.VarChar(100)
+  category_description String?
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("sermon_categories")
+}
+
+model SermonComment {
+  id                Int             @id @default(autoincrement())
+  sermon_id         Int
+  user_name         String          @db.VarChar(100)
+  user_email        String?         @db.VarChar(150)
+  comment_text      String
+  is_approved       Boolean?        @default(false)
+  parent_comment_id Int?
+  created_at        DateTime        @default(now()) @db.Timestamp(0)
+  parent            SermonComment?  @relation("SermonCommentReplies", fields: [parent_comment_id], references: [id], onDelete: Cascade)
+  replies           SermonComment[] @relation("SermonCommentReplies")
+  sermon            Sermon          @relation(fields: [sermon_id], references: [id], onDelete: Cascade)
+
+  @@map("sermon_comments")
+}
+
+model SermonScripture {
+  id                  Int      @id @default(autoincrement())
+  sermon_id           Int
+  scripture_reference String   @db.VarChar(100)
+  display_order       Int?     @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  sermon              Sermon   @relation(fields: [sermon_id], references: [id], onDelete: Cascade)
+
+  @@map("sermon_scriptures")
+}
+
+model SermonSeries {
+  id                 Int       @id @default(autoincrement())
+  series_name        String    @unique @db.VarChar(150)
+  series_slug        String    @unique @db.VarChar(150)
+  series_description String?
+  series_image       String?   @db.VarChar(255)
+  start_date         DateTime? @db.Date
+  end_date           DateTime? @db.Date
+  is_active          Boolean?  @default(true)
+  created_at         DateTime  @default(now()) @db.Timestamp(0)
+
+  @@map("sermon_series")
+}
+
+model SmsLog {
+  sms_id              Int       @id @default(autoincrement())
+  message_id          Int?
+  recipient_phone     String    @db.VarChar(20)
+  message_content     String
+  status              String?   @default("pending")
+  provider            String?   @db.VarChar(50)
+  provider_message_id String?   @db.VarChar(255)
+  cost                Decimal?  @db.Decimal(10, 4)
+  error_message       String?
+  sent_at             DateTime? @db.Timestamp(0)
+  delivered_at        DateTime? @db.Timestamp(0)
+  created_at          DateTime  @default(now()) @db.Timestamp(0)
+
+  @@map("sms_logs")
+}
+
+model SocialMediaAccount {
+  id                 Int               @id @default(autoincrement())
+  platform           SocialPlatform    @unique
+  account_name       String?           @db.VarChar(255)
+  account_id         String?           @db.VarChar(255)
+  account_username   String?           @db.VarChar(255)
+  access_token       String?
+  refresh_token      String?
+  token_expires_at   DateTime?         @db.Timestamp(0)
+  is_connected       Boolean?          @default(false)
+  connection_status  ConnectionStatus? @default(disconnected)
+  followers_count    Int?              @default(0)
+  following_count    Int?              @default(0)
+  engagement_count   Int?              @default(0)
+  engagement_rate    Decimal?          @default(0.00) @db.Decimal(5, 2)
+  posts_count        Int?              @default(0)
+  additional_metrics Json?
+  api_credentials    Json?
+  last_sync_at       DateTime?         @db.Timestamp(0)
+  last_updated       DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+  created_at         DateTime          @default(now()) @db.Timestamp(0)
+
+  @@map("social_media_accounts")
+}
+
+model SocialMediaAnalytics {
+  id               Int            @id @default(autoincrement())
+  platform         SocialPlatform
+  date             DateTime       @db.Date
+  followers_count  Int?           @default(0)
+  new_followers    Int?           @default(0)
+  unfollowers      Int?           @default(0)
+  engagement_count Int?           @default(0)
+  engagement_rate  Decimal?       @default(0.00) @db.Decimal(5, 2)
+  posts_count      Int?           @default(0)
+  reach            Int?           @default(0)
+  impressions      Int?           @default(0)
+  profile_views    Int?           @default(0)
+  website_clicks   Int?           @default(0)
+  top_post_id      Int?
+  metrics_data     Json?
+  created_at       DateTime       @default(now()) @db.Timestamp(0)
+
+  @@unique([platform, date], map: "platform_date")
+  @@map("social_media_analytics")
+}
+
+model SocialMediaCampaign {
+  id               Int             @id @default(autoincrement())
+  campaign_name    String          @db.VarChar(255)
+  description      String?
+  platforms        Json
+  start_date       DateTime        @db.Date
+  end_date         DateTime?       @db.Date
+  budget           Decimal?        @default(0.00) @db.Decimal(10, 2)
+  goals            Json?
+  hashtags         String?
+  target_audience  Json?
+  status           CampaignStatus? @default(draft)
+  total_posts      Int?            @default(0)
+  total_reach      Int?            @default(0)
+  total_engagement Int?            @default(0)
+  created_by       Int?
+  created_at       DateTime        @default(now()) @db.Timestamp(0)
+  updated_at       DateTime        @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("social_media_campaigns")
+}
+
+model SocialMediaInteraction {
+  id                 Int             @id @default(autoincrement())
+  platform           SocialPlatform
+  interaction_type   InteractionType
+  post_id            Int?
+  external_id        String?         @db.VarChar(255)
+  author_name        String?         @db.VarChar(255)
+  author_username    String?         @db.VarChar(255)
+  author_profile_url String?         @db.VarChar(500)
+  content            String
+  parent_id          Int?
+  sentiment          Sentiment?      @default(unknown)
+  is_read            Boolean?        @default(false)
+  is_replied         Boolean?        @default(false)
+  reply_content      String?
+  replied_at         DateTime?       @db.Timestamp(0)
+  replied_by         Int?
+  created_at         DateTime        @default(now()) @db.Timestamp(0)
+
+  @@map("social_media_interactions")
+}
+
+model SocialMediaPost {
+  id               Int            @id @default(autoincrement())
+  platform         SocialPlatform
+  post_type        PostType?      @default(text)
+  content          String
+  media_paths      Json?
+  hashtags         String?
+  mentions         String?
+  post_url         String?        @db.VarChar(500)
+  external_post_id String?        @db.VarChar(255)
+  likes_count      Int?           @default(0)
+  comments_count   Int?           @default(0)
+  shares_count     Int?           @default(0)
+  views_count      Int?           @default(0)
+  reach            Int?           @default(0)
+  impressions      Int?           @default(0)
+  engagement_rate  Decimal?       @default(0.00) @db.Decimal(5, 2)
+  status           PostStatus?    @default(draft)
+  error_message    String?
+  scheduled_at     DateTime?      @db.Timestamp(0)
+  published_at     DateTime?      @db.Timestamp(0)
+  created_by       Int?
+  last_updated     DateTime       @default(now()) @updatedAt @db.Timestamp(0)
+  created_at       DateTime       @default(now()) @db.Timestamp(0)
+
+  @@map("social_media_posts")
+}
+
+model Tithe {
+  tithe_id       Int           @id @default(autoincrement())
+  transaction_id String        @unique @db.VarChar(50)
+  member_id      Int?
+  date           DateTime      @db.Date
+  amount         Decimal       @db.Decimal(10, 2)
+  payment_method PaymentMethod
+  receipt_number String?       @db.VarChar(50)
+  notes          String?
+  status         TitheStatus?  @default(Paid)
+  receipt_url    String?       @db.VarChar(255)
+  created_at     DateTime      @default(now()) @db.Timestamp(0)
+  updated_at     DateTime      @default(now()) @updatedAt @db.Timestamp(0)
+  member         Member?       @relation(fields: [member_id], references: [member_id])
+
+  @@map("tithes")
+}
+
+model User {
+  id              Int        @id @default(autoincrement())
+  first_name      String     @db.VarChar(50)
+  last_name       String     @db.VarChar(50)
+  email           String     @unique @db.VarChar(100)
+  profile_picture String?    @db.VarChar(255)
+  password        String     @db.VarChar(255)
+  role            UserRole?  @default(user)
+  created_at      DateTime   @default(now()) @db.Timestamp(0)
+  updated_at      DateTime   @default(now()) @updatedAt @db.Timestamp(0)
+  is_active       Boolean?   @default(true)
+  remember_token  String?    @db.VarChar(100)
+  blogViews       BlogView[]
+  comments        Comment[]
+
+  @@map("users")
+}
+
+model Visitor {
+  visitor_id          Int             @id @default(autoincrement())
+  name                String          @db.VarChar(100)
+  phone               String          @unique @db.VarChar(20)
+  email               String?         @db.VarChar(100)
+  source              VisitorSource?
+  visitors_purpose    String?         @db.VarChar(255)
+  follow_up_status    FollowUpStatus? @default(pending)
+  follow_up_date      DateTime?       @db.Date
+  follow_up_notes     String?
+  assigned_to         String?         @db.VarChar(100)
+  visit_count         Int?            @default(1)
+  last_visit_date     DateTime?       @db.Timestamp(0)
+  converted_to_member Boolean?        @default(false)
+  created_at          DateTime        @default(now()) @db.Timestamp(0)
+  updated_at          DateTime        @default(now()) @updatedAt @db.Timestamp(0)
+  attendance          Attendance[]
+  followups           VisitorFollowup[]
+
+  @@map("visitors")
+}
+
+model VisitorFollowup {
+  id                 Int      @id @default(autoincrement())
+  visitor_id         Int
+  followup_date      DateTime @default(now()) @db.Date
+  contact_method     String?  @db.VarChar(50)
+  notes              String?
+  outcome            String?  @db.VarChar(100)
+  next_followup_date DateTime? @db.Date
+  created_by         String?  @db.VarChar(100)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+  visitor            Visitor  @relation(fields: [visitor_id], references: [visitor_id], onDelete: Cascade)
+
+  @@map("visitor_followups")
+}
+
+model WelcomeAction {
+  action_id          Int      @id @default(autoincrement())
+  member_id          Int
+  send_welcome_email Boolean? @default(false)
+  notify_pastor      Boolean? @default(false)
+  create_account     Boolean? @default(false)
+  member             Member   @relation(fields: [member_id], references: [member_id], onDelete: Cascade)
+
+  @@map("welcome_actions")
+}
+
+model WelfareContribution {
+  welfare_id     Int                  @id @default(autoincrement())
+  transaction_id String               @unique @db.VarChar(50)
+  member_id      Int?
+  date           DateTime             @db.Date
+  amount         Decimal              @db.Decimal(10, 2)
+  payment_method PaymentMethod
+  payment_period WelfarePaymentPeriod
+  notes          String?
+  status         TitheStatus?         @default(Paid)
+  receipt_url    String?              @db.VarChar(255)
+  created_at     DateTime             @default(now()) @db.Timestamp(0)
+  updated_at     DateTime             @default(now()) @updatedAt @db.Timestamp(0)
+  member         Member?              @relation(fields: [member_id], references: [member_id])
+
+  @@map("welfare_contributions")
+}
+
+model Withdrawal {
+  id             Int      @id @default(autoincrement())
+  transaction_id String   @unique @db.VarChar(50)
+  account_type   String   @db.VarChar(50)
+  amount         Decimal  @db.Decimal(10, 2)
+  recipient      String   @db.VarChar(255)
+  purpose        String   @db.VarChar(255)
+  authorized_by  String   @db.VarChar(255)
+  date           DateTime @db.Date
+  notes          String?
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("withdrawals")
+}
+
+enum ActivityType {
+  member_added
+  donation_recorded
+  event_scheduled
+  message_sent
+  birthday_today
+  other
+}
+
+enum AttendanceStatus {
+  present
+  visitor
+}
+
+enum TokenStatus {
+  active
+  expired
+}
+
+enum BlogStatus {
+  draft
+  published
+}
+
+enum CommunicationSettingType {
+  email
+  sms
+  general
+}
+
+enum ContentType {
+  post
+  story
+  reel
+  video
+  event
+  announcement
+}
+
+enum ContentStatus {
+  draft
+  pending
+  planned
+  approved
+  scheduled
+  published
+  cancelled
+}
+
+enum DepartmentName {
+  None
+  Usher
+  Choir
+  Media
+  Instrumentalist
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum MaritalStatus {
+  Single
+  Married
+  Divorced
+  Widowed
+}
+
+enum MemberStatus {
+  Active
+  Inactive
+}
+
+enum ChurchGroup {
+  Dunamis
+  Kabod
+  Judah
+  Karis
+}
+
+enum LeadershipRole {
+  None
+  Pastor
+  Minister
+  Group_leader @map("Group leader")
+}
+
+enum BaptismStatus {
+  Baptized
+  Not_baptized @map("Not baptized")
+  Pending
+}
+
+enum SpiritualGrowth {
+  New_believer @map("New believer")
+  Growing
+  Committed
+  Leader
+}
+
+enum MembershipType {
+  Full_Member      @map("Full Member")
+  Associate_Member @map("Associate Member")
+  Visitor
+}
+
+enum EmailStatus {
+  pending
+  sent
+  failed
+  bounced
+  opened
+  clicked
+}
+
+enum EventType {
+  Service
+  Bible_study @map("Bible-study")
+  Prayer
+  Conference
+  Retreat
+  Outreach
+  Training
+  Fundraiser
+  Celebration
+  Meeting
+  Social
+  Other
+}
+
+enum EventCategory {
+  Worship
+  Youth
+  Women
+  Men
+  Education
+  Missions
+  Choir
+  Fellowship
+  Admin
+  Media
+  Community
+  Other
+}
+
+enum AgeGroup {
+  All
+  Children
+  Youth
+  Young_adults @map("Young-adults")
+  Adults
+  Seniors
+}
+
+enum EventStatus {
+  Draft
+  Published
+  Cancelled
+}
+
+enum ExpenseCategory {
+  Utilities
+  Maintenance
+  Salaries
+  Supplies
+  Events
+  Transportation
+  Other
+}
+
+enum PaymentMethod {
+  Cash
+  Mobile_Money  @map("Mobile Money")
+  Bank_Transfer @map("Bank Transfer")
+  Cheque
+  Mixed
+}
+
+enum ExpenseStatus {
+  Approved
+  Pending
+  Rejected
+}
+
+enum GalleryCategory {
+  worship
+  events
+  youth
+  missions
+  celebrations
+  community
+  baptism
+  other
+}
+
+enum GalleryStatus {
+  draft
+  published
+}
+
+enum MediaType {
+  photo
+  video
+}
+
+enum MessageType {
+  announcement
+  event
+  prayer_request
+  newsletter
+  birthday
+  general
+}
+
+enum DeliveryChannel {
+  email
+  sms
+  push
+}
+
+enum GroupType {
+  static
+  dynamic
+}
+
+enum RecipientType {
+  member
+  visitor
+  custom
+}
+
+enum MinistryName {
+  Children
+  Women
+  Men
+  Youth
+}
+
+enum ServiceType {
+  Sunday_Worship           @map("Sunday Worship")
+  Wednesday_Service        @map("Wednesday Service")
+  Prayer_Meeting           @map("Prayer Meeting")
+  Special_Offering         @map("Special Offering")
+  Special_Project_Offering @map("Special Project Offering")
+}
+
+enum VideoType {
+  file
+  url
+}
+
+enum SermonActionType {
+  view
+  download_video
+  download_audio
+  download_pdf
+  like
+  share
+}
+
+enum Recurrence {
+  none
+  daily
+  weekly
+  monthly
+}
+
+enum SocialPlatform {
+  facebook
+  instagram
+  twitter
+  youtube
+  tiktok
+  linkedin
+}
+
+enum ConnectionStatus {
+  active
+  expired
+  error
+  disconnected
+}
+
+enum CampaignStatus {
+  draft
+  active
+  paused
+  completed
+  cancelled
+}
+
+enum InteractionType {
+  comment
+  reply
+  message
+  mention
+  tag
+}
+
+enum Sentiment {
+  positive
+  neutral
+  negative
+  unknown
+}
+
+enum PostType {
+  text
+  image
+  video
+  carousel
+  reel
+  story
+  live
+  poll
+  event
+}
+
+enum PostStatus {
+  draft
+  scheduled
+  publishing
+  published
+  failed
+  deleted
+}
+
+enum TitheStatus {
+  Paid
+  Pending
+}
+
+enum UserRole {
+  admin
+  user
+  pastor
+}
+
+enum VisitorSource {
+  friend
+  social
+  online
+  event
+  other
+}
+
+enum FollowUpStatus {
+  pending
+  contacted
+  scheduled
+  completed
+  no_response @map("no_response")
+}
+
+enum WelfarePaymentPeriod {
+  Monthly
+  Quarterly
+  Annually
+}
