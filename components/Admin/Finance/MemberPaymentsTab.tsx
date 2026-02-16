@@ -236,7 +236,11 @@ export default function MemberPaymentsTab() {
                                                     className="suggestion-item"
                                                 >
                                                     {member.photo_path ? (
-                                                        <img src={`../Add_Members/${member.photo_path}`} alt={member.full_name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                        <img
+                                                            src={member.photo_path.startsWith('http') || member.photo_path.startsWith('/') ? member.photo_path : `/uploads/members/${member.photo_path}`}
+                                                            alt={member.full_name}
+                                                            style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }}
+                                                        />
                                                     ) : (
                                                         <div style={{ width: '36px', height: '36px', background: '#3b82f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 600, fontSize: '13px' }}>
                                                             {getInitials(member.full_name)}
@@ -324,7 +328,11 @@ export default function MemberPaymentsTab() {
                                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                         <div style={{ width: '60px', height: '60px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', overflow: 'hidden' }}>
                                             {history.member_info.photo_path ? (
-                                                <img src={`../Add_Members/${history.member_info.photo_path}`} alt={history.member_info.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img
+                                                    src={history.member_info.photo_path.startsWith('http') || history.member_info.photo_path.startsWith('/') ? history.member_info.photo_path : `/uploads/members/${history.member_info.photo_path}`}
+                                                    alt={history.member_info.full_name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             ) : (
                                                 <span style={{ fontSize: '24px', fontWeight: 600 }}>{getInitials(history.member_info.full_name)}</span>
                                             )}

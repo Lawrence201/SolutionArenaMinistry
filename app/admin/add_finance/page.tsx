@@ -17,8 +17,8 @@ const MemberAvatar = ({ member }: { member: Member }) => {
     const [error, setError] = useState(false);
     // Logic: If photo exists and didn't error, show it. Otherwise fall back to initials.
     if (member.photo_path && member.photo_path !== 'NULL' && !error) {
-        // Handle paths that might already be absolute (start with /)
-        const imgSrc = member.photo_path.startsWith('/')
+        // Handle paths that might already be absolute or external
+        const imgSrc = (member.photo_path.startsWith('/') || member.photo_path.startsWith('http'))
             ? member.photo_path
             : `/uploads/members/${member.photo_path}`;
 

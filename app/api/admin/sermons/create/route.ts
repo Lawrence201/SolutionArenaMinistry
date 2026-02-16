@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { prisma } from '@/lib/prisma';
-
+import { saveFile } from '@/lib/storage';
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,30 +19,6 @@ export async function POST(request: NextRequest) {
 
         const getBool = (key: string) => {
             return formData.get(key) === '1';
-        };
-
-        const saveFile = async (file: File | null, subDir: string) => {
-            if (!file) return null;
-
-            const buffer = Buffer.from(await file.arrayBuffer());
-            // Create "unique" filename: timestamp_sanitizedName
-            const timestamp = Date.now();
-            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const filename = `${timestamp}_${sanitizedName}`;
-
-            // Define paths
-            // Saving to public/uploads/... so they are accessible
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads', subDir);
-
-            // Ensure directory exists
-            await mkdir(uploadDir, { recursive: true });
-
-            // Write file
-            const filePath = path.join(uploadDir, filename);
-            await writeFile(filePath, buffer);
-
-            // Return relative path for DB
-            return `/uploads/${subDir}/${filename}`;
         };
 
         // --- Validation ---

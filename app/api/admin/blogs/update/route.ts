@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { saveFile, deleteFile } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import { join } from 'path';
 import { BlogStatus } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -38,27 +37,14 @@ export async function POST(request: NextRequest) {
 
         // Helper to save file and cleanup old
         const handleFileReplacement = async (file: File | null, oldPath: string | null, subDir: string) => {
-            if (!file || typeof file === 'string') return oldPath;
+            if (!file || typeof file === 'string' || file.size === 0) return oldPath;
 
             // Delete old file if exists
             if (oldPath) {
-                try {
-                    const fullPath = join(process.cwd(), 'public', oldPath);
-                    await unlink(fullPath);
-                } catch (err) {
-                    console.warn(`Failed to delete old file ${oldPath}:`, err);
-                }
+                await deleteFile(oldPath);
             }
 
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const uploadDir = join(process.cwd(), 'public', 'uploads', subDir);
-            await mkdir(uploadDir, { recursive: true });
-
-            const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-            const filePath = join(uploadDir, uniqueName);
-            await writeFile(filePath, buffer);
-
-            return `/uploads/${subDir}/${uniqueName}`;
+            return await saveFile(file, subDir);
         };
 
         const title = getString('title') || existingBlog.title;

@@ -1,9 +1,6 @@
-'use server';
-
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { unlink } from 'fs/promises';
-import { join } from 'path';
+import { deleteFile } from '@/lib/storage';
 
 export async function deleteMember(memberId: number) {
     try {
@@ -22,28 +19,11 @@ export async function deleteMember(memberId: number) {
             where: { member_id: memberId },
         });
 
-        // 3. Delete files from filesystem
-        const errors: string[] = [];
-
-        if (member.photo_path && member.photo_path.startsWith('/uploads/')) {
-            try {
-                const absolutePath = join(process.cwd(), 'public', member.photo_path);
-                await unlink(absolutePath);
-            } catch (err) {
-                console.error(`Failed to delete photo: ${member.photo_path}`, err);
-                errors.push(`Failed to delete photo file`);
-            }
-        }
-
-        if (member.birthday_thumb && member.birthday_thumb.startsWith('/uploads/')) {
-            try {
-                const absolutePath = join(process.cwd(), 'public', member.birthday_thumb);
-                await unlink(absolutePath);
-            } catch (err) {
-                console.error(`Failed to delete birthday thumb: ${member.birthday_thumb}`, err);
-                errors.push(`Failed to delete birthday flyer`);
-            }
-        }
+        // 3. Delete files using the storage abstraction
+        await Promise.all([
+            deleteFile(member.photo_path),
+            deleteFile(member.birthday_thumb)
+        ]);
 
         // 4. Revalidate path
         revalidatePath('/admin/members');
@@ -51,8 +31,7 @@ export async function deleteMember(memberId: number) {
 
         return {
             success: true,
-            message: 'Member and associated data deleted successfully',
-            warnings: errors.length > 0 ? errors : undefined
+            message: 'Member and associated data deleted successfully'
         };
 
     } catch (error: any) {

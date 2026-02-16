@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { existsSync } from 'fs';
+import { saveFile } from '@/lib/storage';
 
 // Validation helpers
 function isValidEmail(email: string): boolean {
@@ -174,43 +172,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Handle file uploads
-        let photoPath: string | null = null;
-        let birthdayThumbPath: string | null = null;
-
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'members');
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
-
-        if (photoFile && photoFile.size > 0) {
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            const maxSize = 2 * 1024 * 1024; // 2MB
-
-            if (!allowedTypes.includes(photoFile.type)) {
-                return NextResponse.json({ success: false, message: 'Invalid photo file type. Only JPG, PNG, or GIF allowed.' }, { status: 400 });
-            }
-
-            // Size limit removed as per user request
-            // if (photoFile.size > maxSize) { ... }
-
-            const ext = photoFile.name.split('.').pop();
-            const fileName = `profile_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-            const filePath = path.join(uploadDir, fileName);
-
-            const bytes = await photoFile.arrayBuffer();
-            await writeFile(filePath, Buffer.from(bytes));
-            photoPath = `/uploads/members/${fileName}`;
-        }
-
-        if (birthdayThumbFile && birthdayThumbFile.size > 0) {
-            const ext = birthdayThumbFile.name.split('.').pop();
-            const fileName = `birthday_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-            const filePath = path.join(uploadDir, fileName);
-
-            const bytes = await birthdayThumbFile.arrayBuffer();
-            await writeFile(filePath, Buffer.from(bytes));
-            birthdayThumbPath = `/uploads/members/${fileName}`;
-        }
+        const photoPath = await saveFile(photoFile, 'members');
+        const birthdayThumbPath = await saveFile(birthdayThumbFile, 'members');
 
         // Create member with transaction
         const result = await prisma.$transaction(async (tx: any) => {

@@ -1,10 +1,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { saveFile } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { BlogStatus } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -21,24 +20,6 @@ export async function POST(request: NextRequest) {
         const getBool = (key: string) => {
             const val = formData.get(key);
             return val === 'true' || val === '1' || val === 'on';
-        };
-
-        // Helper to save file
-        const saveFile = async (file: File | null, subDir: string) => {
-            if (!file) return null;
-
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const uploadDir = join(process.cwd(), 'public', 'uploads', subDir);
-
-            // Ensure directory exists
-            await mkdir(uploadDir, { recursive: true });
-
-            const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-            const filePath = join(uploadDir, uniqueName);
-
-            await writeFile(filePath, buffer);
-
-            return `/uploads/${subDir}/${uniqueName}`;
         };
 
         // Helper to generate unique slug

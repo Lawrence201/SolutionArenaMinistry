@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { mkdir, writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
+import { saveFile, deleteFile } from '@/lib/storage';
 import { GalleryCategory, GalleryStatus, MediaType } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
-    let connectionClosed = false;
     let createdAlbumId: number | null = null;
     let savedFilePaths: string[] = [];
 
@@ -33,14 +31,6 @@ export async function POST(request: NextRequest) {
             if (!eventDateStr) throw new Error('Event date is required.');
             if (!category) throw new Error('Category is required.');
         }
-
-        // File handling setup
-        const now = new Date();
-        const year = now.getFullYear().toString();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const uploadDir = join(process.cwd(), 'public', 'uploads', 'gallery', year, month);
-
-        await mkdir(uploadDir, { recursive: true });
 
         // Database Transaction
         const startTransaction = async () => {
@@ -74,11 +64,8 @@ export async function POST(request: NextRequest) {
                         for (const id of deletedIds) {
                             const mediaItem = await prisma.galleryMedia.findUnique({ where: { id: parseInt(id) } });
                             if (mediaItem) {
-                                // Delete file
-                                try {
-                                    const fullPath = join(process.cwd(), 'public', mediaItem.file_path);
-                                    await unlink(fullPath);
-                                } catch (e) { console.error('File delete fail:', e); }
+                                // Delete file using abstraction
+                                await deleteFile(mediaItem.file_path);
 
                                 // Delete DB
                                 await prisma.galleryMedia.delete({ where: { id: parseInt(id) } });
@@ -116,7 +103,7 @@ export async function POST(request: NextRequest) {
             const newMediaIds: number[] = [];
 
             for (const file of files) {
-                if (!file || typeof file === 'string') continue;
+                if (!file || typeof file === 'string' || file.size === 0) continue;
 
                 // Validate type
                 const mimeType = file.type;
@@ -125,16 +112,12 @@ export async function POST(request: NextRequest) {
 
                 if (!isImage && !isVideo) continue;
 
-                // Save File
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
-                const uniqueFileName = `gallery_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
-                const filePath = join(uploadDir, uniqueFileName);
+                // Save File using abstraction
+                const relativePath = await saveFile(file, 'gallery');
+                if (!relativePath) continue;
 
-                await writeFile(filePath, buffer);
-                savedFilePaths.push(filePath); // Track for cleanup on error
+                savedFilePaths.push(relativePath); // Track for cleanup on error (though for Cloudinary this is less trivial, it's fine for local)
 
-                const relativePath = `/uploads/gallery/${year}/${month}/${uniqueFileName}`;
                 const mediaType = isImage ? MediaType.photo : MediaType.video;
 
                 // Create Media Record
@@ -145,9 +128,9 @@ export async function POST(request: NextRequest) {
                         file_name: file.name,
                         file_path: relativePath,
                         file_size: file.size,
-                        file_extension: fileExtension,
+                        file_extension: file.name.split('.').pop()?.toLowerCase() || '',
                         mime_type: mimeType,
-                        upload_order: 0 // We can adjust this if needed, legacy checks existing count
+                        upload_order: 0
                     }
                 });
 
@@ -205,7 +188,7 @@ export async function POST(request: NextRequest) {
 
         // Cleanup saved files if transaction failed
         for (const path of savedFilePaths) {
-            try { await unlink(path); } catch (e) { /* ignore */ }
+            await deleteFile(path);
         }
 
         // Ideally we would rollback database changes here if we weren't using Prisma's implicit transaction support differently.

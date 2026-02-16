@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import path from 'path';
 import { prisma } from '@/lib/prisma';
+import { saveFile, deleteFile } from '@/lib/storage';
 
 export async function POST(request: NextRequest) {
     try {
@@ -36,17 +35,7 @@ export async function POST(request: NextRequest) {
             return formData.get(key) === '1';
         };
 
-        const deleteFile = async (relativeBtnPath: string | null) => {
-            if (!relativeBtnPath || relativeBtnPath.startsWith('http')) return;
-            try {
-                const fullPath = path.join(process.cwd(), 'public', relativeBtnPath);
-                await unlink(fullPath);
-            } catch (error) {
-                console.error(`Failed to delete file: ${relativeBtnPath}`, error);
-            }
-        };
-
-        const saveFile = async (file: File | null, subDir: string, oldPath: string | null) => {
+        const saveFileWithCleanup = async (file: File | null, subDir: string, oldPath: string | null) => {
             if (!file || !(file instanceof File) || file.size === 0) return oldPath;
 
             // If we have a new file, delete the old one
@@ -54,18 +43,7 @@ export async function POST(request: NextRequest) {
                 await deleteFile(oldPath);
             }
 
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const timestamp = Date.now();
-            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const filename = `${timestamp}_${sanitizedName}`;
-
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads', subDir);
-            await mkdir(uploadDir, { recursive: true });
-
-            const filePath = path.join(uploadDir, filename);
-            await writeFile(filePath, buffer);
-
-            return `/uploads/${subDir}/${filename}`;
+            return await saveFile(file, subDir);
         };
 
         // --- Validation ---
@@ -86,7 +64,7 @@ export async function POST(request: NextRequest) {
         if (videoType === 'file') {
             const file = formData.get('videoFile');
             if (file instanceof File && file.size > 0) {
-                videoFilePath = await saveFile(file, 'videos', existingSermon.video_file);
+                videoFilePath = await saveFileWithCleanup(file, 'videos', existingSermon.video_file);
             }
         } else {
             // If switched to URL, delete old video file if it existed
@@ -96,9 +74,9 @@ export async function POST(request: NextRequest) {
             videoFilePath = videoUrl;
         }
 
-        const audioFilePath = await saveFile(formData.get('audioFile') as File, 'audio', existingSermon.audio_file);
-        const pdfFilePath = await saveFile(formData.get('pdfFile') as File, 'pdfs', existingSermon.pdf_file);
-        const imageFilePath = await saveFile(formData.get('sermonImage') as File, 'images', existingSermon.sermon_image);
+        const audioFilePath = await saveFileWithCleanup(formData.get('audioFile') as File, 'audio', existingSermon.audio_file);
+        const pdfFilePath = await saveFileWithCleanup(formData.get('pdfFile') as File, 'pdfs', existingSermon.pdf_file);
+        const imageFilePath = await saveFileWithCleanup(formData.get('sermonImage') as File, 'images', existingSermon.sermon_image);
 
         // --- Data Preparation ---
         let series = getString('sermonSeries');
