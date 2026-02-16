@@ -5,6 +5,14 @@ import { revalidatePath } from 'next/cache';
 import { GalleryCategory, GalleryStatus, MediaType } from '@prisma/client';
 import { saveFile, deleteFile } from '@/lib/storage';
 
+// --- Types ---
+
+export type GalleryFilters = {
+    view?: 'all' | 'albums' | 'photos' | 'videos';
+    category?: string;
+    search?: string;
+};
+
 // --- Server Actions ---
 
 /**
