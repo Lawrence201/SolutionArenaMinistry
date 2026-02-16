@@ -1,0 +1,117 @@
+/* Legacy Preloader Styles - Global Scope needed for compatibility */
+:global(.preloader) {
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2147483647 !important;
+    /* Absolute highest possible z-index to overlay everything */
+    background-color: #fff;
+    /* Ensure white background */
+    transition: all cubic-bezier(0.785, 0.135, 0.15, 0.86) 1s;
+    overflow: hidden;
+}
+
+:global(.preloader .inner) {
+    display: inline-block;
+    position: relative;
+    z-index: 10;
+    animation-name: preloader-inner;
+    animation-duration: 0.8s;
+    transition: all ease 0.8s;
+}
+
+:global(.preloader .inner figure) {
+    width: 200px !important;
+    height: 200px !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0 !important;
+    top: 0 !important;
+    margin-bottom: 0;
+}
+
+:global(.preloader .inner figure img) {
+    width: 135px !important;
+    /* Legacy logo size */
+    height: 135px !important;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+:global(.preloader .inner small) {
+    width: 100%;
+    display: block;
+    color: #fff;
+    /* Ensure visibility */
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+:global(.preloader .inner .progress-bar) {
+    background: none;
+}
+
+:global(.preloader svg) {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    fill: #355a8b;
+    /* Legacy preloader color from color.css */
+}
+
+:global(.preloader svg path) {
+    animation-name: preloader-svg;
+    -webkit-animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    animation-duration: 0.7s;
+    animation-play-state: paused;
+    animation-fill-mode: forwards;
+}
+
+@keyframes preloader-svg {
+    0% {
+        d: path("m244.333332,38.437499c26.666664,-1.666666 125.666662,0.999995 195.333325,50.33333c69.666663,49.333335 -39.666664,141.666664 -70.666664,174.229164c-31,32.5625 -176.999993,107.437507 -234.999993,76.437507c-58,-31 73.666665,-107.000001 49,-190.4375c-24.666665,-83.437499 34.666668,-108.895835 61.333332,-110.562501z");
+    }
+
+    100% {
+        d: path("m244.333332,38.437499c58.666669,50.333342 24.666647,101.000011 94.33331,150.333346c69.666663,49.333335 71.333353,156.666666 14.333349,175.229163c-57.000004,18.562498 -160.999991,6.437492 -218.999991,-24.562508c-58,-31 -109.333363,-174.000012 -70.000018,-236.437507c39.333345,-62.437496 121.666681,-114.895836 180.33335,-64.562494z");
+    }
+}
+
+@media (max-width: 480px) {
+    :global(.preloader .inner figure img) {
+        width: 110px !important;
+        height: 110px !important;
+    }
+}
+
+/* Page Loaded Transitions */
+:global(.page-loaded.preloader) {
+    top: 100% !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 1s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+:global(.page-loaded.preloader svg path) {
+    animation-play-state: running !important;
+}
+
+:global(.page-loaded.preloader .inner) {
+    transform: translateY(50px);
+    opacity: 0;
+}

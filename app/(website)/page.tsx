@@ -12,9 +12,14 @@ import UpcomingEvents from "@/components/website/UpcomingEvents";
 import { RecentBlogs, MapSection } from "@/components/website/BlogAndMap";
 import Footer from "@/components/website/Footer";
 
+import WelcomeModal from "@/components/website/WelcomeModal";
+import Preloader from "@/components/website/Preloader";
+
 export default function WebsiteHomePage() {
     return (
         <main className="website-page">
+            <Preloader />
+            <WelcomeModal />
             <Header />
             <Hero />
             <Fellowship />
@@ -26,12 +31,6 @@ export default function WebsiteHomePage() {
             <RecentBlogs />
             <MapSection />
             <Footer />
-
-            {/* 
-        NOTE: Dynamic content loading scripts (JS) and modal initialization 
-        will be handled in the next step to ensure full functionality.
-        The UI layout is now exactly mirrored from the legacy code.
-      */}
         </main>
     );
 }

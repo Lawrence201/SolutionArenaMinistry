@@ -138,7 +138,7 @@ export default function GalleryClient() {
         try {
             const result = await getGalleryInsights();
             if (result.success) {
-                setInsights(result.data);
+                setInsights(result.data || []);
             }
         } catch (error) {
             console.error('Error loading insights', error);

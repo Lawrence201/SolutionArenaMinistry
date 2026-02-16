@@ -18,7 +18,7 @@ export default async function EventsPage() {
         <div className="min-h-screen bg-gray-50">
             <Suspense fallback={<div className="p-8 text-center">Loading Events Management...</div>}>
                 <EventsClient
-                    initialEvents={eventsData.success ? eventsData.data.events : []}
+                    initialEvents={eventsData.success ? eventsData.data?.events ?? [] : []}
                     initialMetrics={metricsData.success ? metricsData.data : {
                         total_events: 0,
                         upcoming_events: 0,

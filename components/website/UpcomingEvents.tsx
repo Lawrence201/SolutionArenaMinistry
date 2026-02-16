@@ -226,6 +226,14 @@ const UpcomingEvents = () => {
                     font-size: 32px;
                 }
             }
+            @media (max-width: 480px) {
+                .events-carousal .heading h2 {
+                    font-size: 28px !important;
+                }
+                .events-carousal .heading p {
+                    font-size: 14px !important;
+                }
+            }
           `}} />
                 </div>
                 <div className="events-carousal-slider" id="eventsCarouselContainer">
