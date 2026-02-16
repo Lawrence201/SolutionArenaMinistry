@@ -21,14 +21,16 @@ const getDatabaseUrl = () => {
     return url;
 };
 
+const databaseUrl = getDatabaseUrl();
+
 export const prisma =
     globalForPrisma.prisma ??
     new PrismaClient({
-        datasources: {
+        datasources: databaseUrl ? {
             db: {
-                url: getDatabaseUrl(),
+                url: databaseUrl,
             },
-        },
+        } : undefined,
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     });
 
