@@ -122,7 +122,7 @@ const HomeAbout = () => {
                                 </div>
                             </div>
                             <div>
-                                <img className="img-fluid w-100" src="/assets/images/Img-2.JPG" alt="About Image"
+                                <img className="img-fluid w-100" src="/assets/images/rev_1.jpeg" alt="About Image"
                                     style={{ width: "640px", height: "500px", objectFit: "cover", display: "block", maxHeight: "100%", objectPosition: "top" }} />
                                 <div className="slider-data">
                                     <h2 className="text-white">God is with you, wherever you may be and whatever you may choose
