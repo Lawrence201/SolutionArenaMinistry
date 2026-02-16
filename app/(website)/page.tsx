@@ -4,6 +4,7 @@ import React from "react";
 import Header from "@/components/website/Header";
 import Hero from "@/components/website/Hero";
 import Fellowship from "@/components/website/Fellowship";
+import HomeAbout from "@/components/website/HomeAbout";
 import RecentSermons from "@/components/website/RecentSermons";
 import DigitalMinistry from "@/components/website/DigitalMinistry";
 import LiveStream from "@/components/website/LiveStream";
@@ -23,6 +24,7 @@ export default function WebsiteHomePage() {
             <Header />
             <Hero />
             <Fellowship />
+            <HomeAbout />
             <RecentSermons />
             <DigitalMinistry />
             <LiveStream />
