@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/emailHandler";
 import { sendSMS } from "@/lib/smsHandler";
 
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const { searchParams } = new URL(req.url);
 
         switch (slug) {
@@ -31,9 +32,10 @@ export async function GET(req: NextRequest, { params }: { params: { slug?: strin
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const data = await req.json();
 
         switch (slug) {
@@ -59,9 +61,10 @@ export async function POST(req: NextRequest, { params }: { params: { slug?: stri
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const id = new URL(req.url).searchParams.get('id');
         if (!id) return NextResponse.json({ success: false, message: "ID required" }, { status: 400 });
         if (slug === 'groups') await prisma.messageGroup.delete({ where: { group_id: parseInt(id) } });

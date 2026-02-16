@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const { searchParams } = new URL(req.url);
         const range = searchParams.get('range') || 'month';
         const start = searchParams.get('start_date') ? new Date(searchParams.get('start_date')!) : new Date();
@@ -46,9 +47,10 @@ export async function GET(req: NextRequest, { params }: { params: { slug?: strin
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const body = await req.json();
         switch (slug) {
             case 'tithes': {
@@ -68,9 +70,10 @@ export async function POST(req: NextRequest, { params }: { params: { slug?: stri
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const id = new URL(req.url).searchParams.get('id');
         const body = await req.json();
         if (!id) return NextResponse.json({ success: false, message: "ID required" }, { status: 400 });
@@ -84,9 +87,10 @@ export async function PUT(req: NextRequest, { params }: { params: { slug?: strin
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const id = new URL(req.url).searchParams.get('id');
         if (!id) return NextResponse.json({ success: false, message: "ID required" }, { status: 400 });
         switch (slug) {

@@ -6,10 +6,10 @@ import { prisma } from '@/lib/prisma';
  * Handles all public-facing website API requests to stay within Vercel Hobby plan limits.
  */
 
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slugArr = params.slug || [];
-        const slug = slugArr.join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).filter(Boolean).join('/');
         const { searchParams } = new URL(req.url);
 
         switch (slug) {
@@ -111,14 +111,14 @@ export async function GET(req: NextRequest, { params }: { params: { slug?: strin
                     prisma.event.count({ where: { status: 'Published' } }),
                     prisma.sermon.count({ where: { is_published: true } }),
                     prisma.event.count({ where: { status: 'Published', start_date: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } }),
-                    prisma.$queryRaw`SELECT COUNT(*)::int as count FROM members WHERE EXTRACT(MONTH FROM date_of_birth) = ${now.getMonth() + 1} AND date_of_birth IS NOT NULL` as { count: number }[]
-                ]);
+                    (await prisma.$queryRaw`SELECT COUNT(*)::int as count FROM members WHERE EXTRACT(MONTH FROM date_of_birth) = ${now.getMonth() + 1} AND date_of_birth IS NOT NULL`) as any
+                ]) as [number, number, number, { count: number }[]];
                 return NextResponse.json({ success: true, data: { total_events: totalEvents, total_sermons: totalSermons, birthdays_this_month: birthdaysResult[0]?.count || 0, upcoming_events: upcomingEvents } });
             }
 
             case 'audio-playlist': {
                 const sermons = await prisma.sermon.findMany({
-                    where: { is_published: true, audio_file: { not: null, not: '' } },
+                    where: { is_published: true, AND: [{ audio_file: { not: null } }, { audio_file: { not: '' } }] },
                     orderBy: [{ is_featured: 'desc' }, { sermon_date: 'desc' }],
                     take: 5,
                 });
@@ -206,10 +206,10 @@ export async function GET(req: NextRequest, { params }: { params: { slug?: strin
     }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slugArr = params.slug || [];
-        const slug = slugArr.join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).filter(Boolean).join('/');
 
         switch (slug) {
             case 'gallery/like': {
