@@ -1,0 +1,318 @@
+.pastorMeta {
+    position: relative;
+    padding-bottom: 55px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+}
+
+.pastorDetailSection {
+    padding: 160px 0 120px;
+}
+
+.pastorInfoWrapper {
+    padding: 0 40px;
+}
+
+.featuredImg {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+}
+
+.pastorImg {
+    width: 100%;
+    max-width: 440px;
+    border-radius: 10px;
+    border: 13px solid white;
+    margin-top: -320px;
+    margin-left: 100px;
+    position: relative;
+    display: block;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.nameSection {
+    margin-top: 30px;
+}
+
+.pastorName {
+    display: flex;
+    flex-direction: column;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+.prefix {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.mainName {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 40px;
+    align-items: center;
+}
+
+.designation {
+    font-size: 16px;
+    color: #355a8b;
+    font-weight: 600;
+    margin: 0;
+}
+
+.socialList {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.socialList li {
+    display: flex;
+    align-items: center;
+}
+
+.socialList li:not(:last-child):after {
+    content: "|";
+    margin-left: 10px;
+    color: #333;
+    font-weight: 900;
+}
+
+.socialList a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.socialList a svg {
+    fill: #3d3d3d;
+    width: 20px;
+    height: 18px;
+    transition: fill 0.3s ease;
+}
+
+.socialList a:hover svg {
+    fill: #355a8b;
+}
+
+.contactList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    font-size: 19px;
+    color: #666;
+}
+
+.contactItem svg {
+    margin-right: 15px;
+    fill: #355a8b;
+    width: 28px;
+}
+
+.contactText {
+    margin: 0;
+}
+
+@media (max-width: 1200px) {
+    .mainName {
+        font-size: 42px !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    .pastorImg {
+        margin-top: -270px !important;
+        margin-left: 80px !important;
+        max-width: 400px !important;
+    }
+}
+
+@media (max-width: 991px) {
+    .infoGrid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pastorImg {
+        margin-top: -140px !important;
+        margin-left: 30px !important;
+        width: 60% !important;
+        max-width: 300px !important;
+        border-width: 7px !important;
+    }
+
+    .featuredImg {
+        height: 300px !important;
+    }
+
+    .pastorInfoWrapper {
+        padding: 0 20px !important;
+    }
+
+    .prefix {
+        font-size: 24px !important;
+    }
+
+    .mainName {
+        font-size: 32px !important;
+    }
+
+    .pastorName {
+        margin-bottom: 15px !important;
+    }
+
+    .pastorDetailSection {
+        padding: 180px 0 60px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .pastorImg {
+        margin-top: -100px !important;
+        margin-left: 10px !important;
+        width: 80% !important;
+    }
+
+    .featuredImg {
+        height: 250px !important;
+    }
+
+    .nameSection {
+        margin-top: 15px !important;
+    }
+
+    .pastorMeta {
+        padding-bottom: 30px !important;
+    }
+}
+
+/* Content Sections */
+.contentSection {
+    margin-top: 80px;
+    padding: 0 40px;
+}
+
+.sectionTitle {
+    font-size: 32px;
+    font-weight: 800;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+.infoText {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.skillsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px 30px;
+    margin-top: 30px;
+}
+
+.skillPill {
+    flex: 0 0 calc(50% - 15px);
+    background-color: #355a8b;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 991px) {
+    .skillPill {
+        flex: 0 0 100%;
+    }
+
+    .contentSection {
+        padding: 0 20px;
+    }
+}
+
+/* Checklist Styles */
+.checklist {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.checklistItem {
+    position: relative;
+    padding-left: 45px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 28px;
+    color: #666;
+    display: flex;
+    align-items: flex-start;
+}
+
+.checkIcon {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 28px;
+    height: 28px;
+    fill: #b1712a;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1200px) {
+    .pastorImg {
+        margin-left: 60px !important;
+        max-width: 450px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .contentSection {
+        margin-top: 40px !important;
+    }
+
+    .sectionTitle {
+        font-size: 26px !important;
+    }
+
+    .infoText {
+        font-size: 16px !important;
+    }
+
+    .checklistItem {
+        font-size: 16px !important;
+        padding-left: 40px !important;
+    }
+
+    .checkIcon {
+        width: 24px !important;
+        height: 24px !important;
+    }
+}

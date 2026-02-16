@@ -224,7 +224,7 @@ async function getRecipients(tx: any, data: any): Promise<any[]> {
                     }
                 }
             });
-            return memberMinistries.map(mm => mm.member).filter(Boolean);
+            return memberMinistries.map((mm: any) => mm.member).filter(Boolean);
 
         case 'custom_group':
             const groupMembers = await tx.messageGroupMember.findMany({
@@ -242,7 +242,7 @@ async function getRecipients(tx: any, data: any): Promise<any[]> {
                     }
                 }
             });
-            return groupMembers.map(gm => gm.member).filter(Boolean);
+            return groupMembers.map((gm: any) => gm.member).filter(Boolean);
 
         case 'individual':
             return await tx.member.findMany({
@@ -268,7 +268,7 @@ async function getRecipients(tx: any, data: any): Promise<any[]> {
                     email: true
                 }
             });
-            return users.map(user => ({
+            return users.map((user: any) => ({
                 member_id: user.id,
                 first_name: user.first_name,
                 last_name: user.last_name,

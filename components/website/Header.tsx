@@ -5,6 +5,16 @@ import React from "react";
 const Header = () => {
   return (
     <header className="header-one">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .header-one {
+          position: absolute;
+          width: 100%;
+          top: 0;
+          left: 0;
+          z-index: 1000 !important;
+        }
+      `}} />
       <div className="top-bar">
         <div className="container">
           <div className="row">
@@ -119,11 +129,20 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="desktop-nav" id="stickyHeader">
-        <div className="container">
+      <div className="desktop-nav" id="stickyHeader" style={{ backgroundColor: 'transparent' }}>
+        <div className="container" style={{ position: 'relative' }}>
           <div className="row">
             <div className="col-lg-12">
-              <nav>
+              <nav style={{
+                backgroundColor: 'white',
+                marginTop: '10px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                padding: '10px 40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
                 <div className="full-logo">
                   <div className="logo">
                     <a href="/">
@@ -143,15 +162,67 @@ const Header = () => {
                     max-width: 100px;
                     height: auto;
                   }
+                   @media (max-width: 991px) {
+                    .desktop-nav .container {
+                      padding-left: 0 !important;
+                      padding-right: 0 !important;
+                      max-width: 100% !important;
+                    }
+                    .desktop-nav .row {
+                      margin-left: 0 !important;
+                      margin-right: 0 !important;
+                    }
+                    .desktop-nav nav {
+                      margin-top: 0 !important;
+                      border-radius: 0 !important;
+                      padding: 10px 10px !important;
+                    }
+                    .full-logo {
+                      margin-left: -10px !important;
+                    }
+                    
+                    /* Legacy Sermon Mobile Layout */
+                    .sermon {
+                      flex-wrap: wrap !important;
+                      flex-direction: row !important; /* Keep as row but wrap */
+                    }
+                    .sermon-img, .sermon-data {
+                      flex-basis: 100% !important;
+                      width: 100% !important;
+                      height: auto !important;
+                    }
+                    .sermon-data {
+                      padding: 50px 40px !important;
+                    }
+                    .sermon-media {
+                      height: 330px !important;
+                    }
+                    .sermon-img ul {
+                      visibility: visible !important;
+                      opacity: 1 !important;
+                      transform: translateY(-50%) !important;
+                      right: 30px !important;
+                    }
+                  }
+                  
+                  @media (max-width: 767px) {
+                    .sermon-img img, .sermon-media video {
+                        border-radius: 0 !important;
+                    }
+                    .sermon-data h3 a {
+                        font-size: 24px !important;
+                        line-height: 32px !important;
+                    }
+                  }
                   .full-logo {
                     display: flex;
                     align-items: center;
                   }
                   .logo-text {
-                    text-align: center;
+                    text-align: left;
                     position: relative;
                     top: 10px;
-                    left: -20px;
+                    left: 5px;
                   }
                   .logo-text h1 {
                     font-size: 16px;
@@ -215,25 +286,25 @@ const Header = () => {
                       <a href="JavaScript:void(0)">Pages</a>
                       <ul className="sub-menu">
                         <li><a href="/about-us">About</a></li>
-                        <li><a href="/groups.html">Groups</a></li>
-                        <li><a href="/pastor-detail.html">Pastor Detail</a></li>
+                        <li><a href="/groups">Groups</a></li>
+                        <li><a href="/pastors">Pastor Detail</a></li>
                       </ul>
                     </li>
                     <li className="menu-item-has-children"><a href="JavaScript:void(0)">Sermons</a>
                       <ul className="sub-menu">
-                        <li><a href="/sermons.html">Our Sermons</a></li>
+                        <li><a href="/sermons">Our Sermons</a></li>
                       </ul>
                     </li>
                     <li className="menu-item-has-children"><a href="JavaScript:void(0)">Events</a>
                       <ul className="sub-menu">
-                        <li><a href="/events.html">Our Events</a></li>
-                        <li><a href="/gallery.html">Gallery</a></li>
+                        <li><a href="/events">Our Events</a></li>
+                        <li><a href="/gallery">Gallery</a></li>
                       </ul>
                     </li>
-                    <li><a href="/contact-us.html">Contact</a></li>
+                    <li><a href="/contact-us">Contact</a></li>
                     <li className="menu-item-has-children"><a href="JavaScript:void(0)">Blog</a>
                       <ul className="sub-menu">
-                        <li><a href="/blog.html">Our Blog</a></li>
+                        <li><a href="/blog">Our Blog</a></li>
                       </ul>
                     </li>
                   </ul>
@@ -279,7 +350,7 @@ const Header = () => {
                   }
                   .nav-bar ul li.menu-item-has-children > a {
                     position: relative;
-                    padding-right: 25px !important;
+                    padding-right: 10px !important; /* Reduced from 25px to bring arrow closer */
                   }
                   .nav-bar ul li.menu-item-has-children > a::after {
                     content: "\f107";
@@ -335,9 +406,10 @@ const Header = () => {
               margin-bottom: 10px;
             }
             .sam-logo-text {
-              text-align: center;
+              text-align: left; /* Changed from center */
               position: relative;
               top: 10px;
+              left: 5px; /* Reduced from default to be closer to logo */
             }
             .sam-logo-text h1 {
               font-size: 20px;
@@ -371,8 +443,8 @@ const Header = () => {
                 text-align: left;
                 position: relative;
                 top: 10px;
-                left: 50px;
-                margin-left: 18px;
+                left: -5px !important; /* Move text flush with logo image */
+                margin-left: 0 !important; 
               }
               .sam-logo-text h1 { font-size: 16px; }
               .sam-logo-text p {
@@ -389,25 +461,25 @@ const Header = () => {
           <li className="menu-item-has-children"><a href="JavaScript:void(0)">Pages</a>
             <ul className="sub-menu">
               <li><a href="/about-us">About</a></li>
-              <li><a href="/groups.html">Groups</a></li>
-              <li><a href="/pastor-detail.html">Pastor Detail</a></li>
+              <li><a href="/groups">Groups</a></li>
+              <li><a href="/pastors">Pastor Detail</a></li>
             </ul>
           </li>
           <li className="menu-item-has-children"><a href="JavaScript:void(0)">Sermons</a>
             <ul className="sub-menu">
-              <li><a href="/sermons.html">Our Sermons</a></li>
+              <li><a href="/sermons">Our Sermons</a></li>
             </ul>
           </li>
           <li className="menu-item-has-children"><a href="JavaScript:void(0)">Events</a>
             <ul className="sub-menu">
-              <li><a href="/events.html">Our Events</a></li>
-              <li><a href="/gallery.html">Gallery</a></li>
+              <li><a href="/events">Our Events</a></li>
+              <li><a href="/gallery">Gallery</a></li>
             </ul>
           </li>
-          <li><a href="/contact-us.html">Contact</a></li>
+          <li><a href="/contact-us">Contact</a></li>
           <li className="menu-item-has-children"><a href="JavaScript:void(0)">Blog</a>
             <ul className="sub-menu">
-              <li><a href="/blog.html">Our Blog</a></li>
+              <li><a href="/blog">Our Blog</a></li>
             </ul>
           </li>
         </ul>
@@ -444,12 +516,32 @@ const Header = () => {
               margin-top: 0;
               font-size: 16px;
             }
+            #auth-links-mobile a,
+            #auth-links-mobile span {
+              display: flex;
+              align-items: center;
+            }
             #auth-links-mobile img[src*="user-profile.svg"] {
               width: 22px;
               height: auto;
               margin-right: 5px;
               filter: invert(50%) sepia(93%) saturate(1352%) hue-rotate(188deg) brightness(93%) contrast(95%);
             }
+            #divider-mobile {
+              margin: 0 5px;
+              font-weight: 600;
+            }
+            #register-link-mobile {
+              padding: 4px 8px;
+            }
+          }
+          
+          /* Ensure mobile overlay covers all elements including hero buttons */
+          #mobile-nav.mobile-nav {
+            z-index: 9999 !important;
+          }
+          .mobile-nav {
+            z-index: 9999 !important;
           }
         `}} />
 

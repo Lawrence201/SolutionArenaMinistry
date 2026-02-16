@@ -65,20 +65,22 @@ function AddGalleryContent() {
                         setAlbumId(data.id.toString());
 
                         if (editType === 'album') {
-                            setAlbumName(data.album_name || '');
-                            setEventDate(data.event_date ? new Date(data.event_date).toISOString().split('T')[0] : '');
-                            setCategory(data.category || '');
-                            setDescription(data.description || '');
-                            setTags(data.tags || '');
-                            setPhotographer(data.photographer || '');
-                            setStatus(data.status || 'published');
-                            setExistingMedia(data.media || []);
+                            const albumData = data as any;
+                            setAlbumName(albumData.album_name || '');
+                            setEventDate(albumData.event_date ? new Date(albumData.event_date).toISOString().split('T')[0] : '');
+                            setCategory(albumData.category || '');
+                            setDescription(albumData.description || '');
+                            setTags(albumData.tags || '');
+                            setPhotographer(albumData.photographer || '');
+                            setStatus(albumData.status || 'published');
+                            setExistingMedia(albumData.media || []);
                         } else {
+                            const mediaData = data as any;
                             // Media Item specific pre-population
-                            setAlbumName(data.title || data.file_name || '');
-                            setDescription(data.caption || '');
+                            setAlbumName(mediaData.title || mediaData.file_name || '');
+                            setDescription(mediaData.caption || '');
                             // Store original media to show it
-                            setExistingMedia([data]);
+                            setExistingMedia([mediaData]);
                         }
                     } else {
                         showNotification(result.message || 'Failed to load gallery data', 'error');

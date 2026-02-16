@@ -130,9 +130,17 @@ const Footer = () => {
                   @media (max-width: 480px) {
                     .logo-img-area img { max-width: 120px; }
                     .logo-box { flex-direction: row; align-items: center; justify-content: flex-start; }
-                    .logo-caption { text-align: left; position: relative; top: 10px; left: 50px; margin-left: 18px; }
+                    .logo-caption { text-align: left; position: relative; top: 10px; left: 0px; margin-left: 8px; }
                     .logo-caption h1 { font-size: 16px; }
                     .logo-caption p { font-size: 12px; position: relative; top: -5px; }
+                    
+                    /* Subscribe Section Mobile Font Sizes */
+                    .subscribe h3 {
+                      font-size: 28px !important;
+                    }
+                    .subscribe p {
+                      font-size: 14px !important;
+                    }
                   }
                 `}} />
 
@@ -238,6 +246,13 @@ const Footer = () => {
                     .copy-right { flex-direction: column; gap: 30px; text-align: center; }
                     .footer-row { flex-direction: column; }
                     .footer-text { text-align: center; }
+                }
+                @media (max-width: 480px) {
+                    .footer-rights { width: 100%; max-width: 100%; text-align: left; top: 0; }
+                    .footer-row { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; width: 100%; }
+                    .footer-text { text-align: left; top: 0; width: 100%; }
+                    .footer-logo { max-width: 120px; height: auto; }
+                    .footer-text span, .footer-text a { font-size: 13px; }
                 }
               `}} />
                     </div>

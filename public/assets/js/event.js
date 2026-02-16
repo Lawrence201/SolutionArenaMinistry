@@ -77,47 +77,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-const events = document.querySelectorAll(".unique-event-container");
-let currentIndex = 0;
-const transitionTime = 100; // Fade transition (ms)
-const displayTime = 8000; // Display time per event (ms)
-let timeoutId;
+    const events = document.querySelectorAll(".unique-event-container");
+    let currentIndex = 0;
+    const transitionTime = 100; // Fade transition (ms)
+    const displayTime = 8000; // Display time per event (ms)
+    let timeoutId;
 
-function isMobileOrTablet() {
-    return window.matchMedia("(max-width: 1024px)").matches;
-}
+    function isMobileOrTablet() {
+        return window.matchMedia("(max-width: 1024px)").matches;
+    }
 
-function showNextEvent() {
-    if (!isMobileOrTablet()) return;
+    function showNextEvent() {
+        if (!isMobileOrTablet()) return;
+        if (events.length === 0) return;
 
-    events.forEach(event => event.classList.remove("active"));
+        events.forEach(event => {
+            if (event) event.classList.remove("active");
+        });
 
-    // Move to next
-    currentIndex = (currentIndex + 1) % events.length;
-    events[currentIndex].classList.add("active");
+        // Move to next
+        currentIndex = (currentIndex + 1) % events.length;
+        if (events[currentIndex]) {
+            events[currentIndex].classList.add("active");
+        }
 
-    // Schedule the next
-    timeoutId = setTimeout(showNextEvent, displayTime);
-}
+        // Schedule the next
+        timeoutId = setTimeout(showNextEvent, displayTime);
+    }
 
-function initializeEvents() {
-    // Clear old timeout if any
-    clearTimeout(timeoutId);
+    function initializeEvents() {
+        // Clear old timeout if any
+        clearTimeout(timeoutId);
 
-    if (!isMobileOrTablet()) return;
+        if (!isMobileOrTablet()) return;
+        if (events.length === 0) return;
 
-    // Reset
-    currentIndex = 0;
-    events.forEach(event => event.classList.remove("active"));
-    events[currentIndex].classList.add("active");
+        // Reset
+        currentIndex = 0;
+        events.forEach(event => {
+            if (event) event.classList.remove("active");
+        });
 
-    // Start the timed loop
-    timeoutId = setTimeout(showNextEvent, displayTime);
-}
+        if (events[currentIndex]) {
+            events[currentIndex].classList.add("active");
+        }
 
-// Init on load
-initializeEvents();
+        // Start the timed loop
+        timeoutId = setTimeout(showNextEvent, displayTime);
+    }
 
-// Re-initialize on screen resize
-window.addEventListener("resize", initializeEvents);
+    // Init on load
+    initializeEvents();
+
+    // Re-initialize on screen resize
+    window.addEventListener("resize", initializeEvents);
 });

@@ -9,7 +9,9 @@ export async function GET() {
                 is_published: true,
                 audio_file: {
                     not: null,
-                    not: '',
+                },
+                NOT: {
+                    audio_file: '',
                 },
             },
             orderBy: [

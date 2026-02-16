@@ -342,7 +342,7 @@ export default function FinancialAnalytics() {
                         </div>
                     </div>
 
-                    <div className="sum-card" style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', color: 'white' }}>
+                    <div className="sum-card" style={{ padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', color: 'white' }}>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.8, marginBottom: '4px' }}>Predictive Insight</div>
                             <div style={{ fontSize: '13px', opacity: 0.9 }}>"Income is projected to hit ₵{(extendedData?.forecast?.[2]?.predicted_income || 0).toFixed(0)} by next quarter."</div>
@@ -361,7 +361,7 @@ export default function FinancialAnalytics() {
                             datasets: [{
                                 data: [data.offerings, data.tithes, data.project_offerings, data.welfare, data.expenses],
                                 backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
-                                borderWeight: 2,
+                                borderWidth: 2,
                                 borderColor: 'white'
                             }]
                         }} height={300} />

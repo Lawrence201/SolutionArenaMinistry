@@ -118,8 +118,8 @@ export async function GET(req: NextRequest) {
                 email_open_rate: emailOpenRate,
                 top_messages: topMessages.map(msg => ({
                     ...msg,
-                    open_rate: msg.total_sent > 0
-                        ? Math.round(((msg.total_opened || 0) / msg.total_sent) * 100)
+                    open_rate: (msg.total_sent || 0) > 0
+                        ? Math.round(((msg.total_opened || 0) / (msg.total_sent || 1)) * 100)
                         : 0
                 })),
                 daily_trend: dailyMessages

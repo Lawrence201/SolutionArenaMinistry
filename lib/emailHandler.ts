@@ -62,7 +62,7 @@ export async function sendEmail(
         const settings = await getEmailSettings();
 
         // Create transporter
-        const transporter = nodemailer.createTransporter({
+        const transporter = nodemailer.createTransport({
             host: settings.smtp_host,
             port: parseInt(settings.smtp_port.toString()),
             secure: settings.smtp_encryption === 'ssl', // true for SSL, false for TLS
@@ -92,10 +92,10 @@ export async function sendEmail(
 
     } catch (error: any) {
         console.error('Email sending error:', error);
-        
+
         // Log failure
         await logEmail(messageId, to, subject, body, 'failed', error.message);
-        
+
         return false;
     }
 }

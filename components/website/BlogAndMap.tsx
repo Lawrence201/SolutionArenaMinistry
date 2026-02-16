@@ -56,8 +56,14 @@ export const RecentBlogs = () => {
                         }
                         @media (max-width: 480px) {
                             .heading img {
-                                transform: translateY(15px);
+                                transform: translateY(15px); /* Matches legacy Mobile shift */
                                 max-width: 90px;
+                            }
+                            .heading h2 {
+                                font-size: 32px !important;
+                            }
+                            .heading p {
+                                font-size: 15px !important;
                             }
                         }
                         .blog-meta {
@@ -205,13 +211,80 @@ export const MapSection = () => {
                 </div>
                 <div className="map-wrapper" style={{ position: "relative" }}>
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.623194514!2d-0.2033!3d5.6037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMzYnMTMuMyJOIDDCsDEyJzExLjkiVw!5e0!3m2!1sen!2sgh!4v1634567890123!5m2!1sen!2sgh"
+                        id="churchMap"
+                        src="https://www.google.com/maps?q=5.574380648684242,-0.28743606802307203&output=embed"
                         width="100%"
-                        height="450"
+                        height="400"
                         style={{ border: 0 }}
                         allowFullScreen={true}
                         loading="lazy"
                     ></iframe>
+
+                    {/* Liquid Glass Button */}
+                    <button className="glass-btn" onClick={() => {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    const userLat = position.coords.latitude;
+                                    const userLng = position.coords.longitude;
+                                    const churchLat = 5.574380648684242;
+                                    const churchLng = -0.28743606802307203;
+                                    const mapsUrl = `https://www.google.com/maps/dir/${userLat},${userLng}/${churchLat},${churchLng}`;
+                                    window.open(mapsUrl, "_blank");
+                                },
+                                () => alert("Unable to access your location. Please allow location permission.")
+                            );
+                        } else {
+                            alert("Your browser does not support geolocation.");
+                        }
+                    }}>
+                        Get Directions
+                    </button>
+
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        .glass-btn {
+                            position: absolute;
+                            top: 15px;
+                            right: 15px;
+                            z-index: 10;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 12px 24px;
+                            border-radius: 50px;
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+                            backdrop-filter: blur(20px) saturate(180%);
+                            -webkit-backdrop-filter: blur(20px) saturate(180%);
+                            border: 1px solid rgba(255, 255, 255, 0.3);
+                            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+                            color: #619de5;
+                            font-family: 'Poppins', sans-serif;
+                            font-weight: 600;
+                            font-size: 14px;
+                            letter-spacing: 0.5px;
+                            cursor: pointer;
+                            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                        }
+                        .glass-btn:hover {
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+                            border-color: rgba(255, 255, 255, 0.5);
+                            transform: translateY(-3px) scale(1.02);
+                            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+                        }
+                        .glass-btn:active {
+                            transform: scale(0.96);
+                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                        }
+                        @media (max-width: 480px) {
+                            .map .heading h2 {
+                                font-size: 32px !important;
+                            }
+                            .map .heading p {
+                                font-size: 15px !important;
+                            }
+                        }
+                    `}} />
                 </div>
             </div>
         </div>

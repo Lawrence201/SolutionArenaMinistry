@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
             const members = await prisma.member.findMany({
                 select: {
                     member_id: true,
-                    id_number: true,
                     first_name: true,
                     last_name: true,
                     email: true,
@@ -30,7 +29,6 @@ export async function GET(req: NextRequest) {
 
             const formattedMembers = members.map(m => ({
                 id: m.member_id,
-                id_number: m.id_number,
                 full_name: `${m.first_name} ${m.last_name}`,
                 email: m.email,
                 phone: m.phone,

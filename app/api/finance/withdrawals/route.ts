@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
                 purpose: body.purpose,
                 authorized_by: body.authorized_by,
                 recipient: body.recipient,
-                reference_number: body.reference_number || '',
+                transaction_id: body.transaction_id || `WDL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                 notes: body.notes || ''
             }
         });
@@ -190,7 +190,7 @@ export async function PUT(req: NextRequest) {
                 purpose: body.purpose,
                 authorized_by: body.authorized_by,
                 recipient: body.recipient,
-                reference_number: body.reference_number,
+                transaction_id: body.transaction_id,
                 notes: body.notes
             }
         });

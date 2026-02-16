@@ -799,42 +799,29 @@ jQuery(document).ready(function ($) {
   // // Scroll Top
 
   window.onscroll = function () {
-
     var num = window.pageYOffset;
-
-    if (num >= 160) {
-
-      document.querySelector('#scrollTop').classList.add('active');
-
+    var scrollTop = document.querySelector('#scrollTop');
+    if (scrollTop) {
+      if (num >= 160) {
+        scrollTop.classList.add('active');
+      } else {
+        scrollTop.classList.remove('active');
+      }
     }
-
-    else {
-
-      document.querySelector('#scrollTop').classList.remove('active');
-
-    }
-
   }
 
   // // Just add #scrollTop to the footer
 
-  document.querySelector('#scrollTop').addEventListener('click', function () {
-
-    window.scrollTo({
-
-      top: 0,
-
-      left: 0,
-
-      behavior: 'smooth'
-
+  var scrollTopBtn = document.querySelector('#scrollTop');
+  if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', function () {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
     });
-
-
-
-
-
-  })
+  }
 
 });
 
@@ -908,53 +895,44 @@ $(document).ready(function () {
 
 
   window.addEventListener('scroll', function (e) {
-
     last_scroll_position = window.scrollY;
-
-
-
-    // Scrolling down
-
-    if (new_scroll_position < last_scroll_position && last_scroll_position > 100) {
-
-      // header.removeClass('slideDown').addClass('slideUp');
-
-      header.classList.remove("slideDown");
-
-      header.classList.add("slideUp");
-
-
-
-      // Scroll top
-
+    if (header) {
+      // Scrolling down
+      if (new_scroll_position < last_scroll_position && last_scroll_position > 100) {
+        header.classList.remove("slideDown");
+        header.classList.add("slideUp");
+      } else if (last_scroll_position < 100) {
+        header.classList.remove("slideDown");
+      } else if (new_scroll_position > last_scroll_position) {
+        header.classList.remove("slideUp");
+        header.classList.add("slideDown");
+      }
     }
-
-    else if (last_scroll_position < 100) {
-
-      header.classList.remove("slideDown");
-
-    }
-
-    else if (new_scroll_position > last_scroll_position) {
-
-      header.classList.remove("slideUp");
-
-      header.classList.add("slideDown");
-
-    }
-
-
-
     new_scroll_position = last_scroll_position;
-
   });
 
   // Responsive header menu
+  $('.mobile-nav .menu-item-has-children').on('click', function (e) {
+    // If we clicked on the <a> tag itself and it's not the arrow area, 
+    // we let it toggle. If we clicked on the arrow (the :before pseudo area is on the li),
+    // we also toggle.
 
-  $('.mobile-nav .menu-item-has-children a').on('click', function () {
+    var $this = $(this);
+    var $siblings = $this.siblings('.menu-item-has-children');
 
-    $(this).parent().toggleClass('active');
+    // Close all other open menus
+    $siblings.removeClass('active');
 
+    // Toggle this menu
+    $this.toggleClass('active');
+
+    // Stop propagation if we are clicking the trigger area
+    if ($(e.target).is('a') || $(e.target).is('li')) {
+      // If it has children, don't navigate immediately if it's just a toggle
+      // but if the user clicked the text and it has a real link, they might expect navigation.
+      // However, usually in these templates, the parent link just toggles.
+      e.stopPropagation();
+    }
   });
 
 
@@ -1059,27 +1037,28 @@ if ($(".audio-player")[0]) {
   }
 
   var indexAudio = 0;
+  this.indexAudio = 0; // Initialize for shared context
 
 
 
   function loadNewTrack(index) {
+    var audioData = listAudio[index];
+    if (!audioData) return;
 
-    var player = document.querySelector('#source-audio')
+    var playerSource = document.querySelector('#source-audio');
+    if (playerSource) playerSource.src = audioData.file;
 
-    player.src = listAudio[index].file
-
-    document.querySelector('.title').innerHTML = listAudio[index].name
+    var titleEle = document.querySelector('.title');
+    if (titleEle) titleEle.innerHTML = audioData.name;
 
     this.currentAudio = document.getElementById("myAudio");
-
-    this.currentAudio.load();
-
-    this.toggleAudio();
+    if (this.currentAudio) {
+      this.currentAudio.load();
+      this.toggleAudio();
+    }
 
     this.updateStylePlaylist(this.indexAudio, index)
-
     this.indexAudio = index;
-
   }
 
 
@@ -1122,26 +1101,25 @@ if ($(".audio-player")[0]) {
 
 
 
-  document.querySelector('#source-audio').src = listAudio[indexAudio].file
+  if (listAudio.length > 0 && listAudio[indexAudio]) {
+    var initialSource = document.querySelector('#source-audio');
+    if (initialSource) initialSource.src = listAudio[indexAudio].file;
 
-  document.querySelector('.title').innerHTML = listAudio[indexAudio].name
-
-
-
-
+    var initialTitle = document.querySelector('.title');
+    if (initialTitle) initialTitle.innerHTML = listAudio[indexAudio].name;
+  }
 
   var currentAudio = document.getElementById("myAudio");
 
-
-
-  currentAudio.load()
+  if (currentAudio) {
+    currentAudio.load();
+  }
 
 
 
   currentAudio.onloadedmetadata = function () {
-
-    document.getElementsByClassName('duration')[0].innerHTML = this.getMinutes(this.currentAudio.duration)
-
+    var durationEle = document.getElementsByClassName('duration')[0];
+    if (durationEle) durationEle.innerHTML = this.getMinutes(this.currentAudio.duration);
   }.bind(this);
 
 
@@ -1151,43 +1129,38 @@ if ($(".audio-player")[0]) {
 
 
   function toggleAudio() {
-
-
+    if (!this.currentAudio) return;
 
     if (this.currentAudio.paused) {
+      var iconPlay = document.querySelector('#icon-play');
+      var iconPause = document.querySelector('#icon-pause');
+      var trackItem = document.querySelector('#ptc-' + this.indexAudio);
 
-      document.querySelector('#icon-play').style.display = 'none';
-
-      document.querySelector('#icon-pause').style.display = 'block';
-
-      document.querySelector('#ptc-' + this.indexAudio).classList.add("active-track");
+      if (iconPlay) iconPlay.style.display = 'none';
+      if (iconPause) iconPause.style.display = 'block';
+      if (trackItem) trackItem.classList.add("active-track");
 
       this.playToPause(this.indexAudio)
-
       this.currentAudio.play();
-
     } else {
+      var iconPlay = document.querySelector('#icon-play');
+      var iconPause = document.querySelector('#icon-pause');
 
-      document.querySelector('#icon-play').style.display = 'block';
-
-      document.querySelector('#icon-pause').style.display = 'none';
+      if (iconPlay) iconPlay.style.display = 'block';
+      if (iconPause) iconPause.style.display = 'none';
 
       this.pauseToPlay(this.indexAudio)
-
       this.currentAudio.pause();
-
     }
-
   }
 
 
 
   function pauseAudio() {
-
-    this.currentAudio.pause();
-
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+    }
     clearInterval(interval1);
-
   }
 
 
@@ -1207,18 +1180,16 @@ if ($(".audio-player")[0]) {
 
 
   function onTimeUpdate() {
-
     var t = this.currentAudio.currentTime
-
-    timer.innerHTML = this.getMinutes(t);
-
+    var timer = document.getElementsByClassName('timer')[0];
+    if (timer) timer.innerHTML = this.getMinutes(t);
     this.setBarProgress();
 
-    if (this.currentAudio.ended) {
-
-      document.querySelector('#icon-play').style.display = 'block';
-
-      document.querySelector('#icon-pause').style.display = 'none';
+    if (this.currentAudio && this.currentAudio.ended) {
+      var playIcon = document.querySelector('#icon-play');
+      var pauseIcon = document.querySelector('#icon-pause');
+      if (playIcon) playIcon.style.display = 'block';
+      if (pauseIcon) pauseIcon.style.display = 'none';
 
       this.pauseToPlay(this.indexAudio)
 
@@ -1239,11 +1210,10 @@ if ($(".audio-player")[0]) {
 
 
   function setBarProgress() {
-
+    if (!this.currentAudio || !this.currentAudio.duration) return;
     var progress = (this.currentAudio.currentTime / this.currentAudio.duration) * 100;
-
-    document.getElementById("myBar").style.width = progress + "%";
-
+    var bar = document.getElementById("myBar");
+    if (bar) bar.style.width = progress + "%";
   }
 
 
@@ -1274,22 +1244,20 @@ if ($(".audio-player")[0]) {
 
 
 
-  var progressbar = document.querySelector('#myProgress')
-
-  progressbar.addEventListener("click", seek.bind(this));
+  var progressbar = document.querySelector('#myProgress');
+  if (progressbar) {
+    progressbar.addEventListener("click", seek.bind(this));
+  }
 
 
 
 
 
   function seek(event) {
-
+    if (!this.currentAudio || !progressbar) return;
     var percent = event.offsetX / progressbar.offsetWidth;
-
     this.currentAudio.currentTime = percent * this.currentAudio.duration;
-
-    barProgress.style.width = percent * 100 + "%";
-
+    if (barProgress) barProgress.style.width = percent * 100 + "%";
   }
 
 
@@ -1353,39 +1321,31 @@ if ($(".audio-player")[0]) {
 
 
   function updateStylePlaylist(oldIndex, newIndex) {
+    var oldTrack = document.querySelector('#ptc-' + oldIndex);
+    var newTrack = document.querySelector('#ptc-' + newIndex);
 
-    document.querySelector('#ptc-' + oldIndex).classList.remove("active-track");
-
+    if (oldTrack) oldTrack.classList.remove("active-track");
     this.pauseToPlay(oldIndex);
-
-    document.querySelector('#ptc-' + newIndex).classList.add("active-track");
-
-    this.playToPause(newIndex)
-
+    if (newTrack) newTrack.classList.add("active-track");
+    this.playToPause(newIndex);
   }
 
 
 
   function playToPause(index) {
-
-    var ele = document.querySelector('#p-img-' + index)
-
-    ele.classList.remove("fa-play");
-
-    ele.classList.add("fa-pause");
-
+    var ele = document.querySelector('#p-img-' + index);
+    if (ele) {
+      ele.classList.remove("fa-play");
+      ele.classList.add("fa-pause");
+    }
   }
 
-
-
   function pauseToPlay(index) {
-
-    var ele = document.querySelector('#p-img-' + index)
-
-    ele.classList.remove("fa-pause");
-
-    ele.classList.add("fa-play");
-
+    var ele = document.querySelector('#p-img-' + index);
+    if (ele) {
+      ele.classList.remove("fa-pause");
+      ele.classList.add("fa-play");
+    }
   }
 
 

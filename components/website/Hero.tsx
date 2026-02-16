@@ -82,7 +82,7 @@ const Hero = () => {
           content: "";
           position: absolute;
           inset: 0;
-          background: rgba(20, 20, 20, 0.5);
+          background: rgba(20, 20, 20, 0.5); /* Legacy charcoal overlay */
           pointer-events: none;
           z-index: 1;
         }

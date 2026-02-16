@@ -79,19 +79,21 @@ export async function GET(req: NextRequest) {
                     },
                     include: {
                         member: {
-                            where: { status: 'Active' },
                             select: {
                                 member_id: true,
                                 first_name: true,
                                 last_name: true,
                                 email: true,
-                                phone: true
+                                phone: true,
+                                status: true
                             }
                         }
                     }
                 });
 
-                recipients = memberMinistries.map(mm => mm.member).filter(Boolean);
+                recipients = memberMinistries
+                    .map(mm => mm.member)
+                    .filter(m => m && m.status === 'Active');
                 break;
 
             case 'custom_group':
@@ -107,19 +109,21 @@ export async function GET(req: NextRequest) {
                     where: { group_id: parseInt(groupId) },
                     include: {
                         member: {
-                            where: { status: 'Active' },
                             select: {
                                 member_id: true,
                                 first_name: true,
                                 last_name: true,
                                 email: true,
-                                phone: true
+                                phone: true,
+                                status: true
                             }
                         }
                     }
                 });
 
-                recipients = groupMembers.map(gm => gm.member).filter(Boolean);
+                recipients = groupMembers
+                    .map(gm => gm.member)
+                    .filter(m => m && m.status === 'Active');
                 break;
 
             case 'individual':

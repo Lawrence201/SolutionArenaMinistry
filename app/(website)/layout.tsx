@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import WebsiteModals from "@/components/website/WebsiteModals";
+import Preloader from "@/components/website/Preloader";
 
 export const metadata: Metadata = {
     // ... existing metadata ...
@@ -41,6 +42,7 @@ export default function WebsiteLayout({
             <link rel="stylesheet" href="/assets/css/responsive.css" />
 
             {children}
+            <Preloader />
             <WebsiteModals />
 
             {/* Legacy JS Scripts */}
