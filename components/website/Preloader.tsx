@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import "./Preloader.module.css"; // Import for side-effect styles
+import "./Preloader.css"; // Import for side-effect styles
 
 const Preloader = () => {
     const [isLoaded, setIsLoaded] = React.useState(false);
