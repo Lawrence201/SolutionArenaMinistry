@@ -5,82 +5,82 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 
 const LoginContent = () => {
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    // Login state
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  // Login state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    // Register state
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [registerEmail, setRegisterEmail] = useState("");
-    const [registerPassword, setRegisterPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+  // Register state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    useEffect(() => {
-        if (searchParams?.get("register") === "true") {
-            setIsRegistering(true);
-        }
-    }, [searchParams]);
+  useEffect(() => {
+    if (searchParams?.get("register") === "true") {
+      setIsRegistering(true);
+    }
+  }, [searchParams]);
 
-    const toggleForm = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setIsRegistering(!isRegistering);
-    };
+  const toggleForm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsRegistering(!isRegistering);
+  };
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-            const data = await response.json();
+      const data = await response.json();
 
-            if (data.success) {
-                toast.success(data.message || 'Login successful!');
-                // Wait a moment for the toast
-                setTimeout(() => {
-                    router.push(data.redirect);
-                }, 1000);
-            } else {
-                toast.error(data.message || 'Invalid credentials');
-            }
-        } catch (error) {
-            console.error("Login error:", error);
-            toast.error("An error occurred during login. Please try again.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+      if (data.success) {
+        toast.success(data.message || 'Login successful!');
+        // Wait a moment for the toast
+        setTimeout(() => {
+          router.push(data.redirect);
+        }, 1000);
+      } else {
+        toast.error(data.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const handleRegister = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        if (registerPassword !== confirmPassword) {
-            toast.error("Passwords do not match");
-            return;
-        }
+    if (registerPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
 
-        setIsLoading(true);
-        // Note: Registration API not implemented yet in this turn, but planned
-        toast.loading("Registration coming soon...");
-        setTimeout(() => setIsLoading(false), 2000);
-    };
+    setIsLoading(true);
+    // Note: Registration API not implemented yet in this turn, but planned
+    toast.loading("Registration coming soon...");
+    setTimeout(() => setIsLoading(false), 2000);
+  };
 
-    return (
-        <main>
-            <style dangerouslySetInnerHTML={{
-                __html: `
+  return (
+    <main>
+      <style dangerouslySetInnerHTML={{
+        __html: `
                 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
 
                 * {
@@ -366,7 +366,7 @@ const LoginContent = () => {
                 }
 
                 @media (max-width: 768px) {
-                  .wrapper { width: 95%; padding: 25px 20px; min-height: auto; }
+                  .wrapper { width: 100%; padding: 25px 20px; min-height: auto; border: none; border-radius: 0; }
                   .heading-image { width: 50px; padding: 6px 0; }
                   h2 { font-size: 1.2rem; margin-bottom: 6px; }
                   .sub-title { font-size: 0.8rem; margin-bottom: 6px; }
@@ -378,7 +378,7 @@ const LoginContent = () => {
                 }
 
                 @media (max-width: 430px) {
-                  .wrapper { width: 95%; padding: 20px 15px; min-height: auto; margin: 0 auto; }
+                  .wrapper { width: 100%; padding: 20px 15px; min-height: auto; margin: 0; border: none; border-radius: 0; }
                   .heading-image { width: 45px; padding: 4px 0; }
                   h2 { font-size: 1.1rem; margin-bottom: 5px; }
                   .sub-title { font-size: 0.75rem; margin-bottom: 5px; }
@@ -389,176 +389,176 @@ const LoginContent = () => {
                   .auth-switch { margin-top: 10px; }
                 }
             `}} />
-            {!isRegistering ? (
-                <div className="wrapper">
-                    <img
-                        src="/assets/images/church-logo.png"
-                        alt="Church Logo"
-                        className="heading-image"
-                    />
-                    <h2>Solution Arena Ministry</h2>
-                    <p className="sub-title">Sign In To Site</p>
+      {!isRegistering ? (
+        <div className="wrapper">
+          <img
+            src="/assets/images/church-logo.png"
+            alt="Church Logo"
+            className="heading-image"
+          />
+          <h2>Solution Arena Ministry</h2>
+          <p className="sub-title">Sign In To Site</p>
 
-                    <form onSubmit={handleLogin}>
-                        <div className="input-field">
-                            <input
-                                type="text"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className={email ? "has-value" : ""}
-                            />
-                            <label>Enter your email</label>
-                        </div>
+          <form onSubmit={handleLogin}>
+            <div className="input-field">
+              <input
+                type="text"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={email ? "has-value" : ""}
+              />
+              <label>Enter your email</label>
+            </div>
 
-                        <div className="input-field">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className={password ? "has-value" : ""}
-                            />
-                            <label>Enter your password</label>
-                            <i
-                                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} eye-icon`}
-                                onClick={() => setShowPassword(!showPassword)}
-                            ></i>
-                        </div>
+            <div className="input-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={password ? "has-value" : ""}
+              />
+              <label>Enter your password</label>
+              <i
+                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} eye-icon`}
+                onClick={() => setShowPassword(!showPassword)}
+              ></i>
+            </div>
 
-                        <div className="forget">
-                            <label htmlFor="remember">
-                                <input type="checkbox" id="remember" />
-                                <p>Remember me</p>
-                            </label>
-                            <a href="#">Forgot password?</a>
-                        </div>
+            <div className="forget">
+              <label htmlFor="remember">
+                <input type="checkbox" id="remember" />
+                <p>Remember me</p>
+              </label>
+              <a href="#">Forgot password?</a>
+            </div>
 
-                        <button type="submit">Log In</button>
+            <button type="submit">Log In</button>
 
-                        <div className="divider">
-                            <div className="divider-line"></div>
-                            <span className="divider-text">OR</span>
-                            <div className="divider-line"></div>
-                        </div>
+            <div className="divider">
+              <div className="divider-line"></div>
+              <span className="divider-text">OR</span>
+              <div className="divider-line"></div>
+            </div>
 
-                        <div className="google-btn">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon" />
-                            Sign in with Google
-                        </div>
-                    </form>
+            <div className="google-btn">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon" />
+              Sign in with Google
+            </div>
+          </form>
 
-                    <div className="auth-switch">
-                        <p>
-                            Don't have an account?{" "}
-                            <a href="#" onClick={toggleForm}>Register</a>
-                        </p>
-                    </div>
-                </div>
-            ) : (
-                <div className="wrapper">
-                    <img
-                        src="/assets/images/church-logo.png"
-                        alt="Church Logo"
-                        className="heading-image"
-                    />
-                    <h2>Create Account</h2>
-                    <p className="sub-title">Register for Church Management System</p>
+          <div className="auth-switch">
+            <p>
+              Don't have an account?{" "}
+              <a href="#" onClick={toggleForm}>Register</a>
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="wrapper">
+          <img
+            src="/assets/images/church-logo.png"
+            alt="Church Logo"
+            className="heading-image"
+          />
+          <h2>Create Account</h2>
+          <p className="sub-title">Register for Church Management System</p>
 
-                    <form onSubmit={handleRegister}>
-                        <div className="input-field">
-                            <input
-                                type="text"
-                                required
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className={firstName ? "has-value" : ""}
-                            />
-                            <label>First Name</label>
-                        </div>
+          <form onSubmit={handleRegister}>
+            <div className="input-field">
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className={firstName ? "has-value" : ""}
+              />
+              <label>First Name</label>
+            </div>
 
-                        <div className="input-field">
-                            <input
-                                type="text"
-                                required
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className={lastName ? "has-value" : ""}
-                            />
-                            <label>Last Name</label>
-                        </div>
+            <div className="input-field">
+              <input
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={lastName ? "has-value" : ""}
+              />
+              <label>Last Name</label>
+            </div>
 
-                        <div className="input-field">
-                            <input
-                                type="email"
-                                required
-                                value={registerEmail}
-                                onChange={(e) => setRegisterEmail(e.target.value)}
-                                className={registerEmail ? "has-value" : ""}
-                            />
-                            <label>Email Address</label>
-                        </div>
+            <div className="input-field">
+              <input
+                type="email"
+                required
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
+                className={registerEmail ? "has-value" : ""}
+              />
+              <label>Email Address</label>
+            </div>
 
-                        <div className="input-field">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                value={registerPassword}
-                                onChange={(e) => setRegisterPassword(e.target.value)}
-                                className={registerPassword ? "has-value" : ""}
-                            />
-                            <label>Password</label>
-                            <i
-                                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} eye-icon`}
-                                onClick={() => setShowPassword(!showPassword)}
-                            ></i>
-                        </div>
+            <div className="input-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
+                className={registerPassword ? "has-value" : ""}
+              />
+              <label>Password</label>
+              <i
+                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} eye-icon`}
+                onClick={() => setShowPassword(!showPassword)}
+              ></i>
+            </div>
 
-                        <div className="input-field">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className={confirmPassword ? "has-value" : ""}
-                            />
-                            <label>Confirm Password</label>
-                        </div>
+            <div className="input-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={confirmPassword ? "has-value" : ""}
+              />
+              <label>Confirm Password</label>
+            </div>
 
-                        <button type="submit">Register</button>
+            <button type="submit">Register</button>
 
-                        <div className="divider">
-                            <div className="divider-line"></div>
-                            <span className="divider-text">OR</span>
-                            <div className="divider-line"></div>
-                        </div>
+            <div className="divider">
+              <div className="divider-line"></div>
+              <span className="divider-text">OR</span>
+              <div className="divider-line"></div>
+            </div>
 
-                        <div className="google-btn">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon" />
-                            Sign up with Google
-                        </div>
-                    </form>
+            <div className="google-btn">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon" />
+              Sign up with Google
+            </div>
+          </form>
 
-                    <div className="auth-switch">
-                        <p>
-                            Already have an account?{" "}
-                            <a href="#" onClick={toggleForm}>Log In</a>
-                        </p>
-                    </div>
-                </div>
-            )}
+          <div className="auth-switch">
+            <p>
+              Already have an account?{" "}
+              <a href="#" onClick={toggleForm}>Log In</a>
+            </p>
+          </div>
+        </div>
+      )}
 
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-        </main>
-    );
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    </main>
+  );
 };
 
 const LoginPage = () => {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <LoginContent />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
 };
 
 export default LoginPage;
