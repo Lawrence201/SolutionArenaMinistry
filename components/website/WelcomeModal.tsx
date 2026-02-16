@@ -57,13 +57,13 @@ const WelcomeModal = () => {
                         <p>Join our community to access exclusive content, sermons, and stay connected with us.</p>
                     </div>
                     <div className={styles.actions}>
-                        <Link href="/auth/register" className={styles.primaryBtn}>
+                        <Link href="/login?register=true" className={styles.primaryBtn}>
                             Create profile
                         </Link>
                         <button className={styles.secondaryBtn} onClick={dismissModal}>Dismiss</button>
                         <div className={styles.loginPrompt}>
                             <span>Already have an account?</span>
-                            <Link href="/auth/login" className={styles.loginLink}>Log in</Link>
+                            <Link href="/login" className={styles.loginLink}>Log in</Link>
                         </div>
                     </div>
                 </div>

@@ -21,12 +21,12 @@ const Header = () => {
             <div className="col-lg-9">
               <ul className="login">
                 <li className="auth-links" id="auth-links-desktop">
-                  <a href="/users_login/Users_login.html" id="login-link-desktop">
+                  <a href="/login" id="login-link-desktop">
                     <img src="/assets/images/user-profile.svg" alt="User Profile" />
                     Login
                   </a>
                   <span className="divider" id="divider-desktop">|</span>
-                  <a href="/users_login/Users_login.html?register=true" id="register-link-desktop">Register</a>
+                  <a href="/login?register=true" id="register-link-desktop">Register</a>
                 </li>
                 <li>
                   <a href="JavaScript:void(0)">
@@ -485,12 +485,12 @@ const Header = () => {
         </ul>
 
         <li className="auth-buttons" id="auth-links-mobile">
-          <a href="/users_login/Users_login.html" id="login-link-mobile">
+          <a href="/login" id="login-link-mobile">
             <img src="/assets/images/user-profile.svg" alt="User Profile" />
             Login
           </a>
           <span className="divider" id="divider-mobile">|</span>
-          <a href="/users_login/Users_login.html?register=true" className="btn-auth register-btn"
+          <a href="/login?register=true" className="btn-auth register-btn"
             id="register-link-mobile">
             Register
           </a>
