@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const { searchParams } = new URL(req.url);
         const type = searchParams.get('type') || 'overview';
         const now = new Date();

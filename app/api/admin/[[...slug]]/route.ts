@@ -28,9 +28,10 @@ const getTimeAgo = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const { searchParams } = new URL(req.url);
 
         switch (slug) {
@@ -110,9 +111,10 @@ export async function GET(req: NextRequest, { params }: { params: { slug?: strin
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const formData = await req.formData().catch(() => null);
         const body = !formData ? await req.json().catch(() => ({})) : null;
 
@@ -166,9 +168,10 @@ export async function POST(req: NextRequest, { params }: { params: { slug?: stri
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
-        const slug = (params.slug || []).join('/');
+        const { slug: slugArr } = await params;
+        const slug = (slugArr || []).join('/');
         const { ids, type } = await req.json();
         if (slug === 'finance/records' || slug === 'finance/delete') {
             let res;
