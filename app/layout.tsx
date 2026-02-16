@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Solution Arena Ministry",
   description: "Church Management System",
+  icons: {
+    icon: "/assets/Logo.PNG",
+  },
 };
 
 export default function RootLayout({
