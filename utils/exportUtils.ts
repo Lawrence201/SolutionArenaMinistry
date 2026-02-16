@@ -120,7 +120,10 @@ export const exportToPDF = async (members: any[]) => {
         await Promise.all(members.map(async (member) => {
             if (member.photo_path) {
                 try {
-                    const src = member.photo_path.startsWith('/') ? member.photo_path : `/assets/${member.photo_path}`;
+                    let src = member.photo_path;
+                    if (!src.startsWith('http') && !src.startsWith('/')) {
+                        src = `/uploads/${src}`;
+                    }
                     const img = await loadImageForPDF(src);
                     const id = member.member_id || member.id;
                     if (id) imageMap.set(id, img);

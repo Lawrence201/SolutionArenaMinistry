@@ -96,11 +96,16 @@ function formatBirthdayDate(dateString: string) {
 
 // Helper to resolve birthday image path
 function getBirthdayImage(member: Member) {
-    // Logic matches legacy birthday_loader.js
     if (member.birthday_thumb) {
-        return `/admin_dashboard/Add_Members/${member.birthday_thumb}`;
+        if (member.birthday_thumb.startsWith('http') || member.birthday_thumb.startsWith('/')) {
+            return member.birthday_thumb;
+        }
+        return `/uploads/birthday/${member.birthday_thumb}`;
     } else if (member.photo_path) {
-        return `/admin_dashboard/Add_Members/${member.photo_path}`;
+        if (member.photo_path.startsWith('http') || member.photo_path.startsWith('/')) {
+            return member.photo_path;
+        }
+        return `/uploads/members/${member.photo_path}`;
     }
     return '/assets/images/placeholder_user.png';
 }

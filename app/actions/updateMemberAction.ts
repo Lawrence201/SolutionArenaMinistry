@@ -1,9 +1,6 @@
-'use server';
-
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import { join } from 'path';
+import { saveBase64Image, deleteFile } from '@/lib/storage';
 
 export async function updateMember(memberId: number, formData: any) {
     try {
@@ -16,22 +13,21 @@ export async function updateMember(memberId: number, formData: any) {
         // Handle photo upload if it's base64
         let photoPath = formData.photo_path || null;
         if (formData.photoData && formData.photoData.startsWith('data:')) {
-            photoPath = await saveBase64Image(formData.photoData, 'members');
+            const newPhotoPath = await saveBase64Image(formData.photoData, 'members');
+            if (newPhotoPath) {
+                if (currentMember?.photo_path) await deleteFile(currentMember.photo_path);
+                photoPath = newPhotoPath;
+            }
         }
 
         // Handle birthday thumb upload if it's base64
         let birthdayThumb = formData.birthday_thumb || null;
         if (formData.birthdayThumbData && formData.birthdayThumbData.startsWith('data:')) {
-            birthdayThumb = await saveBase64Image(formData.birthdayThumbData, 'birthday');
-        }
-
-        // Determine files to delete (cleaning)
-        const filesToDelete: string[] = [];
-        if (currentMember?.photo_path && photoPath !== currentMember.photo_path && currentMember.photo_path.startsWith('/uploads/')) {
-            filesToDelete.push(join(process.cwd(), 'public', currentMember.photo_path));
-        }
-        if (currentMember?.birthday_thumb && birthdayThumb !== currentMember.birthday_thumb && currentMember.birthday_thumb.startsWith('/uploads/')) {
-            filesToDelete.push(join(process.cwd(), 'public', currentMember.birthday_thumb));
+            const newThumb = await saveBase64Image(formData.birthdayThumbData, 'birthday');
+            if (newThumb) {
+                if (currentMember?.birthday_thumb) await deleteFile(currentMember.birthday_thumb);
+                birthdayThumb = newThumb;
+            }
         }
 
         // Update member
@@ -138,16 +134,6 @@ export async function updateMember(memberId: number, formData: any) {
             }
         }
 
-        // Process file deletion only after successful update
-        for (const file of filesToDelete) {
-            try {
-                await unlink(file);
-            } catch (err) {
-                console.error(`Failed to delete old file ${file}:`, err);
-                // Continue even if delete fails
-            }
-        }
-
         revalidatePath('/admin/members');
         return { success: true, message: 'Member updated successfully', member };
     } catch (error: any) {
@@ -156,34 +142,5 @@ export async function updateMember(memberId: number, formData: any) {
             success: false,
             error: error.message || 'Failed to update member'
         };
-    }
-}
-
-async function saveBase64Image(base64Data: string, folder: string): Promise<string> {
-    try {
-        // Extract base64 data and determine file extension
-        const matches = base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
-        if (!matches) throw new Error('Invalid base64 image data');
-
-        const ext = matches[1];
-        const data = matches[2];
-        const buffer = Buffer.from(data, 'base64');
-
-        // Generate unique filename
-        const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-
-        // Create upload directory if it doesn't exist
-        const uploadDir = join(process.cwd(), 'public', 'uploads', folder);
-        await mkdir(uploadDir, { recursive: true });
-
-        // Write file
-        const filepath = join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-
-        // Return relative path for database
-        return `/uploads/${folder}/${filename}`;
-    } catch (error) {
-        console.error('Error saving base64 image:', error);
-        throw error;
     }
 }

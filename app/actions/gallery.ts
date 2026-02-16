@@ -3,54 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { GalleryCategory, GalleryStatus, MediaType } from '@prisma/client';
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import { join } from 'path';
-
-// --- Types ---
-export interface GalleryFilters {
-    view?: 'all' | 'albums' | 'photos' | 'videos';
-    category?: string;
-    search?: string;
-}
-
-// --- Helper Functions ---
-
-async function saveFile(file: File, subDir: string = 'gallery'): Promise<string | null> {
-    if (!file || file.size === 0) return null;
-
-    try {
-        const buffer = Buffer.from(await file.arrayBuffer());
-
-        const year = new Date().getFullYear();
-        const month = String(new Date().getMonth() + 1).padStart(2, '0');
-        const uploadDir = join(process.cwd(), 'public', 'uploads', subDir, String(year), month);
-
-        await mkdir(uploadDir, { recursive: true });
-
-        const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const filePath = join(uploadDir, uniqueName);
-
-        await writeFile(filePath, buffer);
-
-        // Return relative path for DB
-        return `/uploads/${subDir}/${year}/${month}/${uniqueName}`;
-    } catch (error) {
-        console.error('Error saving file:', error);
-        throw new Error('Failed to save uploaded file');
-    }
-}
-
-async function deleteFile(filePath: string | null) {
-    if (!filePath) return;
-    try {
-        const relativePath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
-        const fullPath = join(process.cwd(), 'public', relativePath);
-        await unlink(fullPath);
-    } catch (error) {
-        console.error(`Failed to delete file: ${filePath}`, error);
-        // Non-fatal, continue
-    }
-}
+import { saveFile, deleteFile } from '@/lib/storage';
 
 // --- Server Actions ---
 

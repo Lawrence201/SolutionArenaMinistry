@@ -131,7 +131,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                 });
             };
 
-            const photoUrl = member.photo_path ? (member.photo_path.startsWith('/') ? member.photo_path : `/Add_Members/${member.photo_path}`) : null;
+            const photoUrl = member.photo_path ? (member.photo_path.startsWith('/') || member.photo_path.startsWith('http') ? member.photo_path : `/uploads/members/${member.photo_path}`) : null;
 
             if (photoUrl) {
                 try {
@@ -333,7 +333,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                         <div className="cf-profile-avatar">
                             {member.photo_path ? (
                                 <img
-                                    src={member.photo_path.startsWith('/') ? member.photo_path : `/Add_Members/${member.photo_path}`}
+                                    src={member.photo_path.startsWith('/') || member.photo_path.startsWith('http') ? member.photo_path : `/uploads/members/${member.photo_path}`}
                                     alt={memberName}
                                     style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }}
                                     onError={(e) => {

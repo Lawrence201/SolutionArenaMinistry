@@ -3,8 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { EventStatus, EventType, EventCategory } from '@prisma/client';
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { saveFile, deleteFile } from '@/lib/storage';
 
 export async function getEvents(options: {
     filter?: string;
@@ -389,18 +388,6 @@ export async function deleteEvent(id: number) {
 
         if (!event) return { success: false, message: 'Event not found' };
 
-        // 2. Helper to delete files
-        const deleteFile = async (filePath: string | null) => {
-            if (!filePath) return;
-            try {
-                const relativePath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
-                const fullPath = join(process.cwd(), 'public', relativePath);
-                await unlink(fullPath);
-            } catch (error) {
-                console.error(`Failed to delete file: ${filePath}`, error);
-            }
-        };
-
         // 3. Delete all associated media
         await Promise.all([
             deleteFile(event.image_path),
@@ -468,40 +455,7 @@ const getBool = (formData: FormData, key: string) => {
     return val === 'true' || val === '1' || val === 'on';
 };
 
-// Helper to save file
-const saveFile = async (file: File | null) => {
-    if (!file || file.size === 0 || file.name === 'undefined') return null;
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'events');
-
-    // Ensure directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-    const filePath = join(uploadDir, uniqueName);
-
-    await writeFile(filePath, buffer);
-
-    return `/uploads/events/${uniqueName}`;
-};
-
-// Helper to delete old file
-const deleteOldFile = async (filePath: string | null) => {
-    if (!filePath) return;
-    try {
-        // Remove leading slash for local path resolution
-        const relativePath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
-        const fullPath = join(process.cwd(), 'public', relativePath);
-        await unlink(fullPath);
-    } catch (error) {
-        console.error(`Failed to delete old file: ${filePath}`, error);
-        // non-fatal
-    }
-};
-
 export async function updateEvent(formData: FormData) {
-
     try {
         const eventId = parseInt(getString(formData, 'event_id'));
         if (!eventId) return { success: false, message: 'Event ID is required' };
@@ -521,20 +475,20 @@ export async function updateEvent(formData: FormData) {
         const adVideo1File = formData.get('adVideo1') as File;
         const adVideo2File = formData.get('adVideo2') as File;
 
-        const newEventImage = await saveFile(eventImageFile);
-        const newContactImage = await saveFile(contactImageFile);
-        const newAdImage1 = await saveFile(adImage1File);
-        const newAdImage2 = await saveFile(adImage2File);
-        const newAdVideo1 = await saveFile(adVideo1File);
-        const newAdVideo2 = await saveFile(adVideo2File);
+        const newEventImage = await saveFile(eventImageFile, 'events');
+        const newContactImage = await saveFile(contactImageFile, 'events');
+        const newAdImage1 = await saveFile(adImage1File, 'events');
+        const newAdImage2 = await saveFile(adImage2File, 'events');
+        const newAdVideo1 = await saveFile(adVideo1File, 'events');
+        const newAdVideo2 = await saveFile(adVideo2File, 'events');
 
         // 3. Delete old files if replaced
-        if (newEventImage && existingEvent.image_path) await deleteOldFile(existingEvent.image_path);
-        if (newContactImage && existingEvent.contact_person_image) await deleteOldFile(existingEvent.contact_person_image);
-        if (newAdImage1 && existingEvent.ad_image_1) await deleteOldFile(existingEvent.ad_image_1);
-        if (newAdImage2 && existingEvent.ad_image_2) await deleteOldFile(existingEvent.ad_image_2);
-        if (newAdVideo1 && existingEvent.ad_video_1) await deleteOldFile(existingEvent.ad_video_1);
-        if (newAdVideo2 && existingEvent.ad_video_2) await deleteOldFile(existingEvent.ad_video_2);
+        if (newEventImage && existingEvent.image_path) await deleteFile(existingEvent.image_path);
+        if (newContactImage && existingEvent.contact_person_image) await deleteFile(existingEvent.contact_person_image);
+        if (newAdImage1 && existingEvent.ad_image_1) await deleteFile(existingEvent.ad_image_1);
+        if (newAdImage2 && existingEvent.ad_image_2) await deleteFile(existingEvent.ad_image_2);
+        if (newAdVideo1 && existingEvent.ad_video_1) await deleteFile(existingEvent.ad_video_1);
+        if (newAdVideo2 && existingEvent.ad_video_2) await deleteFile(existingEvent.ad_video_2);
 
         // 4. Map Enums (Duplicate logic from create route, ideally should be shared utils)
         const typeMap: Record<string, EventType> = {
@@ -662,12 +616,12 @@ export async function createEvent(formData: FormData) {
         const adVideo1File = formData.get('adVideo1') as File;
         const adVideo2File = formData.get('adVideo2') as File;
 
-        const newEventImage = await saveFile(eventImageFile);
-        const newContactImage = await saveFile(contactImageFile);
-        const newAdImage1 = await saveFile(adImage1File);
-        const newAdImage2 = await saveFile(adImage2File);
-        const newAdVideo1 = await saveFile(adVideo1File);
-        const newAdVideo2 = await saveFile(adVideo2File);
+        const newEventImage = await saveFile(eventImageFile, 'events');
+        const newContactImage = await saveFile(contactImageFile, 'events');
+        const newAdImage1 = await saveFile(adImage1File, 'events');
+        const newAdImage2 = await saveFile(adImage2File, 'events');
+        const newAdVideo1 = await saveFile(adVideo1File, 'events');
+        const newAdVideo2 = await saveFile(adVideo2File, 'events');
 
         // 2. Map Enums
         const typeMap: Record<string, EventType> = {

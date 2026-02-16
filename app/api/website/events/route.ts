@@ -45,13 +45,8 @@ export async function GET() {
 
             // Correctly resolve the image path
             let imagePath = event.image_path;
-            if (imagePath) {
-                if (imagePath.includes('/Church_Management_System/')) {
-                    imagePath = imagePath.split('/').pop() || '';
-                }
-                if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
-                    imagePath = `/uploads/events/${imagePath}`;
-                }
+            if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+                imagePath = `/uploads/events/${imagePath}`;
             }
             if (!imagePath) imagePath = '/assets/images/event-img-1.webp';
 

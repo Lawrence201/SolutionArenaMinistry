@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { mkdir, writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
+import { saveFile, deleteFile } from '@/lib/storage';
 import { MediaType } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -30,35 +29,18 @@ export async function POST(request: NextRequest) {
 
         // Handle File Update
         if (mediaFile && mediaFile.size > 0) {
-            const now = new Date();
-            const year = now.getFullYear().toString();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const uploadDir = join(process.cwd(), 'public', 'uploads', 'gallery', year, month);
+            const relativePath = await saveFile(mediaFile, 'gallery');
+            if (relativePath) {
+                // Delete old file
+                await deleteFile(existingMedia.file_path);
 
-            await mkdir(uploadDir, { recursive: true });
-
-            const buffer = Buffer.from(await mediaFile.arrayBuffer());
-            const fileExtension = mediaFile.name.split('.').pop()?.toLowerCase() || '';
-            const uniqueFileName = `gallery_update_${Date.now()}.${fileExtension}`;
-            const filePath = join(uploadDir, uniqueFileName);
-
-            await writeFile(filePath, buffer);
-
-            const relativePath = `/uploads/gallery/${year}/${month}/${uniqueFileName}`;
-            const mediaType = mediaFile.type.startsWith('image/') ? MediaType.photo : MediaType.video;
-
-            // Delete old file
-            try {
-                const oldPath = join(process.cwd(), 'public', existingMedia.file_path);
-                await unlink(oldPath);
-            } catch (e) { console.error('Failed to delete old media file:', e); }
-
-            updateData.file_path = relativePath;
-            updateData.file_name = mediaFile.name;
-            updateData.file_size = mediaFile.size;
-            updateData.file_extension = fileExtension;
-            updateData.mime_type = mediaFile.type;
-            updateData.media_type = mediaType;
+                updateData.file_path = relativePath;
+                updateData.file_name = mediaFile.name;
+                updateData.file_size = mediaFile.size;
+                updateData.file_extension = mediaFile.name.split('.').pop()?.toLowerCase() || '';
+                updateData.mime_type = mediaFile.type;
+                updateData.media_type = mediaFile.type.startsWith('image/') ? MediaType.photo : MediaType.video;
+            }
         }
 
         const updated = await prisma.galleryMedia.update({

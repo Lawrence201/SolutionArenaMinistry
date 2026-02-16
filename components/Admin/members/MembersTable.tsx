@@ -141,7 +141,7 @@ export default function MembersTable({
                                             <div className="cf-member-icon">
                                                 {member.photo_path ? (
                                                     <img
-                                                        src={member.photo_path.startsWith('/') ? member.photo_path : `/assets/${member.photo_path}`}
+                                                        src={member.photo_path.startsWith('/') || member.photo_path.startsWith('http') ? member.photo_path : `/uploads/members/${member.photo_path}`}
                                                         alt={member.first_name}
                                                         style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
                                                         onError={(e) => {

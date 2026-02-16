@@ -1,8 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { saveFile } from '@/lib/storage';
 import { EventType, EventCategory, EventStatus } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -21,31 +20,13 @@ export async function POST(request: NextRequest) {
             return val === 'true' || val === '1' || val === 'on';
         };
 
-        // Helper to save file
-        const saveFile = async (file: File | null) => {
-            if (!file) return null;
-
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const uploadDir = join(process.cwd(), 'public', 'uploads', 'events');
-
-            // Ensure directory exists
-            await mkdir(uploadDir, { recursive: true });
-
-            const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-            const filePath = join(uploadDir, uniqueName);
-
-            await writeFile(filePath, buffer);
-
-            return `/uploads/events/${uniqueName}`;
-        };
-
         // 1. Extract and Save Files
-        const eventImage = await saveFile(formData.get('eventImage') as File);
-        const contactPersonImage = await saveFile(formData.get('contactPersonImage') as File);
-        const adImage1 = await saveFile(formData.get('adImage1') as File);
-        const adImage2 = await saveFile(formData.get('adImage2') as File);
-        const adVideo1 = await saveFile(formData.get('adVideo1') as File);
-        const adVideo2 = await saveFile(formData.get('adVideo2') as File);
+        const eventImage = await saveFile(formData.get('eventImage') as File, 'events');
+        const contactPersonImage = await saveFile(formData.get('contactPersonImage') as File, 'events');
+        const adImage1 = await saveFile(formData.get('adImage1') as File, 'events');
+        const adImage2 = await saveFile(formData.get('adImage2') as File, 'events');
+        const adVideo1 = await saveFile(formData.get('adVideo1') as File, 'events');
+        const adVideo2 = await saveFile(formData.get('adVideo2') as File, 'events');
 
         // 2. Map Enums
         // Mappings for EventType
