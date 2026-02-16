@@ -87,7 +87,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                 let data: any[] = [];
                 if (type === 'offering') data = await prisma.offering.findMany({ where: search ? { ...where, OR: [{ notes: { contains: search, mode: 'insensitive' } }, { transaction_id: { contains: search, mode: 'insensitive' } }] } : where, orderBy: { date: 'desc' }, take: 50 });
                 else if (type === 'tithe') data = await prisma.tithe.findMany({ where: search ? { ...where, OR: [{ member: { first_name: { contains: search, mode: 'insensitive' } } }, { transaction_id: { contains: search, mode: 'insensitive' } }] } : where, include: { member: { select: { first_name: true, last_name: true } } }, orderBy: { date: 'desc' }, take: 50 });
-                return NextResponse.json({ success: true, data: data.map(r => ({ id: r.offering_id || r.tithe_id || r.project_offering_id || r.welfare_id, transaction_id: r.transaction_id, date: r.date, amount: r.amount || r.amount_collected, member_name: r.member ? `${r.member.first_name} ${r.member.last_name}` : null })) });
+                else if (type === 'projectoffering') data = await prisma.projectOffering.findMany({ where: search ? { ...where, OR: [{ project_name: { contains: search, mode: 'insensitive' } }, { transaction_id: { contains: search, mode: 'insensitive' } }] } : where, orderBy: { date: 'desc' }, take: 50 });
+                else if (type === 'welfare') data = await prisma.welfareContribution.findMany({ where: search ? { ...where, OR: [{ notes: { contains: search, mode: 'insensitive' } }, { transaction_id: { contains: search, mode: 'insensitive' } }] } : where, include: { member: { select: { first_name: true, last_name: true } } }, orderBy: { date: 'desc' }, take: 50 });
+                else if (type === 'expense') data = await prisma.expense.findMany({ where: search ? { ...where, OR: [{ description: { contains: search, mode: 'insensitive' } }, { transaction_id: { contains: search, mode: 'insensitive' } }] } : where, orderBy: { date: 'desc' }, take: 50 });
+
+                return NextResponse.json({ success: true, data: data.map(r => ({ id: r.offering_id || r.tithe_id || r.project_offering_id || r.welfare_id || r.expense_id, transaction_id: r.transaction_id, date: r.date, amount: r.amount || r.amount_collected, member_name: r.member ? `${r.member.first_name} ${r.member.last_name}` : null, description: r.project_name || r.description || r.notes })) });
             }
 
             case 'members/search': {
@@ -137,32 +141,73 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
             }
 
             case 'finance/create': {
-                const { type, amount, date, paymentMethod, serviceType, status, countedBy, notes } = body;
+                const { type, amount, date, paymentMethod, serviceType, status, countedBy, notes, member_id, project_name, category, description, vendor_payee, payment_period } = body;
                 const trxId = `TRX-${Date.now()}`;
                 let result;
                 if (type === 'offering') {
                     result = await prisma.offering.create({
                         data: {
                             transaction_id: trxId,
-                            amount_collected: parseFloat(amount),
                             date: new Date(date),
-                            service_type: (serviceType || 'Sunday Worship') as any,
-                            collection_method: (paymentMethod || 'Cash') as any,
-                            counted_by: countedBy || '',
-                            notes: notes || '',
-                            status: (status || 'Pending') as any
+                            service_type: serviceType as any,
+                            amount_collected: amount,
+                            collection_method: paymentMethod as any,
+                            counted_by: countedBy,
+                            notes: notes,
+                            status: status as any
                         }
                     });
                 } else if (type === 'tithe') {
                     result = await prisma.tithe.create({
                         data: {
                             transaction_id: trxId,
-                            amount: parseFloat(amount),
+                            member_id: member_id,
                             date: new Date(date),
-                            payment_method: (paymentMethod || 'Cash') as any,
-                            status: (status || 'Paid') as any,
-                            member_id: parseInt(body.memberId) || null,
-                            notes: notes || ''
+                            amount: amount,
+                            payment_method: paymentMethod as any,
+                            notes: notes,
+                            status: status as any
+                        }
+                    });
+                } else if (type === 'projectoffering') {
+                    result = await prisma.projectOffering.create({
+                        data: {
+                            transaction_id: trxId,
+                            date: new Date(date),
+                            service_type: serviceType as any,
+                            project_name: project_name,
+                            amount_collected: amount,
+                            collection_method: paymentMethod as any,
+                            counted_by: countedBy,
+                            notes: notes,
+                            status: status as any
+                        }
+                    });
+                } else if (type === 'welfare') {
+                    result = await prisma.welfareContribution.create({
+                        data: {
+                            transaction_id: trxId,
+                            member_id: member_id,
+                            date: new Date(date),
+                            amount: amount,
+                            payment_method: paymentMethod as any,
+                            payment_period: payment_period as any,
+                            notes: notes,
+                            status: status as any
+                        }
+                    });
+                } else if (type === 'expense') {
+                    result = await prisma.expense.create({
+                        data: {
+                            transaction_id: trxId,
+                            date: new Date(date),
+                            category: category as any,
+                            description: description,
+                            amount: amount,
+                            payment_method: paymentMethod as any,
+                            vendor_payee: vendor_payee,
+                            notes: notes,
+                            status: status as any
                         }
                     });
                 }
@@ -176,6 +221,173 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                 if (total - withdrawn < amount) return NextResponse.json({ success: false, message: "Insufficient funds" }, { status: 400 });
                 const wd = await prisma.withdrawal.create({ data: { transaction_id: `WD-${Date.now()}`, account_type, amount, recipient, purpose, authorized_by: body.authorized_by, date: new Date(date) } });
                 return NextResponse.json({ success: true, data: wd });
+            }
+
+            case 'blogs/create':
+            case 'blogs/update': {
+                const isUpdate = slug === 'blogs/update';
+                const id = getString(formData!, 'id');
+                const title = getString(formData!, 'title');
+                const authorImagePath = await saveFile(formData?.get('author_image') as File, 'blogs/authors');
+                const thumbnailPath = await saveFile(formData?.get('thumbnail') as File, 'blogs/thumbnails');
+
+                const data: any = {
+                    title,
+                    slug: getString(formData!, 'slug') || title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''),
+                    author: getString(formData!, 'author'),
+                    category: getString(formData!, 'category'),
+                    tags: getString(formData!, 'tags'),
+                    excerpt: getString(formData!, 'excerpt'),
+                    content: getString(formData!, 'content'),
+                    status: getString(formData!, 'status') as any,
+                    is_featured: getBool(formData!, 'is_featured'),
+                    published_at: formData?.get('publish_date') ? new Date(getString(formData!, 'publish_date')) : new Date(),
+                };
+
+                if (authorImagePath) data.author_image_path = authorImagePath;
+                if (thumbnailPath) data.thumbnail_path = thumbnailPath;
+
+                let blog;
+                if (isUpdate && id) {
+                    blog = await prisma.blog.update({ where: { id: parseInt(id) }, data });
+                } else {
+                    blog = await prisma.blog.create({ data });
+                }
+
+                return NextResponse.json({ success: true, data: blog });
+            }
+
+            case 'events/create':
+            case 'events/update': {
+                const isUpdate = slug === 'events/update';
+                const id = getString(formData!, 'event_id') || getString(formData!, 'id');
+
+                const eventImagePath = await saveFile(formData?.get('eventImage') as File, 'events');
+                const contactImagePath = await saveFile(formData?.get('contactPersonImage') as File, 'events/contacts');
+                const adImage1Path = await saveFile(formData?.get('adImage1') as File, 'events/ads');
+                const adImage2Path = await saveFile(formData?.get('adImage2') as File, 'events/ads');
+                const adVideo1Path = await saveFile(formData?.get('adVideo1') as File, 'events/ads');
+                const adVideo2Path = await saveFile(formData?.get('adVideo2') as File, 'events/ads');
+
+                const data: any = {
+                    name: getString(formData!, 'eventName'),
+                    type: getString(formData!, 'eventType').toUpperCase() as any,
+                    type_other: getString(formData!, 'eventTypeOther'),
+                    category: getString(formData!, 'eventCategory').toUpperCase() as any,
+                    category_other: getString(formData!, 'eventCategoryOther'),
+                    description: getString(formData!, 'eventDescription'),
+                    start_date: new Date(getString(formData!, 'startDate')),
+                    start_time: new Date(`1970-01-01T${getString(formData!, 'startTime')}:00`),
+                    end_date: new Date(getString(formData!, 'endDate')),
+                    end_time: new Date(`1970-01-01T${getString(formData!, 'endTime')}:00`),
+                    is_recurring: getBool(formData!, 'recurringEvent'),
+                    location: getString(formData!, 'eventLocation') === 'Other' ? getString(formData!, 'eventLocationCustom') : getString(formData!, 'eventLocation'),
+                    room_building: getString(formData!, 'roomBuilding'),
+                    full_address: getString(formData!, 'fullAddress'),
+                    is_virtual: getBool(formData!, 'virtualEvent'),
+                    virtual_link: getString(formData!, 'virtualLink'),
+                    max_capacity: getInt(formData!, 'maxCapacity'),
+                    registration_deadline: formData?.get('registrationDeadline') ? new Date(getString(formData!, 'registrationDeadline')) : null,
+                    require_registration: getBool(formData!, 'requireRegistration'),
+                    open_to_public: getBool(formData!, 'openToPublic'),
+                    volunteers_needed: getInt(formData!, 'volunteersNeeded'),
+                    contact_person: getString(formData!, 'contactPerson'),
+                    contact_email: getString(formData!, 'contactEmail'),
+                    contact_phone: getString(formData!, 'contactPhone'),
+                    age_group: (getString(formData!, 'ageGroup').charAt(0).toUpperCase() + getString(formData!, 'ageGroup').slice(1)) as any,
+                    special_notes: getString(formData!, 'specialNotes'),
+                    status: getString(formData!, 'status') as any,
+                };
+
+                if (eventImagePath) data.image_path = eventImagePath;
+                if (contactImagePath) data.contact_person_image = contactImagePath;
+                if (adImage1Path) data.ad_image_1 = adImage1Path;
+                if (adImage2Path) data.ad_image_2 = adImage2Path;
+                if (adVideo1Path) data.ad_video_1 = adVideo1Path;
+                if (adVideo2Path) data.ad_video_2 = adVideo2Path;
+
+                let eventRecord: Event;
+                if (isUpdate && id) {
+                    eventRecord = await prisma.event.update({ where: { id: parseInt(id) }, data });
+                    // Handle Tags and Roles if needed - usually requires clearing and recreating
+                    const tags = JSON.parse(getString(formData!, 'eventTags') || '[]');
+                    if (tags.length > 0) {
+                        await prisma.eventTag.deleteMany({ where: { event_id: eventRecord.id } });
+                        await prisma.eventTag.createMany({ data: tags.map((t: string) => ({ event_id: eventRecord.id, tag: t })) });
+                    }
+                    const roles = JSON.parse(getString(formData!, 'volunteerRoles') || '[]');
+                    if (roles.length > 0) {
+                        await prisma.eventVolunteerRole.deleteMany({ where: { event_id: eventRecord.id } });
+                        await prisma.eventVolunteerRole.createMany({ data: roles.map((r: any) => ({ event_id: eventRecord.id, role_name: r.name, quantity_needed: parseInt(r.quantity) })) });
+                    }
+                } else {
+                    eventRecord = await prisma.event.create({ data });
+                    const tags = JSON.parse(getString(formData!, 'eventTags') || '[]');
+                    if (tags.length > 0) {
+                        await prisma.eventTag.createMany({ data: tags.map((t: string) => ({ event_id: eventRecord.id, tag: t })) });
+                    }
+                    const roles = JSON.parse(getString(formData!, 'volunteerRoles') || '[]');
+                    if (roles.length > 0) {
+                        await prisma.eventVolunteerRole.createMany({ data: roles.map((r: any) => ({ event_id: eventRecord.id, role_name: r.name, quantity_needed: parseInt(r.quantity) })) });
+                    }
+                }
+
+                return NextResponse.json({ success: true, data: eventRecord });
+            }
+
+            case 'sermons/create':
+            case 'sermons/update': {
+                const isUpdate = slug === 'sermons/update';
+                const id = getString(formData!, 'id');
+                const videoType = getString(formData!, 'videoType') as any;
+
+                const videoFile = await saveFile(formData?.get('videoFile') as File, 'sermons/videos');
+                const audioFile = await saveFile(formData?.get('audioFile') as File, 'sermons/audio');
+                const pdfFile = await saveFile(formData?.get('pdfFile') as File, 'sermons/docs');
+                const sermonImage = await saveFile(formData?.get('sermonImage') as File, 'sermons/images');
+
+                const data: any = {
+                    sermon_title: getString(formData!, 'sermonTitle'),
+                    sermon_speaker: getString(formData!, 'sermonSpeaker'),
+                    sermon_date: new Date(getString(formData!, 'sermonDate')),
+                    sermon_series: getString(formData!, 'sermonSeries'),
+                    sermon_series_other: getString(formData!, 'sermonSeriesOther'),
+                    sermon_description: getString(formData!, 'sermonDescription'),
+                    video_type: videoType,
+                    sermon_duration: getInt(formData!, 'sermonDuration'),
+                    sermon_category: getString(formData!, 'sermonCategory'),
+                    sermon_category_other: getString(formData!, 'sermonCategoryOther'),
+                    tags: JSON.parse(getString(formData!, 'tags') || '[]'),
+                    is_featured: getString(formData!, 'featuredSermon') === '1',
+                    allow_downloads: getString(formData!, 'allowDownloads') === '1',
+                    is_published: getString(formData!, 'publishImmediately') === '1',
+                    enable_comments: getString(formData!, 'enableComments') === '1',
+                };
+
+                if (videoType === 'url') data.video_file = getString(formData!, 'videoUrl');
+                else if (videoFile) data.video_file = videoFile;
+
+                if (audioFile) data.audio_file = audioFile;
+                if (pdfFile) data.pdf_file = pdfFile;
+                if (sermonImage) data.sermon_image = sermonImage;
+
+                let sermon: Sermon;
+                if (isUpdate && id) {
+                    sermon = await prisma.sermon.update({ where: { id: parseInt(id) }, data });
+                    const scriptures = formData?.getAll('scripture[]') as string[];
+                    if (scriptures && scriptures.length > 0) {
+                        await prisma.sermonScripture.deleteMany({ where: { sermon_id: sermon.id } });
+                        await prisma.sermonScripture.createMany({ data: scriptures.map(s => ({ sermon_id: sermon.id, scripture_reference: s })) });
+                    }
+                } else {
+                    sermon = await prisma.sermon.create({ data });
+                    const scriptures = formData?.getAll('scripture[]') as string[];
+                    if (scriptures && scriptures.length > 0) {
+                        await prisma.sermonScripture.createMany({ data: scriptures.map(s => ({ sermon_id: sermon.id, scripture_reference: s })) });
+                    }
+                }
+
+                return NextResponse.json({ success: true, data: sermon });
             }
 
             case 'gallery/create': {
@@ -202,6 +414,80 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     }
                 }
                 return NextResponse.json({ success: true, album_id: albumId });
+            }
+
+            case 'members/create': {
+                const photoPath = await saveFile(formData?.get('photoInput') as File, 'members');
+                const birthdayThumbPath = await saveFile(formData?.get('birthdayThumb') as File, 'members');
+
+                const member = await prisma.member.create({
+                    data: {
+                        first_name: getString(formData!, 'firstName'),
+                        last_name: getString(formData!, 'lastName'),
+                        date_of_birth: formData?.get('dateOfBirth') ? new Date(getString(formData!, 'dateOfBirth')) : null,
+                        gender: getString(formData!, 'gender') as any,
+                        marital_status: getString(formData!, 'maritalStatus') as any,
+                        occupation: getString(formData!, 'occupation'),
+                        phone: getString(formData!, 'phone'),
+                        email: getString(formData!, 'email'),
+                        address: getString(formData!, 'address'),
+                        city: getString(formData!, 'city'),
+                        region: getString(formData!, 'region'),
+                        status: (getString(formData!, 'status').charAt(0).toUpperCase() + getString(formData!, 'status').slice(1)) as any,
+                        church_group: getString(formData!, 'selectedMinistry') as any,
+                        leadership_role: getString(formData!, 'leadership').replace(' ', '_') as any,
+                        baptism_status: getString(formData!, 'baptismStatus') as any,
+                        spiritual_growth: getString(formData!, 'spiritualGrowth').replace(' ', '_') as any,
+                        membership_type: getString(formData!, 'membershipType').replace(' ', '_') as any,
+                        notes: getString(formData!, 'notes'),
+                        photo_path: photoPath,
+                        birthday_thumb: birthdayThumbPath,
+                        birthday_title: getString(formData!, 'birthdayTitle'),
+                        birthday_message: getString(formData!, 'birthdayMessage'),
+                        emergencyContacts: {
+                            create: {
+                                emergency_name: getString(formData!, 'emergencyName'),
+                                emergency_phone: getString(formData!, 'emergencyPhone'),
+                                emergency_relation: getString(formData!, 'emergencyRelation')
+                            }
+                        }
+                    }
+                });
+
+                // Handle Departments
+                const depts = formData?.getAll('departments[]') as string[];
+                if (depts && depts.length > 0) {
+                    for (const deptName of depts) {
+                        if (deptName === 'None') continue;
+                        const dept = await prisma.department.findFirst({ where: { department_name: deptName as any } });
+                        if (dept) {
+                            await prisma.memberDepartment.create({
+                                data: {
+                                    member_id: member.member_id,
+                                    department_id: dept.department_id
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // Handle Ministries
+                const mins = formData?.getAll('ministries[]') as string[];
+                if (mins && mins.length > 0) {
+                    for (const minName of mins) {
+                        const min = await prisma.ministry.findFirst({ where: { ministry_name: minName as any } });
+                        if (min) {
+                            await prisma.memberMinistry.create({
+                                data: {
+                                    member_id: member.member_id,
+                                    ministry_id: min.ministry_id
+                                }
+                            });
+                        }
+                    }
+                }
+
+                return NextResponse.json({ success: true, member_id: member.member_id, photoPath, birthdayThumbPath });
             }
 
             default: return NextResponse.json({ success: false, message: "Route not found" }, { status: 404 });
