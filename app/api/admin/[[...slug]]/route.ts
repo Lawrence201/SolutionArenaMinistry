@@ -124,20 +124,48 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                 const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 const blog = await prisma.blog.create({
                     data: {
-                        title, slug, author: getString(formData!, 'author'), excerpt: getString(formData!, 'excerpt'), content: getString(formData!, 'content'),
-                        thumbnail_path: await saveFile(formData?.get('thumbnail') as File, 'blogs'),
-                        status: getString(formData!, 'status') === 'draft' ? BlogStatus.draft : BlogStatus.published
+                        title: title as any,
+                        slug: slug as any,
+                        author: getString(formData!, 'author') as any,
+                        excerpt: getString(formData!, 'excerpt') as any,
+                        content: getString(formData!, 'content') as any,
+                        thumbnail_path: (await saveFile(formData?.get('thumbnail') as File, 'blogs')) as any,
+                        status: (getString(formData!, 'status') === 'draft' ? BlogStatus.draft : BlogStatus.published) as any
                     }
                 });
                 return NextResponse.json({ success: true, blog_id: blog.id });
             }
 
             case 'finance/create': {
-                const { type, amount, date, paymentMethod } = body;
+                const { type, amount, date, paymentMethod, serviceType, status, countedBy, notes } = body;
                 const trxId = `TRX-${Date.now()}`;
                 let result;
-                if (type === 'offering') result = await prisma.offering.create({ data: { transaction_id: trxId, amount_collected: parseFloat(amount), date: new Date(date), collection_method: paymentMethod as any, status: 'Pending' } });
-                else if (type === 'tithe') result = await prisma.tithe.create({ data: { transaction_id: trxId, amount: parseFloat(amount), date: new Date(date), payment_method: paymentMethod as any, status: 'Paid', member_id: parseInt(body.memberId) || null } });
+                if (type === 'offering') {
+                    result = await prisma.offering.create({
+                        data: {
+                            transaction_id: trxId,
+                            amount_collected: parseFloat(amount),
+                            date: new Date(date),
+                            service_type: (serviceType || 'Sunday Worship') as any,
+                            collection_method: (paymentMethod || 'Cash') as any,
+                            counted_by: countedBy || '',
+                            notes: notes || '',
+                            status: (status || 'Pending') as any
+                        }
+                    });
+                } else if (type === 'tithe') {
+                    result = await prisma.tithe.create({
+                        data: {
+                            transaction_id: trxId,
+                            amount: parseFloat(amount),
+                            date: new Date(date),
+                            payment_method: (paymentMethod || 'Cash') as any,
+                            status: (status || 'Paid') as any,
+                            member_id: parseInt(body.memberId) || null,
+                            notes: notes || ''
+                        }
+                    });
+                }
                 return NextResponse.json({ success: true, data: result });
             }
 
@@ -157,7 +185,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                 for (const file of files) {
                     if (file.size > 0) {
                         const path = await saveFile(file, 'gallery');
-                        await prisma.galleryMedia.create({ data: { album_id: albumId, media_type: file.type.startsWith('image/') ? 'photo' : 'video', file_path: path, file_name: file.name, file_size: file.size, file_extension: file.name.split('.').pop() || '', mime_type: file.type, upload_order: 0 } });
+                        if (path) {
+                            await prisma.galleryMedia.create({
+                                data: {
+                                    album_id: albumId as any,
+                                    media_type: (file.type.startsWith('image/') ? 'photo' : 'video') as any,
+                                    file_path: path as any,
+                                    file_name: file.name as any,
+                                    file_size: BigInt(file.size) as any,
+                                    file_extension: (file.name.split('.').pop() || '') as any,
+                                    mime_type: file.type as any,
+                                    upload_order: 0 as any
+                                }
+                            });
+                        }
                     }
                 }
                 return NextResponse.json({ success: true, album_id: albumId });

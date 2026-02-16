@@ -54,15 +54,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
         const body = await req.json();
         switch (slug) {
             case 'tithes': {
-                const t = await prisma.tithe.create({ data: { transaction_id: `CPS${Date.now()}`, member_id: body.member_id, date: new Date(body.date), amount: parseFloat(body.amount), payment_method: body.payment_method, receipt_number: body.receipt_number || '', notes: body.notes || '' } });
+                const t = await prisma.tithe.create({ data: { transaction_id: `CPS${Date.now()}`, member_id: body.member_id, date: new Date(body.date), amount: parseFloat(body.amount), payment_method: body.payment_method as any, receipt_number: body.receipt_number || '', notes: body.notes || '' } });
                 return NextResponse.json({ success: true, data: t });
             }
             case 'offerings': {
-                const o = await prisma.offering.create({ data: { transaction_id: `OFF${Date.now()}`, date: new Date(body.date), service_type: body.service_type, amount_collected: parseFloat(body.amount_collected), collection_method: body.collection_method, counted_by: body.counted_by, notes: body.notes || '', status: body.status === 'Verified' ? 'Approved' : 'Pending' } });
+                const o = await prisma.offering.create({ data: { transaction_id: `OFF${Date.now()}`, date: new Date(body.date), service_type: body.service_type as any, amount_collected: parseFloat(body.amount_collected), collection_method: body.collection_method as any, counted_by: body.counted_by, notes: body.notes || '', status: (body.status === 'Verified' ? 'Approved' : 'Pending') as any } });
                 return NextResponse.json({ success: true, data: o });
             }
             case 'expenses': {
-                const e = await prisma.expense.create({ data: { transaction_id: `EXP${Date.now()}`, date: new Date(body.date), category: body.category, description: body.description, amount: parseFloat(body.amount), vendor_payee: body.vendor_payee, payment_method: body.payment_method, notes: body.notes || '', status: body.status || 'Pending' } });
+                const e = await prisma.expense.create({ data: { transaction_id: `EXP${Date.now()}`, date: new Date(body.date), category: body.category as any, description: body.description, amount: parseFloat(body.amount), vendor_payee: body.vendor_payee, payment_method: body.payment_method as any, notes: body.notes || '', status: (body.status || 'Pending') as any } });
                 return NextResponse.json({ success: true, data: e });
             }
             default: return NextResponse.json({ success: false, message: "Route not found" }, { status: 404 });
