@@ -42,17 +42,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
             case 'send': {
                 if (!data.title || !data.content || !data.delivery_channels) return NextResponse.json({ success: false, error: 'Missing fields' }, { status: 400 });
                 const res = await prisma.$transaction(async (tx) => {
-                    const message = await tx.message.create({ data: { message_type: data.message_type || 'general', title: data.title, content: data.content, delivery_channels: data.delivery_channels, status: 'pending', total_recipients: 0, total_sent: 0, total_failed: 0 } });
+                    const message = await tx.message.create({ data: { message_type: (data.message_type || 'general') as any, title: data.title, content: data.content, delivery_channels: data.delivery_channels, status: 'pending' as any, total_recipients: 0, total_sent: 0, total_failed: 0 } });
                     // Simplified recipient logic for consolidation - in practice this would be more detailed
                     const members = await tx.member.findMany({ where: { status: 'Active' }, take: 10 });
-                    for (const m of members) await tx.messageRecipient.create({ data: { message_id: message.message_id, member_id: m.member_id, recipient_name: `${m.first_name} ${m.last_name}`, recipient_email: m.email, recipient_phone: m.phone, delivery_channel: 'email', delivery_status: 'pending' } });
-                    await tx.message.update({ where: { message_id: message.message_id }, data: { total_recipients: members.length, status: 'published', sent_at: new Date(), total_sent: members.length } });
+                    for (const m of members) await tx.messageRecipient.create({ data: { message_id: message.message_id, member_id: m.member_id, recipient_name: `${m.first_name} ${m.last_name}`, recipient_email: m.email, recipient_phone: m.phone, delivery_channel: 'email' as any, delivery_status: 'pending' as any } });
+                    await tx.message.update({ where: { message_id: message.message_id }, data: { total_recipients: members.length, status: 'published' as any, sent_at: new Date(), total_sent: members.length } });
                     return { success: true, message_id: message.message_id, total_recipients: members.length };
                 });
                 return NextResponse.json(res);
             }
             case 'groups': {
-                const group = await prisma.messageGroup.create({ data: { group_name: data.group_name, description: data.description, group_type: data.group_type || 'static' } });
+                const group = await prisma.messageGroup.create({ data: { group_name: data.group_name, description: data.description, group_type: (data.group_type || 'static') as any } });
                 if (data.member_ids) for (const id of data.member_ids) await prisma.messageGroupMember.create({ data: { group_id: group.group_id, member_id: id } });
                 return NextResponse.json({ success: true, group_id: group.group_id });
             }
