@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 import { BlogStatus } from '@prisma/client';
