@@ -15,6 +15,23 @@ const getBool = (formData: FormData, key: string) => {
     return val === 'true' || val === '1' || val === 'on';
 };
 const getInt = (formData: FormData, key: string) => parseInt(formData.get(key)?.toString() || '0');
+const getOptionalString = (formData: FormData, key: string) => {
+    const val = formData.get(key)?.toString();
+    return (val && val.trim() !== '' && val !== 'undefined' && val !== 'null') ? val : null;
+};
+const getSafeDate = (formData: FormData, key: string) => {
+    const val = formData.get(key)?.toString();
+    if (!val || val.trim() === '') return null;
+    const date = new Date(val);
+    return isNaN(date.getTime()) ? null : date;
+};
+const getEnum = (formData: FormData, key: string, defaultValue: string | null = null) => {
+    const val = getOptionalString(formData, key);
+    if (!val) return defaultValue;
+    return val.replace(/\s+/g, '_');
+};
+
+console.log('Admin API Route Loaded [v1.1 - Added Robust Enum Sanitization]');
 
 const getTimeAgo = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -233,15 +250,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 const data: any = {
                     title,
-                    slug: getString(formData!, 'slug') || title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''),
-                    author: getString(formData!, 'author'),
-                    category: getString(formData!, 'category'),
-                    tags: getString(formData!, 'tags'),
-                    excerpt: getString(formData!, 'excerpt'),
-                    content: getString(formData!, 'content'),
-                    status: getString(formData!, 'status') as any,
+                    slug: getOptionalString(formData!, 'slug') || title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''),
+                    author: getOptionalString(formData!, 'author'),
+                    category: getOptionalString(formData!, 'category'),
+                    tags: getOptionalString(formData!, 'tags'),
+                    excerpt: getOptionalString(formData!, 'excerpt'),
+                    content: getOptionalString(formData!, 'content'),
+                    status: getEnum(formData!, 'status', 'published') as any,
                     is_featured: getBool(formData!, 'is_featured'),
-                    published_at: formData?.get('publish_date') ? new Date(getString(formData!, 'publish_date')) : new Date(),
+                    published_at: getSafeDate(formData!, 'publish_date') || new Date(),
                 };
 
                 if (authorImagePath) data.author_image_path = authorImagePath;
@@ -271,32 +288,32 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 const data: any = {
                     name: getString(formData!, 'eventName'),
-                    type: getString(formData!, 'eventType').toUpperCase() as any,
-                    type_other: getString(formData!, 'eventTypeOther'),
-                    category: getString(formData!, 'eventCategory').toUpperCase() as any,
-                    category_other: getString(formData!, 'eventCategoryOther'),
-                    description: getString(formData!, 'eventDescription'),
-                    start_date: new Date(getString(formData!, 'startDate')),
-                    start_time: new Date(`1970-01-01T${getString(formData!, 'startTime')}:00`),
-                    end_date: new Date(getString(formData!, 'endDate')),
-                    end_time: new Date(`1970-01-01T${getString(formData!, 'endTime')}:00`),
+                    type: (getEnum(formData!, 'eventType', 'OTHER')?.toUpperCase()) as any,
+                    type_other: getOptionalString(formData!, 'eventTypeOther'),
+                    category: (getEnum(formData!, 'eventCategory', 'OTHER')?.toUpperCase()) as any,
+                    category_other: getOptionalString(formData!, 'eventCategoryOther'),
+                    description: getOptionalString(formData!, 'eventDescription') || '',
+                    start_date: getSafeDate(formData!, 'startDate') || new Date(),
+                    start_time: getSafeDate(formData!, 'startTime') ? new Date(`1970-01-01T${getString(formData!, 'startTime')}:00`) : new Date('1970-01-01T00:00:00'),
+                    end_date: getSafeDate(formData!, 'endDate') || new Date(),
+                    end_time: getSafeDate(formData!, 'endTime') ? new Date(`1970-01-01T${getString(formData!, 'endTime')}:00`) : new Date('1970-01-01T00:00:00'),
                     is_recurring: getBool(formData!, 'recurringEvent'),
-                    location: getString(formData!, 'eventLocation') === 'Other' ? getString(formData!, 'eventLocationCustom') : getString(formData!, 'eventLocation'),
-                    room_building: getString(formData!, 'roomBuilding'),
-                    full_address: getString(formData!, 'fullAddress'),
+                    location: getString(formData!, 'eventLocation') === 'Other' ? getString(formData!, 'eventLocationCustom') : (getString(formData!, 'eventLocation') || 'TBD'),
+                    room_building: getOptionalString(formData!, 'roomBuilding'),
+                    full_address: getOptionalString(formData!, 'fullAddress'),
                     is_virtual: getBool(formData!, 'virtualEvent'),
-                    virtual_link: getString(formData!, 'virtualLink'),
+                    virtual_link: getOptionalString(formData!, 'virtualLink'),
                     max_capacity: getInt(formData!, 'maxCapacity'),
-                    registration_deadline: formData?.get('registrationDeadline') ? new Date(getString(formData!, 'registrationDeadline')) : null,
+                    registration_deadline: getSafeDate(formData!, 'registrationDeadline'),
                     require_registration: getBool(formData!, 'requireRegistration'),
                     open_to_public: getBool(formData!, 'openToPublic'),
                     volunteers_needed: getInt(formData!, 'volunteersNeeded'),
-                    contact_person: getString(formData!, 'contactPerson'),
-                    contact_email: getString(formData!, 'contactEmail'),
-                    contact_phone: getString(formData!, 'contactPhone'),
-                    age_group: (getString(formData!, 'ageGroup').charAt(0).toUpperCase() + getString(formData!, 'ageGroup').slice(1)) as any,
-                    special_notes: getString(formData!, 'specialNotes'),
-                    status: getString(formData!, 'status') as any,
+                    contact_person: getOptionalString(formData!, 'contactPerson'),
+                    contact_email: getOptionalString(formData!, 'contactEmail'),
+                    contact_phone: getOptionalString(formData!, 'contactPhone'),
+                    age_group: getEnum(formData!, 'ageGroup', 'All') as any,
+                    special_notes: getOptionalString(formData!, 'specialNotes'),
+                    status: getEnum(formData!, 'status', 'Published') as any,
                 };
 
                 if (eventImagePath) data.image_path = eventImagePath;
@@ -349,14 +366,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                 const data: any = {
                     sermon_title: getString(formData!, 'sermonTitle'),
                     sermon_speaker: getString(formData!, 'sermonSpeaker'),
-                    sermon_date: new Date(getString(formData!, 'sermonDate')),
-                    sermon_series: getString(formData!, 'sermonSeries'),
-                    sermon_series_other: getString(formData!, 'sermonSeriesOther'),
-                    sermon_description: getString(formData!, 'sermonDescription'),
-                    video_type: videoType,
+                    sermon_date: getSafeDate(formData!, 'sermonDate') || new Date(),
+                    sermon_series: getOptionalString(formData!, 'sermonSeries'),
+                    sermon_series_other: getOptionalString(formData!, 'sermonSeriesOther'),
+                    sermon_description: getOptionalString(formData!, 'sermonDescription') || '',
+                    video_type: getEnum(formData!, 'videoType', 'file') as any,
                     sermon_duration: getInt(formData!, 'sermonDuration'),
-                    sermon_category: getString(formData!, 'sermonCategory'),
-                    sermon_category_other: getString(formData!, 'sermonCategoryOther'),
+                    sermon_category: getOptionalString(formData!, 'sermonCategory'),
+                    sermon_category_other: getOptionalString(formData!, 'sermonCategoryOther'),
                     tags: JSON.parse(getString(formData!, 'tags') || '[]'),
                     is_featured: getString(formData!, 'featuredSermon') === '1',
                     allow_downloads: getString(formData!, 'allowDownloads') === '1',
@@ -424,26 +441,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     data: {
                         first_name: getString(formData!, 'firstName'),
                         last_name: getString(formData!, 'lastName'),
-                        date_of_birth: formData?.get('dateOfBirth') ? new Date(getString(formData!, 'dateOfBirth')) : null,
-                        gender: getString(formData!, 'gender') as any,
-                        marital_status: getString(formData!, 'maritalStatus') as any,
-                        occupation: getString(formData!, 'occupation'),
+                        date_of_birth: getSafeDate(formData!, 'dateOfBirth'),
+                        gender: getEnum(formData!, 'gender') as any,
+                        marital_status: getEnum(formData!, 'maritalStatus') as any,
+                        occupation: getOptionalString(formData!, 'occupation'),
                         phone: getString(formData!, 'phone'),
                         email: getString(formData!, 'email'),
-                        address: getString(formData!, 'address'),
-                        city: getString(formData!, 'city'),
-                        region: getString(formData!, 'region'),
-                        status: (getString(formData!, 'status').charAt(0).toUpperCase() + getString(formData!, 'status').slice(1)) as any,
-                        church_group: getString(formData!, 'selectedMinistry') as any,
-                        leadership_role: getString(formData!, 'leadership').replace(' ', '_') as any,
-                        baptism_status: getString(formData!, 'baptismStatus') as any,
-                        spiritual_growth: getString(formData!, 'spiritualGrowth').replace(' ', '_') as any,
-                        membership_type: getString(formData!, 'membershipType').replace(' ', '_') as any,
-                        notes: getString(formData!, 'notes'),
+                        address: getOptionalString(formData!, 'address'),
+                        city: getOptionalString(formData!, 'city'),
+                        region: getOptionalString(formData!, 'region'),
+                        status: getEnum(formData!, 'status', 'Active') as any,
+                        church_group: getEnum(formData!, 'selectedMinistry') as any,
+                        leadership_role: getEnum(formData!, 'leadership', 'None') as any,
+                        baptism_status: getEnum(formData!, 'baptismStatus') as any,
+                        spiritual_growth: getEnum(formData!, 'spiritualGrowth') as any,
+                        membership_type: getEnum(formData!, 'membershipType', 'Full_Member') as any,
+                        notes: getOptionalString(formData!, 'notes'),
                         photo_path: photoPath,
                         birthday_thumb: birthdayThumbPath,
-                        birthday_title: getString(formData!, 'birthdayTitle'),
-                        birthday_message: getString(formData!, 'birthdayMessage'),
+                        birthday_title: getOptionalString(formData!, 'birthdayTitle'),
+                        birthday_message: getOptionalString(formData!, 'birthdayMessage'),
                         emergencyContacts: {
                             create: {
                                 emergency_name: getString(formData!, 'emergencyName'),
