@@ -47,6 +47,7 @@ export async function updateMember(memberId: number, formData: any) {
                 address: formData.address || null,
                 city: formData.city || null,
                 region: formData.region || null,
+                gps_address: formData.gps_address || null,
                 emergencyContacts: {
                     deleteMany: {},
                     create: {

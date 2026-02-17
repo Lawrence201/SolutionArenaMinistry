@@ -83,10 +83,18 @@ export default function EditEventForm({ event }: EditEventFormProps) {
 
     // File states
     const [eventImage, setEventImage] = useState<File | null>(null);
-    const [eventImagePreview, setEventImagePreview] = useState<string | null>(event?.image_path || null);
+    const [eventImagePreview, setEventImagePreview] = useState<string | null>(
+        event?.image_path
+            ? (event.image_path.startsWith('/') || event.image_path.startsWith('http') ? event.image_path : `/uploads/events/${event.image_path}`)
+            : null
+    );
 
     const [contactImage, setContactImage] = useState<File | null>(null);
-    const [contactImagePreview, setContactImagePreview] = useState<string | null>(event?.contact_person_image || null);
+    const [contactImagePreview, setContactImagePreview] = useState<string | null>(
+        event?.contact_person_image
+            ? (event.contact_person_image.startsWith('/') || event.contact_person_image.startsWith('http') ? event.contact_person_image : `/uploads/events/contacts/${event.contact_person_image}`)
+            : null
+    );
 
     // Ad Media States
     const [adImage1, setAdImage1] = useState<File | null>(null);

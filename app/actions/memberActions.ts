@@ -184,7 +184,8 @@ export async function getMembers(filters: MemberFilters = {}) {
 
         console.log('🎯 Final where clause:', JSON.stringify(where, null, 2));
 
-        const threeMonthsAgo = subMonths(new Date(), 3);
+        const engagementPeriod = subMonths(new Date(), 6);
+        const attendancePeriod = subMonths(new Date(), 3);
 
         const members = await prisma.member.findMany({
             where,
@@ -194,19 +195,19 @@ export async function getMembers(filters: MemberFilters = {}) {
                 attendance: {
                     where: {
                         check_in_date: {
-                            gte: threeMonthsAgo
+                            gte: engagementPeriod
                         }
                     }
                 },
                 tithes: {
                     where: {
-                        date: { gte: threeMonthsAgo },
+                        date: { gte: engagementPeriod },
                         status: 'Paid'
                     }
                 },
                 welfareContributions: {
                     where: {
-                        date: { gte: threeMonthsAgo },
+                        date: { gte: engagementPeriod },
                         status: 'Paid'
                     }
                 }
@@ -214,24 +215,32 @@ export async function getMembers(filters: MemberFilters = {}) {
             orderBy: { created_at: 'desc' },
         });
 
-        // 1. Calculate the denominator: Number of Sundays in the last 90 days
-        let totalSundays = 0;
+        // 1. Calculate the denominator for engagement (6 months)
+        let totalSundaysEng = 0;
         const now = new Date();
-        const checkDate = new Date(threeMonthsAgo);
+        const checkDateEng = new Date(engagementPeriod);
 
-        while (checkDate <= now) {
-            if (checkDate.getDay() === 0) { // 0 is Sunday
-                totalSundays++;
-            }
-            checkDate.setDate(checkDate.getDate() + 1);
+        while (checkDateEng <= now) {
+            if (checkDateEng.getDay() === 0) totalSundaysEng++;
+            checkDateEng.setDate(checkDateEng.getDate() + 1);
         }
-        totalSundays = Math.max(totalSundays, 1); // Avoid division by zero
+        totalSundaysEng = Math.max(totalSundaysEng, 1);
+
+        // 2. Calculate the denominator for attendance (3 months)
+        let totalSundaysAtt = 0;
+        const checkDateAtt = new Date(attendancePeriod);
+
+        while (checkDateAtt <= now) {
+            if (checkDateAtt.getDay() === 0) totalSundaysAtt++;
+            checkDateAtt.setDate(checkDateAtt.getDate() + 1);
+        }
+        totalSundaysAtt = Math.max(totalSundaysAtt, 1);
 
         // 2. Get unique service dates in the last 3 months (for debug/reference if needed, but we use totalSundays now)
         const distinctServiceDates = await prisma.attendance.findMany({
             where: {
                 check_in_date: {
-                    gte: threeMonthsAgo
+                    gte: engagementPeriod
                 }
             },
             select: {
@@ -245,18 +254,17 @@ export async function getMembers(filters: MemberFilters = {}) {
         // Enrich members with calculated fields
         const enrichedMembers = members.map(member => {
             const joinDate = new Date(member.created_at);
-            const effectiveStartDate = joinDate > threeMonthsAgo ? joinDate : threeMonthsAgo;
+            const effectiveStartDate = joinDate > engagementPeriod ? joinDate : engagementPeriod;
 
-            // 1. Attendance Score (40%)
-            // We now use totalSundays as the fixed denominator for a 3-month window
-            const attendanceCount = member.attendance.length;
-            const attendancePct = Math.min(Math.round((attendanceCount / totalSundays) * 100), 100);
+            // 1. Attendance Score (40%) - Uses 3-month window
+            const attendanceCount = member.attendance.filter(a => new Date(a.check_in_date) >= attendancePeriod).length;
+            const attendancePct = Math.min(Math.round((attendanceCount / totalSundaysAtt) * 100), 100);
 
-            // 2. Tithes Score (30%)
-            // Check how many months they paid at least one tithe vs how many months they've been a member (max 3)
+            // 2. Tithes Score (30%) - Uses 6-month window
+            // Check how many months they paid at least one tithe vs how many months they've been a member (max 6)
             const titheMonths = new Set(member.tithes.map(t => new Date(t.date).getMonth() + '-' + new Date(t.date).getFullYear()));
 
-            // Calculate number of full/partial months since joining (capped at 3)
+            // Calculate number of full/partial months since joining (capped at 6)
             const now = new Date();
             const startMonth = effectiveStartDate.getMonth();
             const startYear = effectiveStartDate.getFullYear();
@@ -264,7 +272,7 @@ export async function getMembers(filters: MemberFilters = {}) {
             const endYear = now.getFullYear();
 
             let monthsToCount = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
-            monthsToCount = Math.min(monthsToCount, 3);
+            monthsToCount = Math.min(monthsToCount, 6);
 
             const titheScore = Math.min((titheMonths.size / monthsToCount) * 100, 100);
 
@@ -275,16 +283,14 @@ export async function getMembers(filters: MemberFilters = {}) {
             // Final Engagement Score
             const finalScore = (attendancePct * 0.4) + (titheScore * 0.3) + (welfareScore * 0.3);
 
-            let engagement = 'Low';
-            if (finalScore >= 90) engagement = 'Extreme';
-            else if (finalScore >= 75) engagement = 'High';
-            else if (finalScore >= 50) engagement = 'Moderate';
-            else if (finalScore >= 25) engagement = 'Low';
+            let engagement = 'Very Low';
+            if (finalScore >= 95) engagement = 'Excellent';
+            else if (finalScore >= 80) engagement = 'Very High';
+            else if (finalScore >= 60) engagement = 'High';
+            else if (finalScore >= 45) engagement = 'Medium';
+            else if (finalScore >= 30) engagement = 'Moderate';
+            else if (finalScore >= 15) engagement = 'Low';
             else engagement = 'Very Low';
-
-            // Override for very new members (< 1 week) to give them a 'Moderate' start
-            const daysSinceJoined = (new Date().getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24);
-            if (daysSinceJoined < 7 && finalScore < 50) engagement = 'Moderate';
 
             return {
                 ...member,
