@@ -1,0 +1,15 @@
+[2026-02-17T10:51:52.245Z] getMemberStats: Start
+[2026-02-17T10:51:57.391Z] getMemberStats ERROR: 
+Invalid `prisma.member.count()` invocation in
+C:\xampp\htdocs\Church_Management_System\Church_Management_System\app\actions\memberActions.ts:44:43
+
+  41 try {
+  42     logDebug('getMemberStats: Start');
+  43     // Run group queries sequentially to minimize connection usage
+→ 44     const total = await prisma.member.count(
+Can't reach database server at `ep-holy-dust-ahoodz3g-pooler.c-3.us-east-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-holy-dust-ahoodz3g-pooler.c-3.us-east-1.aws.neon.tech:5432`.
+[2026-02-17T10:51:57.402Z] getMembers: Start with filters: {}
+[2026-02-17T10:51:57.409Z] getMembers: Calling prisma.member.findMany
+[2026-02-17T10:52:02.056Z] getMembers: findMany found 1 members
