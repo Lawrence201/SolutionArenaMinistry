@@ -544,6 +544,12 @@ export async function generateQRToken(
             data: { status: 'expired' }
         });
 
+        // Cleanup: Delete tokens older than 90 days to keep the database clean
+        const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+        await prisma.attendanceToken.deleteMany({
+            where: { created_at: { lt: ninetyDaysAgo } }
+        });
+
         // Generate new secure token
         const rawToken = crypto.randomBytes(32).toString('hex');
         const metadata = JSON.stringify({ sid: serviceId, date, svc: serviceName, ts: Date.now() });
@@ -789,6 +795,26 @@ export async function getAdvancedAttendanceData(
             service: a.service_id.replace(/-/g, ' ').toUpperCase()
         }));
 
+        // 7. Ministry Breakdown
+        const ministryMap: Record<string, number> = {};
+        attendance.forEach(a => {
+            const m = a.member?.church_group || (a.member_id ? 'General' : 'Visitor');
+            ministryMap[m] = (ministryMap[m] || 0) + 1;
+        });
+        const ministryBreakdown = Object.entries(ministryMap).map(([name, count]) => ({ name, count }));
+
+        // 8. Gender Breakdown
+        const genderMap: Record<string, number> = { Male: 0, Female: 0, Unknown: 0 };
+        attendance.forEach(a => {
+            if (a.member) {
+                const g = a.member.gender || 'Unknown';
+                genderMap[g]++;
+            } else if (a.visitor) {
+                genderMap['Unknown']++;
+            }
+        });
+        const genderBreakdown = Object.entries(genderMap).map(([name, count]) => ({ name, count }));
+
         return {
             success: true,
             data: {
@@ -801,12 +827,83 @@ export async function getAdvancedAttendanceData(
                 memberAttendance,
                 dailyBreakdown,
                 visitorLogs,
-                rawLogs
+                rawLogs,
+                ministryBreakdown,
+                genderBreakdown
             }
         };
 
     } catch (error) {
         console.error('Error in getAdvancedAttendanceData:', error);
         return { success: false, message: 'Failed to fetch advanced data' };
+    }
+}
+// ============= SYNC STATUS (Lightweight) =============
+
+export async function getAttendanceSyncStatus(
+    serviceId?: string,
+    checkInDate?: string
+): Promise<{ success: boolean; lastCount: number; lastTimestamp: string | null }> {
+    try {
+        const date = checkInDate ? new Date(checkInDate) : new Date();
+        const useServiceId = serviceId && serviceId !== '0';
+
+        // Get the total count and the latest check-in time for this service/date
+        const latestRecord = await prisma.attendance.findFirst({
+            where: {
+                check_in_date: date,
+                ...(useServiceId ? { service_id: serviceId } : {})
+            },
+            orderBy: { check_in_time: 'desc' },
+            select: { check_in_time: true }
+        });
+
+        const count = await prisma.attendance.count({
+            where: {
+                check_in_date: date,
+                ...(useServiceId ? { service_id: serviceId } : {})
+            }
+        });
+
+        return {
+            success: true,
+            lastCount: count,
+            lastTimestamp: latestRecord?.check_in_time ? latestRecord.check_in_time.toISOString() : null
+        };
+    } catch (error) {
+        console.error('Error fetching sync status:', error);
+        return { success: false, lastCount: 0, lastTimestamp: null };
+    }
+}
+// ============= GET ACTIVE QR TOKEN =============
+
+export async function getActiveQRToken(serviceId: string): Promise<{ success: boolean; token?: string; message?: string }> {
+    try {
+        const tokenRecord = await prisma.attendanceToken.findFirst({
+            where: {
+                service_id: serviceId,
+                status: 'active'
+            },
+            orderBy: { created_at: 'desc' }
+        });
+
+        if (tokenRecord) {
+            // Check if expired (24h)
+            const createdAt = new Date(tokenRecord.created_at).getTime();
+            const now = Date.now();
+            if (now - createdAt > 86400000) {
+                await prisma.attendanceToken.update({
+                    where: { id: tokenRecord.id },
+                    data: { status: 'expired' }
+                });
+                return { success: false, message: 'Token expired' };
+            }
+            return { success: true, token: tokenRecord.token_hash };
+        }
+
+        return { success: false, message: 'No active token found' };
+    } catch (error) {
+        console.error('Error fetching active QR token:', error);
+        return { success: false, message: 'Database error' };
     }
 }

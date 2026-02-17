@@ -47,6 +47,23 @@ const getTimeAgo = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
+const logActivity = async (type: string, title: string, description: string, relatedId?: number) => {
+    try {
+        await prisma.activityLog.create({
+            data: {
+                activity_type: type as any,
+                title,
+                description,
+                related_id: relatedId,
+                icon_type: type,
+                created_by: "Admin"
+            }
+        });
+    } catch (e) {
+        console.error('Failed to log activity:', e);
+    }
+};
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
         const { slug: slugArr } = await params;
@@ -55,16 +72,87 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
         switch (slug) {
             case 'dashboard-stats': {
-                const currentMonthStart = new Date(); currentMonthStart.setDate(1); currentMonthStart.setHours(0, 0, 0, 0);
-                const [totalMembers, newMembers, totalEvents, newEvents, offerings, tithes, projects, welfare, expenses, withdrawals, active, inactive, visitors] = await Promise.all([
-                    prisma.member.count(), prisma.member.count({ where: { created_at: { gte: currentMonthStart } } }),
-                    prisma.event.count(), prisma.event.count({ where: { created_at: { gte: currentMonthStart } } }),
-                    prisma.offering.aggregate({ _sum: { amount_collected: true } }), prisma.tithe.aggregate({ _sum: { amount: true } }),
-                    prisma.projectOffering.aggregate({ _sum: { amount_collected: true } }), prisma.welfareContribution.aggregate({ _sum: { amount: true } }),
-                    prisma.expense.aggregate({ _sum: { amount: true } }), prisma.withdrawal.aggregate({ _sum: { amount: true } }),
-                    prisma.member.count({ where: { status: "Active" } }), prisma.member.count({ where: { status: "Inactive" } }), prisma.member.count({ where: { membership_type: "Visitor" } })
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+
+                const [totalMembers, newMembers, totalEvents, newEvents, offerings, tithes, projects, welfare, expenses, withdrawals, active, inactive, visitors, monthAttendance, monthTithes] = await Promise.all([
+                    prisma.member.count(),
+                    prisma.member.count({ where: { created_at: { gte: currentMonthStart } } }),
+                    prisma.event.count(),
+                    prisma.event.count({ where: { created_at: { gte: currentMonthStart } } }),
+                    prisma.offering.aggregate({ _sum: { amount_collected: true } }),
+                    prisma.tithe.aggregate({ _sum: { amount: true } }),
+                    prisma.projectOffering.aggregate({ _sum: { amount_collected: true } }),
+                    prisma.welfareContribution.aggregate({ _sum: { amount: true } }),
+                    prisma.expense.aggregate({ _sum: { amount: true } }),
+                    prisma.withdrawal.aggregate({ _sum: { amount: true } }),
+                    prisma.member.count({ where: { status: "Active" } }),
+                    prisma.member.count({ where: { status: "Inactive" } }),
+                    prisma.member.count({ where: { membership_type: "Visitor" } }),
+                    prisma.attendance.count({ where: { check_in_date: { gte: currentMonthStart } } }),
+                    prisma.tithe.aggregate({ _sum: { amount: true }, where: { date: { gte: threeMonthsAgo } } })
                 ]);
-                return NextResponse.json({ success: true, data: { total_members: totalMembers, members_change: newMembers, total_events: totalEvents, events_change: newEvents, total_offerings: Number(offerings._sum.amount_collected || 0), total_tithes: Number(tithes._sum.amount || 0), total_project_offerings: Number(projects._sum.amount_collected || 0), total_welfare: Number(welfare._sum.amount || 0), total_expenses: Number(expenses._sum.amount || 0), total_withdrawals: Number(withdrawals._sum.amount || 0), active_members: active, inactive_members: inactive, visitors } });
+
+                // Calculate real trends for the last 6 months
+                const financial_trends = [];
+                const attendance_trends = [];
+
+                for (let i = 5; i >= 0; i--) {
+                    const mDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const mStart = new Date(mDate.getFullYear(), mDate.getMonth(), 1);
+                    const mEnd = new Date(mDate.getFullYear(), mDate.getMonth() + 1, 0, 23, 59, 59);
+                    const mName = mDate.toLocaleString('en-US', { month: 'short' });
+
+                    const [mAtt, mOff, mTit, mPrj, mWelf] = await Promise.all([
+                        prisma.attendance.count({ where: { check_in_date: { gte: mStart, lte: mEnd } } }),
+                        prisma.offering.aggregate({ _sum: { amount_collected: true }, where: { date: { gte: mStart, lte: mEnd } } }),
+                        prisma.tithe.aggregate({ _sum: { amount: true }, where: { date: { gte: mStart, lte: mEnd } } }),
+                        prisma.projectOffering.aggregate({ _sum: { amount_collected: true }, where: { date: { gte: mStart, lte: mEnd } } }),
+                        prisma.welfareContribution.aggregate({ _sum: { amount: true }, where: { date: { gte: mStart, lte: mEnd } } })
+                    ]);
+
+                    const totalMIncome = Number(mOff._sum.amount_collected || 0) +
+                        Number(mTit._sum.amount || 0) +
+                        Number(mPrj._sum.amount_collected || 0) +
+                        Number(mWelf._sum.amount || 0);
+
+                    financial_trends.push({ month: mName, amount: totalMIncome });
+                    attendance_trends.push({ month: mName, attendance: mAtt });
+                }
+
+                const memberGoal = 50;
+                const attendanceGoal = 400;
+                const donationsGoal = 60000;
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        total_members: totalMembers,
+                        members_change: newMembers,
+                        total_events: totalEvents,
+                        events_change: newEvents,
+                        total_offerings: Number(offerings._sum.amount_collected || 0),
+                        total_tithes: Number(tithes._sum.amount || 0),
+                        total_project_offerings: Number(projects._sum.amount_collected || 0),
+                        total_welfare: Number(welfare._sum.amount || 0),
+                        total_expenses: Number(expenses._sum.amount || 0),
+                        total_withdrawals: Number(withdrawals._sum.amount || 0),
+                        active_members: active,
+                        inactive_members: inactive,
+                        visitors,
+                        new_members_month: newMembers,
+                        new_members_goal: memberGoal,
+                        new_members_percent: Math.round((newMembers / memberGoal) * 100),
+                        tithes_last_3_months: Number(monthTithes._sum.amount || 0),
+                        donations_goal: donationsGoal,
+                        event_attendance_month: monthAttendance,
+                        attendance_goal: attendanceGoal,
+                        attendance_percent: Math.round((monthAttendance / attendanceGoal) * 100),
+                        financial_trends,
+                        attendance_trends
+                    }
+                });
             }
 
             case 'insights': {
@@ -230,6 +318,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                         }
                     });
                 }
+                await logActivity(
+                    type === 'expense' ? 'other' : 'donation_recorded',
+                    `New ${type} recorded`,
+                    `A new ${type} of GH₵${amount} was recorded by Admin.`
+                );
                 return NextResponse.json({ success: true, data: result });
             }
 
@@ -277,6 +370,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     blog = await prisma.blog.create({ data });
                 }
 
+                await logActivity('other', 'Blog post created', `New blog post "${blog.title}" was published.`);
                 return NextResponse.json({ success: true, data: blog });
             }
 
@@ -363,6 +457,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     }
                 }
 
+                await logActivity('event_scheduled', 'Event scheduled', `New event "${eventRecord.name}" has been scheduled.`);
                 return NextResponse.json({ success: true, data: eventRecord });
             }
 
@@ -424,6 +519,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     }
                 }
 
+                await logActivity('other', 'Sermon uploaded', `New sermon "${sermon.sermon_title}" was added.`);
                 return NextResponse.json({ success: true, data: sermon });
             }
 
@@ -525,6 +621,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     }
                 }
 
+                await logActivity('member_added', 'New member added', `${member.first_name} ${member.last_name} has joined as a member.`);
                 return NextResponse.json({ success: true, member_id: member.member_id, photoPath, birthdayThumbPath });
             }
 
