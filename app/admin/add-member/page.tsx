@@ -631,11 +631,27 @@ export default function AddMemberPage() {
                                                     height="100%"
                                                     frameBorder="0"
                                                     style={{ border: 0 }}
-                                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.gpsAddress)}&output=embed`}
+                                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.gpsAddress + ', Ghana')}&z=18&t=m&iwloc=addr&output=embed`}
                                                     allowFullScreen
                                                 ></iframe>
                                             </div>
-                                            <p className="form-helper">Map source: Google Maps (Resolving GPS Address)</p>
+                                            <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <p className="form-helper" style={{ margin: 0 }}>Map source: Google Maps (Precise View)</p>
+                                                <a
+                                                    href={`https://www.ghanapostgps.com/map/#${formData.gpsAddress.replace(/-/g, '')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn btn-secondary"
+                                                    style={{ padding: '4px 12px', fontSize: '12px' }}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
+                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                    </svg>
+                                                    Open in Ghana Post GPS
+                                                </a>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
