@@ -17,12 +17,14 @@ type MembersTableProps = {
 // Calculate engagement based on attendance - updated with new tiers
 const getEngagement = (engagement: string): string => {
     switch (engagement) {
-        case 'Extreme': return 'extreme';
+        case 'Excellent': return 'excellent';
+        case 'Very High': return 'very-high';
         case 'High': return 'high';
+        case 'Medium': return 'medium';
         case 'Moderate': return 'moderate';
         case 'Low': return 'low';
         case 'Very Low': return 'very-low';
-        default: return 'moderate';
+        default: return 'very-low';
     }
 };
 

@@ -17,6 +17,7 @@ interface FormData {
     address: string;
     city: string;
     region: string;
+    gpsAddress: string;
     emergencyName: string;
     emergencyPhone: string;
     emergencyRelation: string;
@@ -57,6 +58,7 @@ const initialFormData: FormData = {
     address: '',
     city: '',
     region: '',
+    gpsAddress: '',
     emergencyName: '',
     emergencyPhone: '',
     emergencyRelation: '',
@@ -607,6 +609,35 @@ export default function AddMemberPage() {
                                             placeholder="Region/State"
                                         />
                                     </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">GPS Address (Ghana Post GPS)</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            name="gpsAddress"
+                                            value={formData.gpsAddress}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g., AK-039-5028"
+                                        />
+                                    </div>
+
+                                    {formData.gpsAddress && (
+                                        <div className="form-group full-width" style={{ marginTop: '10px' }}>
+                                            <label className="form-label">Location Preview</label>
+                                            <div style={{ width: '100%', height: '300px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    frameBorder="0"
+                                                    style={{ border: 0 }}
+                                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.gpsAddress)}&output=embed`}
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                            <p className="form-helper">Map source: Google Maps (Resolving GPS Address)</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="info-card">

@@ -36,13 +36,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
         ? member.memberDepartments[0].department.department_name
         : 'No Department';
 
-    // Calculate engagement based on attendance
-    const getEngagement = (attendance: number) => {
-        if (attendance >= 75) return 'High';
-        if (attendance >= 40) return 'Medium';
-        return 'Low';
-    };
-    const engagement = getEngagement(member.attendance || 0);
+    const engagement = member.engagement || 'Low';
 
     // Print function
     const printProfile = () => {
@@ -366,7 +360,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                             </div>
                             <div className="cf-tags-row">
                                 <span className={`cf-badge ${(member.status || 'active').toLowerCase()}`}>{member.status || 'Active'}</span>
-                                <span className={`cf-badge ${engagement.toLowerCase()}`}>{engagement} Engagement</span>
+                                <span className={`cf-badge ${engagement.toLowerCase().replace(/\s+/g, '-')}`}>{engagement} Engagement</span>
                             </div>
                         </div>
                     </div>

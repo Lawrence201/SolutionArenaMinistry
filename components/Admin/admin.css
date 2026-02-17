@@ -2981,6 +2981,19 @@ body {
     color: #64748b;
 }
 
+.cf-badge-excellent,
+.cf-badge.excellent {
+    background: #e0e7ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
+}
+
+.cf-badge-very-high,
+.cf-badge.very-high {
+    background: #f3e8ff;
+    color: #6b21a8;
+}
+
 .cf-badge-high,
 .cf-badge.high {
     background: #d1fae5;
@@ -2989,6 +3002,14 @@ body {
 
 .cf-badge-medium,
 .cf-badge.medium {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.cf-badge-medium,
+.cf-badge-moderate,
+.cf-badge.medium,
+.cf-badge.moderate {
     background: #fef3c7;
     color: #92400e;
 }
@@ -2997,6 +3018,13 @@ body {
 .cf-badge.low {
     background: #fee2e2;
     color: #991b1b;
+}
+
+.cf-badge-very-low,
+.cf-badge.very-low {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
 }
 
 /* Participation Progress */

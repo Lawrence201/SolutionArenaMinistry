@@ -33,6 +33,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                 address: member.address || '',
                 city: member.city || '',
                 region: member.region || '',
+                gps_address: member.gps_address || '',
                 emergency_name: member.emergency_name || '',
                 emergency_phone: member.emergency_phone || '',
                 emergency_relation: member.emergency_relation || '',
@@ -54,9 +55,9 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
             // Match MembersTable photo display logic
             if (member.photo_path) {
                 setPhotoPreview(
-                    member.photo_path.startsWith('/')
+                    member.photo_path.startsWith('/') || member.photo_path.startsWith('http')
                         ? member.photo_path
-                        : `/assets/${member.photo_path}`
+                        : `/uploads/members/${member.photo_path}`
                 );
             } else {
                 setPhotoPreview(null);
@@ -64,9 +65,9 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
 
             if (member.birthday_thumb) {
                 setBirthdayThumbPreview(
-                    member.birthday_thumb.startsWith('/')
+                    member.birthday_thumb.startsWith('/') || member.birthday_thumb.startsWith('http')
                         ? member.birthday_thumb
-                        : `/assets/${member.birthday_thumb}`
+                        : `/uploads/birthday/${member.birthday_thumb}`
                 );
             } else {
                 setBirthdayThumbPreview(null);
@@ -301,6 +302,29 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                                         <input type="text" className="xax-form-input" name="region" value={formData.region || ''} onChange={handleChange}
                                             placeholder="Region/State" />
                                     </div>
+
+                                    <div className="cuttin-form-group">
+                                        <label className="xax-form-label">GPS Address (Ghana Post GPS)</label>
+                                        <input type="text" className="xax-form-input" name="gps_address" value={formData.gps_address || ''} onChange={handleChange}
+                                            placeholder="e.g., AK-039-5028" />
+                                    </div>
+
+                                    {formData.gps_address && (
+                                        <div className="cuttin-form-group" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
+                                            <label className="xax-form-label">Location Preview</label>
+                                            <div style={{ width: '100%', height: '300px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    frameBorder="0"
+                                                    style={{ border: 0 }}
+                                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.gps_address)}&output=embed`}
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                            <p className="cuttin-form-helper">Map source: Google Maps (Resolving GPS Address)</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="cuttin-info-card" style={{ margin: '24px 0' }}>

@@ -33,7 +33,7 @@ const getEnum = (formData: FormData, key: string, defaultValue: string | null = 
     return val;
 };
 
-console.log('Admin API Route Loaded [v1.3 - Final Field Normalization]');
+console.log('Admin API Route Loaded [v1.4 - 6-Month Granular Engagement]');
 
 const getTimeAgo = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -268,6 +268,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 let blog;
                 if (isUpdate && id) {
+                    const currentBlog = await prisma.blog.findUnique({ where: { id: parseInt(id) } });
+                    if (authorImagePath && currentBlog?.author_image_path) await deleteFile(currentBlog.author_image_path);
+                    if (thumbnailPath && currentBlog?.thumbnail_path) await deleteFile(currentBlog.thumbnail_path);
+
                     blog = await prisma.blog.update({ where: { id: parseInt(id) }, data });
                 } else {
                     blog = await prisma.blog.create({ data });
@@ -327,6 +331,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 let eventRecord: Event;
                 if (isUpdate && id) {
+                    const currentEvent = await prisma.event.findUnique({ where: { id: parseInt(id) } });
+                    if (eventImagePath && currentEvent?.image_path) await deleteFile(currentEvent.image_path);
+                    if (contactImagePath && currentEvent?.contact_person_image) await deleteFile(currentEvent.contact_person_image);
+                    if (adImage1Path && currentEvent?.ad_image_1) await deleteFile(currentEvent.ad_image_1);
+                    if (adImage2Path && currentEvent?.ad_image_2) await deleteFile(currentEvent.ad_image_2);
+                    if (adVideo1Path && currentEvent?.ad_video_1) await deleteFile(currentEvent.ad_video_1);
+                    if (adVideo2Path && currentEvent?.ad_video_2) await deleteFile(currentEvent.ad_video_2);
+
                     eventRecord = await prisma.event.update({ where: { id: parseInt(id) }, data });
                     // Handle Tags and Roles if needed - usually requires clearing and recreating
                     const tags = JSON.parse(getString(formData!, 'eventTags') || '[]');
@@ -392,6 +404,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 let sermon: Sermon;
                 if (isUpdate && id) {
+                    const currentSermon = await prisma.sermon.findUnique({ where: { id: parseInt(id) } });
+                    if (videoFile && currentSermon?.video_file) await deleteFile(currentSermon.video_file);
+                    if (audioFile && currentSermon?.audio_file) await deleteFile(currentSermon.audio_file);
+                    if (pdfFile && currentSermon?.pdf_file) await deleteFile(currentSermon.pdf_file);
+                    if (sermonImage && currentSermon?.sermon_image) await deleteFile(currentSermon.sermon_image);
+
                     sermon = await prisma.sermon.update({ where: { id: parseInt(id) }, data });
                     const scriptures = formData?.getAll('scripture[]') as string[];
                     if (scriptures && scriptures.length > 0) {
@@ -452,6 +470,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                         address: getOptionalString(formData!, 'address'),
                         city: getOptionalString(formData!, 'city'),
                         region: getOptionalString(formData!, 'region'),
+                        gps_address: getOptionalString(formData!, 'gpsAddress'),
                         status: getEnum(formData!, 'status', 'Active', true) as any,
                         church_group: getEnum(formData!, 'selectedMinistry', null, true) as any,
                         leadership_role: getEnum(formData!, 'leadership', 'None', true) as any,
@@ -524,6 +543,48 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ s
             if (type === 'offering') res = await prisma.offering.deleteMany({ where: { offering_id: { in: ids } } });
             else if (type === 'tithe') res = await prisma.tithe.deleteMany({ where: { tithe_id: { in: ids } } });
             return NextResponse.json({ success: true, count: res?.count });
+        }
+
+        if (slug === 'blogs/delete') {
+            for (const id of ids) {
+                const blog = await prisma.blog.findUnique({ where: { id: parseInt(id) } });
+                if (blog) {
+                    await deleteFile(blog.author_image_path);
+                    await deleteFile(blog.thumbnail_path);
+                    await prisma.blog.delete({ where: { id: blog.id } });
+                }
+            }
+            return NextResponse.json({ success: true });
+        }
+
+        if (slug === 'events/delete') {
+            for (const id of ids) {
+                const event = await prisma.event.findUnique({ where: { id: parseInt(id) } });
+                if (event) {
+                    await deleteFile(event.image_path);
+                    await deleteFile(event.contact_person_image);
+                    await deleteFile(event.ad_image_1);
+                    await deleteFile(event.ad_image_2);
+                    await deleteFile(event.ad_video_1);
+                    await deleteFile(event.ad_video_2);
+                    await prisma.event.delete({ where: { id: event.id } });
+                }
+            }
+            return NextResponse.json({ success: true });
+        }
+
+        if (slug === 'sermons/delete') {
+            for (const id of ids) {
+                const sermon = await prisma.sermon.findUnique({ where: { id: parseInt(id) } });
+                if (sermon) {
+                    await deleteFile(sermon.video_file);
+                    await deleteFile(sermon.audio_file);
+                    await deleteFile(sermon.pdf_file);
+                    await deleteFile(sermon.sermon_image);
+                    await prisma.sermon.delete({ where: { id: sermon.id } });
+                }
+            }
+            return NextResponse.json({ success: true });
         }
         return NextResponse.json({ success: false, message: "Invalid delete route" }, { status: 400 });
     } catch (error: any) { return NextResponse.json({ success: false, message: error.message }, { status: 500 }); }

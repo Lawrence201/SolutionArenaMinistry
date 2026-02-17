@@ -177,6 +177,7 @@ model Draft {
   address            String?           @db.VarChar(255)
   city               String?           @db.VarChar(100)
   region             String?           @db.VarChar(100)
+  gps_address        String?           @db.VarChar(50)
   status             MemberStatus?
   church_group       ChurchGroup?
   leadership_role    LeadershipRole?
@@ -472,6 +473,7 @@ model Member {
   address              String?               @db.VarChar(255)
   city                 String?               @db.VarChar(100)
   region               String?               @db.VarChar(100)
+  gps_address          String?               @db.VarChar(50)
   status               MemberStatus?         @default(Active)
   church_group         ChurchGroup?
   leadership_role      LeadershipRole?       @default(None)

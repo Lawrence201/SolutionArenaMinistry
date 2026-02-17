@@ -119,17 +119,21 @@ function AddSermonForm() {
                 setVideoUrl(s.video_file || '');
                 setVideoPreview({ url: s.video_file || '', file: null, type: 'video-url', name: 'External Video URL' });
             } else if (s.video_file) {
-                setVideoPreview({ url: s.video_file, file: null, type: 'video', name: 'Existing Video' });
+                const videoUrl = s.video_file.startsWith('/') || s.video_file.startsWith('http') ? s.video_file : `/uploads/sermons/${s.video_file}`;
+                setVideoPreview({ url: videoUrl, file: null, type: 'video', name: 'Existing Video' });
             }
 
             if (s.audio_file) {
-                setAudioPreview({ url: s.audio_file, file: null, type: 'audio', name: 'Existing Audio' });
+                const audioUrl = s.audio_file.startsWith('/') || s.audio_file.startsWith('http') ? s.audio_file : `/uploads/sermons/${s.audio_file}`;
+                setAudioPreview({ url: audioUrl, file: null, type: 'audio', name: 'Existing Audio' });
             }
             if (s.pdf_file) {
-                setPdfPreview({ url: s.pdf_file, file: null, type: 'pdf', name: 'Existing PDF' });
+                const pdfUrl = s.pdf_file.startsWith('/') || s.pdf_file.startsWith('http') ? s.pdf_file : `/uploads/sermons/${s.pdf_file}`;
+                setPdfPreview({ url: pdfUrl, file: null, type: 'pdf', name: 'Existing PDF' });
             }
             if (s.sermon_image) {
-                setImagePreview({ url: s.sermon_image, file: null, type: 'image', name: 'Existing Image' });
+                const imageUrl = s.sermon_image.startsWith('/') || s.sermon_image.startsWith('http') ? s.sermon_image : `/uploads/sermons/${s.sermon_image}`;
+                setImagePreview({ url: imageUrl, file: null, type: 'image', name: 'Existing Image' });
             }
 
             setDuration(s.sermon_duration?.toString() || '');
