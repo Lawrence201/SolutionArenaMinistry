@@ -113,6 +113,41 @@ export default function EditEventForm({ event }: EditEventFormProps) {
 
     // Refs for file inputs
     const eventImageInputRef = useRef<HTMLInputElement>(null);
+    const contactImageInputRef = useRef<HTMLInputElement>(null);
+    const adImage1InputRef = useRef<HTMLInputElement>(null);
+    const adImage2InputRef = useRef<HTMLInputElement>(null);
+    const adVideo1InputRef = useRef<HTMLInputElement>(null);
+    const adVideo2InputRef = useRef<HTMLInputElement>(null);
+
+    const resetForm = () => {
+        setFormData(initialFormData);
+        setTags([]);
+        setTagInput('');
+        setVolunteerRoles([{ name: '', quantity: '' }]);
+        setEventImage(null);
+        setEventImagePreview(null);
+        setContactImage(null);
+        setContactImagePreview(null);
+        setAdImage1(null);
+        setAdImage1Preview(null);
+        setAdImage2(null);
+        setAdImage2Preview(null);
+        setAdVideo1(null);
+        setAdVideo1Preview(null);
+        setAdVideo2(null);
+        setAdVideo2Preview(null);
+
+        // Reset file inputs
+        if (eventImageInputRef.current) eventImageInputRef.current.value = '';
+        if (contactImageInputRef.current) contactImageInputRef.current.value = '';
+        if (adImage1InputRef.current) adImage1InputRef.current.value = '';
+        if (adImage2InputRef.current) adImage2InputRef.current.value = '';
+        if (adVideo1InputRef.current) adVideo1InputRef.current.value = '';
+        if (adVideo2InputRef.current) adVideo2InputRef.current.value = '';
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -203,7 +238,12 @@ export default function EditEventForm({ event }: EditEventFormProps) {
 
             if (result.success) {
                 alert(isDraft ? 'Event saved as draft successfully!' : (isEditMode ? 'Event updated successfully!' : 'Event created successfully!'));
-                router.push('/admin/events');
+
+                if (isEditMode) {
+                    router.push('/admin/events');
+                } else {
+                    resetForm();
+                }
             } else {
                 alert('Error: ' + result.message);
             }
@@ -508,7 +548,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                                     <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>{contactImage ? 'New image selected' : 'Current image'}</div>
                                 </div>
                             )}
-                            <input type="file" className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setContactImage, setContactImagePreview)} />
+                            <input type="file" ref={contactImageInputRef} className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setContactImage, setContactImagePreview)} />
                             <span className="cf-form-hint">Upload a picture of the coordinator (Max 5MB)</span>
                         </div>
 
@@ -571,7 +611,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                                     <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>{adImage1 ? 'New selected' : 'Current'}</div>
                                 </div>
                             )}
-                            <input type="file" className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setAdImage1, setAdImage1Preview)} />
+                            <input type="file" ref={adImage1InputRef} className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setAdImage1, setAdImage1Preview)} />
                         </div>
                         <div className="cf-form-group">
                             <label className="cf-form-label">Advertisement Image 2</label>
@@ -581,7 +621,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                                     <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>{adImage2 ? 'New selected' : 'Current'}</div>
                                 </div>
                             )}
-                            <input type="file" className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setAdImage2, setAdImage2Preview)} />
+                            <input type="file" ref={adImage2InputRef} className="cf-form-input" accept="image/*" onChange={(e) => handleFileChange(e, setAdImage2, setAdImage2Preview)} />
                         </div>
                         <div className="cf-form-group">
                             <label className="cf-form-label">Advertisement Video 1</label>
@@ -591,7 +631,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                                     <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>{adVideo1 ? 'New selected' : 'Current'}</div>
                                 </div>
                             )}
-                            <input type="file" className="cf-form-input" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileChange(e, setAdVideo1, setAdVideo1Preview)} />
+                            <input type="file" ref={adVideo1InputRef} className="cf-form-input" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileChange(e, setAdVideo1, setAdVideo1Preview)} />
                             <span className="cf-form-hint">Max 100MB</span>
                         </div>
                         <div className="cf-form-group">
@@ -602,7 +642,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                                     <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>{adVideo2 ? 'New selected' : 'Current'}</div>
                                 </div>
                             )}
-                            <input type="file" className="cf-form-input" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileChange(e, setAdVideo2, setAdVideo2Preview)} />
+                            <input type="file" ref={adVideo2InputRef} className="cf-form-input" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileChange(e, setAdVideo2, setAdVideo2Preview)} />
                             <span className="cf-form-hint">Max 100MB</span>
                         </div>
                     </div>

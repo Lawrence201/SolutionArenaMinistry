@@ -48,7 +48,7 @@ export async function getGalleryData(filters: GalleryFilters = {}) {
                 where,
                 include: {
                     media: {
-                        select: { media_type: true },
+                        select: { media_type: true, file_path: true },
                     }
                 },
                 orderBy: [
@@ -61,19 +61,32 @@ export async function getGalleryData(filters: GalleryFilters = {}) {
                 const photoCount = album.media.filter(m => m.media_type === MediaType.photo).length;
                 const videoCount = album.media.filter(m => m.media_type === MediaType.video).length;
 
+                // Pick first available media as cover if no cover_image specified
+                let coverImage = album.cover_image;
+                if (!coverImage && album.media.length > 0) {
+                    // Try to find a photo first
+                    const firstPhoto = album.media.find(m => m.media_type === MediaType.photo);
+                    if (firstPhoto) {
+                        coverImage = firstPhoto.file_path;
+                    } else {
+                        // Fallback to first media (video?)
+                        coverImage = album.media[0].file_path;
+                    }
+                }
+
                 return {
                     id: album.id,
                     type: 'album',
                     title: album.album_name,
                     category: album.category,
-                    mediaCount: album.media_count,
+                    mediaCount: album.media_count || album.media.length,
                     date: album.event_date.toISOString().split('T')[0],
-                    description: album.description,
-                    coverImage: album.cover_image || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800', // Default or logical fallback
-                    photographer: album.photographer,
+                    description: album.description || '',
+                    coverImage: album.cover_image || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800',
+                    photographer: album.photographer || 'Unknown',
                     photoCount,
                     videoCount,
-                    views: album.view_count
+                    views: album.view_count || 0
                 };
             });
         }

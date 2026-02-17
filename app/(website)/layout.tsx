@@ -8,9 +8,9 @@ export const metadata: Metadata = {
     title: "Solution Home",
     description: "Church Management System",
     icons: {
-        icon: "/assets/images/favicon.PNG",
-        shortcut: "/assets/images/favicon.PNG",
-        apple: "/assets/images/favicon.PNG",
+        icon: "/assets/images/favicon.PNG?v=1",
+        shortcut: "/assets/images/favicon.PNG?v=1",
+        apple: "/assets/images/favicon.PNG?v=1",
     },
 };
 
