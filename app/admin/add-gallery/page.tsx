@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import './add-gallery.css';
-import { getGalleryItemForEdit } from '@/app/actions/gallery';
+import { getGalleryItemForEdit, updateMedia } from '@/app/actions/gallery';
 
 interface GalleryFile extends File {
     id: string; // Temporary ID for UI handling
@@ -172,9 +172,20 @@ function AddGalleryContent() {
         setDeletedMediaIds(prev => [...prev, id]);
     };
 
-    const clearAll = () => {
+    const resetForm = () => {
+        setAlbumId(null);
+        setAlbumName('');
+        setEventDate('');
+        setCategory('');
+        setDescription('');
+        setTags('');
+        setPhotographer('');
+        setStatus('published');
         setSelectedFiles([]);
+        setExistingMedia([]);
+        setDeletedMediaIds([]);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const formatFileSize = (bytes: number | bigint) => {
@@ -218,16 +229,12 @@ function AddGalleryContent() {
                     formData.append('media_file', selectedFiles[0]);
                 }
 
-                const response = await fetch('/api/admin/gallery/update-media', { // We'll create or update a unified route
-                    method: 'POST',
-                    body: formData,
-                });
-                const result = await response.json();
+                const result = await updateMedia(formData);
                 if (result.success) {
                     showNotification('Media item updated successfully!', 'success');
-                    router.push('/admin/gallery');
+                    setTimeout(() => router.push('/admin/gallery'), 1500);
                 } else {
-                    showNotification(result.message, 'error');
+                    showNotification(result.message || 'Failed to update media item', 'error');
                 }
             } else {
                 // Album Logic (Create/Update)
@@ -264,7 +271,11 @@ function AddGalleryContent() {
 
                 if (result.success) {
                     showNotification(`Gallery ${isEditMode ? 'updated' : 'published'} successfully!`, 'success');
-                    router.push('/admin/gallery');
+                    if (isEditMode) {
+                        setTimeout(() => router.push('/admin/gallery'), 1500);
+                    } else {
+                        resetForm();
+                    }
                 } else {
                     showNotification(result.message, 'error');
                 }
@@ -340,8 +351,8 @@ function AddGalleryContent() {
                             <div className="cf-preview-header">
                                 <div className="cf-preview-title">Gallery Content ({selectedFiles.length + existingMedia.length})</div>
                                 {selectedFiles.length > 0 && (
-                                    <button type="button" className="cf-btn-secondary cf-btn" onClick={clearAll} style={{ width: 'auto' }}>
-                                        Clear New
+                                    <button type="button" className="cf-btn-secondary cf-btn" onClick={resetForm} style={{ width: 'auto' }}>
+                                        Clear All
                                     </button>
                                 )}
                             </div>

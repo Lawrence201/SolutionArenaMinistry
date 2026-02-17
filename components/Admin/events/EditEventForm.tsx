@@ -111,6 +111,14 @@ export default function EditEventForm({ event }: EditEventFormProps) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Notification State
+    const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+    const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3000);
+    };
+
     // Refs for file inputs
     const eventImageInputRef = useRef<HTMLInputElement>(null);
     const contactImageInputRef = useRef<HTMLInputElement>(null);
@@ -237,19 +245,19 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                 : await createEvent(data);
 
             if (result.success) {
-                alert(isDraft ? 'Event saved as draft successfully!' : (isEditMode ? 'Event updated successfully!' : 'Event created successfully!'));
+                showNotification(isDraft ? 'Event saved as draft successfully!' : (isEditMode ? 'Event updated successfully!' : 'Event created successfully!'), 'success');
 
                 if (isEditMode) {
-                    router.push('/admin/events');
+                    setTimeout(() => router.push('/admin/events'), 1500);
                 } else {
                     resetForm();
                 }
             } else {
-                alert('Error: ' + result.message);
+                showNotification('Error: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('An error occurred. Please try again.');
+            showNotification('An error occurred. Please try again.', 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -257,6 +265,11 @@ export default function EditEventForm({ event }: EditEventFormProps) {
 
     return (
         <div className="cf-add-event-container">
+            {notification && (
+                <div className={`cf-notification ${notification.type}`}>
+                    {notification.message}
+                </div>
+            )}
             <div className="cf-add-event-header">
                 <h1>{isEditMode ? 'Edit Event' : 'New Event'}</h1>
                 <p>{isEditMode ? 'Update the details of the event' : 'Create a new event and schedule details'}</p>
