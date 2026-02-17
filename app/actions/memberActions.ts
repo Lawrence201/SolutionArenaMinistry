@@ -210,7 +210,8 @@ export async function getMembers(filters: MemberFilters = {}) {
                         date: { gte: engagementPeriod },
                         status: 'Paid'
                     }
-                }
+                },
+                emergencyContacts: true
             },
             orderBy: { created_at: 'desc' },
         });
@@ -292,10 +293,15 @@ export async function getMembers(filters: MemberFilters = {}) {
             else if (finalScore >= 15) engagement = 'Low';
             else engagement = 'Very Low';
 
+            const emergency = member.emergencyContacts?.[0];
+
             return {
                 ...member,
                 attendance: attendancePct,
-                engagement: engagement
+                engagement: engagement,
+                emergency_name: emergency?.emergency_name || '',
+                emergency_phone: emergency?.emergency_phone || '',
+                emergency_relation: emergency?.emergency_relation || '',
             };
         });
 

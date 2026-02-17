@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 type ViewProfileModalProps = {
     member: any | null;
     isOpen: boolean;
-    handleClose: () => void;
+    onCloseAction: () => void;
 };
 
 declare global {
@@ -14,7 +14,7 @@ declare global {
     }
 }
 
-export default function ViewProfileModal({ member, isOpen, handleClose }: ViewProfileModalProps) {
+export default function ViewProfileModal({ member, isOpen, onCloseAction }: ViewProfileModalProps) {
     useEffect(() => {
         // Load jsPDF script if not already loaded
         if (isOpen && !window.jspdf) {
@@ -174,6 +174,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                 ['Marital Status:', member.marital_status || 'Not specified'],
                 ['Occupation:', member.occupation || 'Not specified'],
                 ['Address:', member.address || 'Not specified'],
+                ['GPS Address:', member.gps_address || 'Not specified'],
                 ['City:', member.city || 'Not specified'],
                 ['Region:', member.region || 'Not specified']
             ];
@@ -299,7 +300,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
     }
 
     return (
-        <div className={`cf-modal ${isOpen ? 'cf-show' : ''}`} id="profileModal" onClick={handleClose}>
+        <div className={`cf-modal ${isOpen ? 'cf-show' : ''}`} id="profileModal" onClick={onCloseAction}>
             <div className="cf-modal-panel" onClick={(e) => e.stopPropagation()}>
                 <div className="cf-modal-head">
                     <h2>Member Profile</h2>
@@ -319,7 +320,7 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                             </svg>
                             Print
                         </button>
-                        <button className="cf-modal-close" onClick={handleClose}>×</button>
+                        <button className="cf-modal-close" onClick={onCloseAction}>×</button>
                     </div>
                 </div>
                 <div className="cf-modal-content" id="profileModalBody">
@@ -388,6 +389,10 @@ export default function ViewProfileModal({ member, isOpen, handleClose }: ViewPr
                             <div className="cf-field-group">
                                 <span className="cf-field-label">Address</span>
                                 <span className="cf-field-value">{member.address || 'Not specified'}</span>
+                            </div>
+                            <div className="cf-field-group">
+                                <span className="cf-field-label">GPS Address</span>
+                                <span className="cf-field-value">{member.gps_address || 'Not specified'}</span>
                             </div>
                             <div className="cf-field-group">
                                 <span className="cf-field-label">City</span>

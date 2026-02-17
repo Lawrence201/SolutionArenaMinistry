@@ -181,7 +181,7 @@ export default function MembersDashboard({ stats, members, insights }: MembersDa
 
             <ViewProfileModal
                 isOpen={isProfileModalOpen}
-                handleClose={() => setIsProfileModalOpen(false)}
+                onCloseAction={() => setIsProfileModalOpen(false)}
                 member={viewingMember}
             />
 

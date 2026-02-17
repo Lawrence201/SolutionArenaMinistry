@@ -144,7 +144,7 @@ export default function AddMemberSuccessPage() {
             <ViewProfileModal
                 member={mappedMember}
                 isOpen={showModal}
-                handleClose={closeModal}
+                onCloseAction={closeModal}
             />
         </div>
     );
