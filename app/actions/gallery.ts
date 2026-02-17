@@ -82,7 +82,7 @@ export async function getGalleryData(filters: GalleryFilters = {}) {
                     mediaCount: album.media_count || album.media.length,
                     date: album.event_date.toISOString().split('T')[0],
                     description: album.description || '',
-                    coverImage: album.cover_image || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800',
+                    coverImage: coverImage || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800',
                     photographer: album.photographer || 'Unknown',
                     photoCount,
                     videoCount,
