@@ -35,6 +35,7 @@ export const exportToExcel = (members: any[]) => {
             'Marital Status': member.marital_status || '',
             'Occupation': member.occupation || '',
             'Address': member.address || '',
+            'GPS Address': member.gps_address || '',
             'City': member.city || '',
             'Region': member.region || '',
             'Status': member.status || '',
@@ -66,6 +67,7 @@ export const exportToExcel = (members: any[]) => {
             { wch: 15 }, // Marital
             { wch: 20 }, // Occupation
             { wch: 30 }, // Address
+            { wch: 20 }, // GPS Address
             { wch: 15 }, // City
             { wch: 15 }, // Region
             { wch: 10 }, // Status
@@ -133,7 +135,7 @@ export const exportToPDF = async (members: any[]) => {
             }
         }));
 
-        const tableColumn = ["", "Name", "Email", "Phone", "Status", "Ministry", "Church Group", "Emergency Number"];
+        const tableColumn = ["", "Name", "Email", "Phone", "GPS Address", "Status", "Ministry", "Emergency Name", "Emergency Phone"];
         const tableRows: any[] = [];
 
         members.forEach(member => {
@@ -147,10 +149,11 @@ export const exportToPDF = async (members: any[]) => {
                 `${member.first_name} ${member.last_name}`,
                 member.email || '-',
                 member.phone || '-',
+                member.gps_address || '-',
                 member.status || 'Active',
                 ministryName,
-                member.church_group || '-',
-                member.emergency_phone || '-' // Replaced Attendance with Emergency Number
+                member.emergency_name || '-',
+                member.emergency_phone || '-'
             ];
             tableRows.push(memberData);
         });
