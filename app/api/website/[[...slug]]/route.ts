@@ -164,16 +164,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
             case 'gallery/albums': {
                 const albums = await prisma.galleryAlbum.findMany({
                     where: { status: "published" },
+                    include: {
+                        media: {
+                            select: { file_path: true, media_type: true },
+                            orderBy: { uploaded_at: 'asc' },
+                            take: 1
+                        }
+                    },
                     orderBy: { event_date: "desc" },
                 });
-                const formattedAlbums = albums.map((album) => ({
-                    id: album.id,
-                    name: album.album_name,
-                    date: album.event_date.toISOString(),
-                    category: album.category,
-                    cover: getSafeUrl(album.cover_image, "/assets/images/album-placeholder.jpg", "gallery"),
-                    count: album.media_count || 0,
-                }));
+                const formattedAlbums = albums.map((album: any) => {
+                    let coverPath = album.cover_image;
+                    if (!coverPath && album.media && album.media.length > 0) {
+                        coverPath = album.media[0].file_path;
+                    }
+                    return {
+                        id: album.id,
+                        name: album.album_name,
+                        date: album.event_date.toISOString(),
+                        category: album.category,
+                        cover: getSafeUrl(coverPath, "/assets/images/album-placeholder.jpg", "gallery"),
+                        count: album.media_count || 0,
+                    };
+                });
                 return NextResponse.json({ success: true, count: formattedAlbums.length, data: formattedAlbums });
             }
 
