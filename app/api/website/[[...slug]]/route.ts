@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+const getSafeUrl = (path: string | null, fallback: string = '', subDir: string = '') => {
+    if (!path) return fallback;
+    if (path.startsWith('http') || path.startsWith('/')) return path;
+    // If it's a legacy local path that needs /uploads/ prefix
+    if (subDir && !path.startsWith('uploads/')) {
+        return `/uploads/${subDir}/${path}`;
+    }
+    return `/${path}`;
+};
+
 /**
  * Consolidated Website API Handler
  * Handles all public-facing website API requests to stay within Vercel Hobby plan limits.
@@ -29,7 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                         author: blog.author,
                         category: blog.category,
                         excerpt: blog.excerpt,
-                        thumbnail_path: blog.thumbnail_path,
+                        thumbnail_path: getSafeUrl(blog.thumbnail_path, '/assets/images/blog-placeholder.jpg', 'blogs'),
                         published_at: blog.published_at,
                         created_at: blog.created_at,
                         views: blog.views,
@@ -61,7 +71,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                         start_time: startTime,
                         end_time: endTime,
                         time_range: startTime && endTime ? `${startTime} - ${endTime}` : 'Time TBA',
-                        image_path: event.image_path ? (event.image_path.startsWith('/') || event.image_path.startsWith('http') ? event.image_path : `/uploads/events/${event.image_path}`) : '/assets/images/event-img-1.webp',
+                        image_path: getSafeUrl(event.image_path, '/assets/images/event-img-1.webp', 'events'),
                         max_capacity: event.max_capacity,
                         age_group: event.age_group,
                         require_registration: event.require_registration,
@@ -79,16 +89,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     take: 2,
                 });
                 const formattedEvents = events.map((event) => {
-                    let imagePath = event.image_path || "/assets/images/f-event.webp";
-                    if (imagePath.includes('/Church_Management_System')) {
-                        imagePath = imagePath.replace('/Church_Management_System/chruch_website/', '/').replace('/Church_Management_System/', '/');
-                    }
-                    if (!imagePath.startsWith('/') && !imagePath.startsWith('http')) imagePath = '/' + imagePath;
                     return {
                         id: event.id,
                         name: event.name,
                         start_date: new Date(event.start_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
-                        image_path: imagePath,
+                        image_path: getSafeUrl(event.image_path, "/assets/images/f-event.webp", "events"),
                     };
                 });
                 return NextResponse.json({ success: true, count: formattedEvents.length, events: formattedEvents });
@@ -96,13 +101,35 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
             case 'birthdays': {
                 const now = new Date();
-                const birthdaysToday = await prisma.$queryRaw`
-                    SELECT member_id, first_name, last_name, photo_path, birthday_thumb, birthday_title, birthday_message, date_of_birth, EXTRACT(DAY FROM date_of_birth)::int as birth_day 
-                    FROM members 
-                    WHERE EXTRACT(MONTH FROM date_of_birth) = ${now.getMonth() + 1} AND EXTRACT(DAY FROM date_of_birth) = ${now.getDate()} AND status = 'Active' 
-                    ORDER BY birth_day ASC
-                ` as any[];
-                return NextResponse.json({ success: true, data: birthdaysToday });
+                const birthdaysToday = await prisma.member.findMany({
+                    where: {
+                        status: 'Active',
+                        date_of_birth: {
+                            not: null
+                        }
+                    },
+                    select: {
+                        member_id: true,
+                        first_name: true,
+                        last_name: true,
+                        photo_path: true,
+                        birthday_thumb: true,
+                        birthday_title: true,
+                        birthday_message: true,
+                        date_of_birth: true
+                    }
+                });
+
+                const filteredBirthdays = birthdaysToday.filter(m => {
+                    const dob = m.date_of_birth;
+                    return dob && dob.getMonth() === now.getMonth() && dob.getDate() === now.getDate();
+                }).map(m => ({
+                    ...m,
+                    photo_path: getSafeUrl(m.photo_path, '/assets/images/placeholder-member.png', 'members'),
+                    birthday_thumb: getSafeUrl(m.birthday_thumb, '/assets/images/birthday-placeholder.png', 'members')
+                }));
+
+                return NextResponse.json({ success: true, data: filteredBirthdays });
             }
 
             case 'statistics': {
@@ -127,8 +154,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     title: sermon.sermon_title || 'Untitled Sermon',
                     speaker: sermon.sermon_speaker || 'Unknown Speaker',
                     date: sermon.sermon_date ? new Date(sermon.sermon_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown Date',
-                    audio_url: sermon.audio_file || '',
-                    image_url: sermon.sermon_image || '',
+                    audio_url: getSafeUrl(sermon.audio_file, '', 'sermons/audio'),
+                    image_url: getSafeUrl(sermon.sermon_image, '/assets/images/sermon-placeholder.jpg', 'sermons/images'),
                     duration: sermon.sermon_duration || 0,
                 }));
                 return NextResponse.json({ success: true, data: processedAudio, count: processedAudio.length });
@@ -144,7 +171,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     name: album.album_name,
                     date: album.event_date.toISOString(),
                     category: album.category,
-                    cover: album.cover_image ? (album.cover_image.startsWith('/') ? album.cover_image : `/${album.cover_image}`) : "/assets/images/album-placeholder.jpg",
+                    cover: getSafeUrl(album.cover_image, "/assets/images/album-placeholder.jpg", "gallery"),
                     count: album.media_count || 0,
                 }));
                 return NextResponse.json({ success: true, count: formattedAlbums.length, data: formattedAlbums });
@@ -161,7 +188,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                 const formattedMedia = mediaItems.map((item) => ({
                     id: item.id,
                     type: item.media_type,
-                    url: item.file_path.startsWith('/') ? item.file_path : `/${item.file_path}`,
+                    url: getSafeUrl(item.file_path, "", "gallery"),
                     filename: item.file_name,
                     title: item.title || item.file_name,
                     caption: item.caption || "",
@@ -194,7 +221,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     prisma.sermon.findMany({ where, include: { scriptures: { orderBy: { display_order: "asc" } } }, orderBy: [{ is_featured: "desc" }, { sermon_date: "desc" }], skip: offset, take: limit }),
                     prisma.sermon.count({ where }),
                 ]);
-                return NextResponse.json({ success: true, data: sermons, pagination: { current_page: page, total_pages: Math.ceil(totalCount / limit), total_count: totalCount, per_page: limit, has_more: page < Math.ceil(totalCount / limit) } });
+                const processedSermons = sermons.map(s => ({
+                    ...s,
+                    audio_file: getSafeUrl(s.audio_file, '', 'sermons/audio'),
+                    video_file: getSafeUrl(s.video_file, '', 'sermons/videos'),
+                    sermon_image: getSafeUrl(s.sermon_image, '/assets/images/sermon-placeholder.jpg', 'sermons/images')
+                }));
+
+                return NextResponse.json({ success: true, data: processedSermons, pagination: { current_page: page, total_pages: Math.ceil(totalCount / limit), total_count: totalCount, per_page: limit, has_more: page < Math.ceil(totalCount / limit) } });
             }
 
             default:
