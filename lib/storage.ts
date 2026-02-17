@@ -118,7 +118,8 @@ async function saveBase64Locally(base64Data: string, subDir: string): Promise<st
         return `/uploads/${subDir}/${filename}`;
     } catch (error) {
         console.error('Local Base64 Save Error:', error);
-        throw new Error('Failed to save base64 locally');
+        console.warn('NOTE: Local filesystem saving is not supported in serverless environments like Vercel. Redirect to Cloudinary for production.');
+        return null; // Return null instead of throwing to prevent application crash
     }
 }
 
@@ -141,7 +142,8 @@ async function saveFileLocally(file: File, subDir: string): Promise<string | nul
         return `/uploads/${subDir}/${year}/${month}/${uniqueName}`;
     } catch (error) {
         console.error('Local Save Error:', error);
-        throw new Error('Failed to save file locally');
+        console.warn('NOTE: Local filesystem saving is not supported in serverless environments like Vercel. Redirect to Cloudinary for production.');
+        return null; // Return null instead of throwing to prevent application crash
     }
 }
 
