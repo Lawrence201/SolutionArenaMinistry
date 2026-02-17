@@ -160,7 +160,7 @@ const RecentSermons = () => {
                                                 <source src={videoPath} type="video/mp4" />
                                             </video>
                                         ) : hasVideo && isUrlVideo ? (
-                                            <div dangerouslySetInnerHTML={{ __html: getIframeHTML(sermon.video_file) }} />
+                                            <div style={{ height: '100%', width: '100%' }} dangerouslySetInnerHTML={{ __html: getIframeHTML(sermon.video_file) }} />
                                         ) : (
                                             <img
                                                 src={sermon.sermon_image || "/assets/images/sermon-img.webp"}
@@ -209,7 +209,7 @@ const RecentSermons = () => {
 function getIframeHTML(videoUrl: string) {
     if (!videoUrl) return '';
 
-    const iframeStyle = 'width: 100%; height: auto; aspect-ratio: 16/9; display: block; border: none; border-radius: 8px;';
+    const iframeStyle = 'width: 100%; height: 100%; display: block; border: none; border-radius: 8px;';
 
     // Check if it's a Facebook URL
     if (videoUrl.includes('facebook.com') || videoUrl.includes('fb.watch')) {

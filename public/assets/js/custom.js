@@ -1113,14 +1113,13 @@ if ($(".audio-player")[0]) {
 
   if (currentAudio) {
     currentAudio.load();
+    currentAudio.onloadedmetadata = function () {
+      var durationEle = document.getElementsByClassName('duration')[0];
+      if (durationEle && currentAudio.duration) {
+        durationEle.innerHTML = getMinutes(currentAudio.duration);
+      }
+    };
   }
-
-
-
-  currentAudio.onloadedmetadata = function () {
-    var durationEle = document.getElementsByClassName('duration')[0];
-    if (durationEle) durationEle.innerHTML = this.getMinutes(this.currentAudio.duration);
-  }.bind(this);
 
 
 
