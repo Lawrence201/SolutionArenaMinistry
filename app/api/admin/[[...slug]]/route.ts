@@ -25,13 +25,15 @@ const getSafeDate = (formData: FormData, key: string) => {
     const date = new Date(val);
     return isNaN(date.getTime()) ? null : date;
 };
-const getEnum = (formData: FormData, key: string, defaultValue: string | null = null) => {
-    const val = getOptionalString(formData, key);
+const getEnum = (formData: FormData, key: string, defaultValue: string | null = null, capitalize = false) => {
+    let val = getOptionalString(formData, key);
     if (!val) return defaultValue;
-    return val.replace(/\s+/g, '_');
+    val = val.replace(/\s+/g, '_');
+    if (capitalize) return val.charAt(0).toUpperCase() + val.slice(1);
+    return val;
 };
 
-console.log('Admin API Route Loaded [v1.1 - Added Robust Enum Sanitization]');
+console.log('Admin API Route Loaded [v1.3 - Final Field Normalization]');
 
 const getTimeAgo = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -288,9 +290,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 const data: any = {
                     name: getString(formData!, 'eventName'),
-                    type: (getEnum(formData!, 'eventType', 'OTHER')?.toUpperCase()) as any,
+                    type: (getEnum(formData!, 'eventType', 'Other', true)) as any,
                     type_other: getOptionalString(formData!, 'eventTypeOther'),
-                    category: (getEnum(formData!, 'eventCategory', 'OTHER')?.toUpperCase()) as any,
+                    category: (getEnum(formData!, 'eventCategory', 'Other', true)) as any,
                     category_other: getOptionalString(formData!, 'eventCategoryOther'),
                     description: getOptionalString(formData!, 'eventDescription') || '',
                     start_date: getSafeDate(formData!, 'startDate') || new Date(),
@@ -311,9 +313,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                     contact_person: getOptionalString(formData!, 'contactPerson'),
                     contact_email: getOptionalString(formData!, 'contactEmail'),
                     contact_phone: getOptionalString(formData!, 'contactPhone'),
-                    age_group: getEnum(formData!, 'ageGroup', 'All') as any,
+                    age_group: getEnum(formData!, 'ageGroup', 'All', true) as any,
                     special_notes: getOptionalString(formData!, 'specialNotes'),
-                    status: getEnum(formData!, 'status', 'Published') as any,
+                    status: getEnum(formData!, 'status', 'Published', true) as any,
                 };
 
                 if (eventImagePath) data.image_path = eventImagePath;
@@ -442,20 +444,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                         first_name: getString(formData!, 'firstName'),
                         last_name: getString(formData!, 'lastName'),
                         date_of_birth: getSafeDate(formData!, 'dateOfBirth'),
-                        gender: getEnum(formData!, 'gender') as any,
-                        marital_status: getEnum(formData!, 'maritalStatus') as any,
+                        gender: getEnum(formData!, 'gender', null, true) as any,
+                        marital_status: getEnum(formData!, 'maritalStatus', null, true) as any,
                         occupation: getOptionalString(formData!, 'occupation'),
                         phone: getString(formData!, 'phone'),
                         email: getString(formData!, 'email'),
                         address: getOptionalString(formData!, 'address'),
                         city: getOptionalString(formData!, 'city'),
                         region: getOptionalString(formData!, 'region'),
-                        status: getEnum(formData!, 'status', 'Active') as any,
-                        church_group: getEnum(formData!, 'selectedMinistry') as any,
-                        leadership_role: getEnum(formData!, 'leadership', 'None') as any,
-                        baptism_status: getEnum(formData!, 'baptismStatus') as any,
-                        spiritual_growth: getEnum(formData!, 'spiritualGrowth') as any,
-                        membership_type: getEnum(formData!, 'membershipType', 'Full_Member') as any,
+                        status: getEnum(formData!, 'status', 'Active', true) as any,
+                        church_group: getEnum(formData!, 'selectedMinistry', null, true) as any,
+                        leadership_role: getEnum(formData!, 'leadership', 'None', true) as any,
+                        baptism_status: getEnum(formData!, 'baptismStatus', null, true) as any,
+                        spiritual_growth: getEnum(formData!, 'spiritualGrowth', null, true) as any,
+                        membership_type: getEnum(formData!, 'membershipType', 'Full_Member', true) as any,
                         notes: getOptionalString(formData!, 'notes'),
                         photo_path: photoPath,
                         birthday_thumb: birthdayThumbPath,
