@@ -695,6 +695,8 @@ export async function getAdvancedAttendanceData(
             time: string;
             service: string;
         }[];
+        ministryBreakdown: { name: string; count: number }[];
+        genderBreakdown: { name: string; count: number }[];
     };
     message?: string;
 }> {

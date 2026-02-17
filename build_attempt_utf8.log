@@ -1,0 +1,60 @@
+﻿Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 20.7s
+  Running TypeScript ...
+node.exe : Failed to compile.
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Failed   
+  to compile.:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+./app/actions/attendance.ts:8
+31:17
+Type error: Object literal 
+may only specify known 
+properties, and 
+'ministryBreakdown' does not 
+exist in type '{ summary: { 
+totalSessions: number; 
+totalCheckIns: number; 
+uniqueMembers: number; 
+uniqueVisitors: number; }; 
+memberAttendance: { 
+memberId: number; name: 
+string; ministry: string; 
+count: number; percentage: 
+number; }[]; dailyBreakdown: 
+{ ...; }[]; visitorLogs: { 
+...; }[]; rawLogs: { ...; 
+}[]; }'.
+
+[0m [90m 829 |[39m        
+         
+visitorLogs[33m,[39m
+ [90m 830 |[39m            
+     rawLogs[33m,[39m
+[31m[1m>[22m[39m[90m 
+831 |[39m                 
+ministryBreakdown[33m,[39m
+ [90m     |[39m            
+     [31m[1m^[22m[39m
+ [90m 832 |[39m            
+     genderBreakdown
+ [90m 833 |[39m            
+ }
+ [90m 834 |[39m         
+}[33m;[39m[0m
+Next.js build worker exited 
+with code: 1 and signal: null
