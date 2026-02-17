@@ -17,7 +17,9 @@ import {
     deleteAttendance,
     generateQRToken,
     registerVisitor,
-    getAdvancedAttendanceData
+    getAdvancedAttendanceData,
+    getAttendanceSyncStatus,
+    getActiveQRToken
 } from '@/app/actions/attendance';
 import { QRCodeSVG } from 'qrcode.react';
 import { exportQRCodeToPDF, exportQRCodeToPNG } from '@/lib/qrExport';
@@ -132,17 +134,24 @@ export default function AttendanceClient() {
     const [mounted, setMounted] = useState(false);
     const [qrBaseUrl, setQrBaseUrl] = useState('');
 
+    // Sync state for smart polling
+    const [lastSync, setLastSync] = useState<{ count: number; timestamp: string | null }>({
+        count: 0,
+        timestamp: null
+    });
+
 
     // Load data from server actions
     const loadData = useCallback(async (isSilent = false) => {
         if (!isSilent) setIsLoading(true);
         try {
             // Fetch all data in parallel
-            const [statsResult, attendanceResult, visitorsResult, absentResult] = await Promise.all([
+            const [statsResult, attendanceResult, visitorsResult, absentResult, qrResult] = await Promise.all([
                 getAttendanceStats(selectedService, currentDate),
                 getAttendanceRecords(selectedService, currentDate),
                 getVisitors(selectedService, currentDate),
-                getAbsentMembers(selectedService, currentDate)
+                getAbsentMembers(selectedService, currentDate),
+                getActiveQRToken(selectedService)
             ]);
 
             if (statsResult.success && statsResult.data) {
@@ -160,6 +169,17 @@ export default function AttendanceClient() {
             if (absentResult.success && absentResult.data) {
                 setAbsentData(absentResult.data);
             }
+
+            // Persistence check: If an active token exists, use it
+            if (qrResult.success && qrResult.token) {
+                setQrToken(qrResult.token);
+                setQrGenerated(true);
+            } else {
+                // If no active token, we don't force a new one, but we reset the state 
+                // so the generic service URL can be used as fallback
+                setQrToken(null);
+                setQrGenerated(false);
+            }
         } catch (error) {
             console.error('Error loading attendance data:', error);
         } finally {
@@ -167,7 +187,7 @@ export default function AttendanceClient() {
         }
     }, [currentDate, selectedService]);
 
-    // Auto-refresh useEffect
+    // Auto-refresh useEffect (Smart Polling)
     useEffect(() => {
         setMounted(true);
         if (typeof window !== 'undefined' && !qrBaseUrl) {
@@ -177,13 +197,28 @@ export default function AttendanceClient() {
         // Initial load
         loadData();
 
-        // 1-second polling for real-time updates (silent)
-        const interval = setInterval(() => {
-            loadData(true);
-        }, 1000);
+        // Smart polling: Check for changes every 2 seconds
+        const interval = setInterval(async () => {
+            try {
+                const status = await getAttendanceSyncStatus(selectedService, currentDate);
+                if (status.success) {
+                    // Only refresh full data if the count or latest timestamp has changed
+                    if (status.lastCount !== lastSync.count || status.lastTimestamp !== lastSync.timestamp) {
+                        console.log('Change detected, refreshing attendance data...');
+                        loadData(true);
+                        setLastSync({
+                            count: status.lastCount,
+                            timestamp: status.lastTimestamp
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Sync check failed:', error);
+            }
+        }, 2000);
 
         return () => clearInterval(interval);
-    }, [loadData, qrBaseUrl]);
+    }, [loadData, qrBaseUrl, lastSync, selectedService, currentDate]);
 
 
     const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -196,17 +231,7 @@ export default function AttendanceClient() {
 
     const handleGenerateQR = async () => {
         try {
-            let serviceName = selectedService;
-            if (selectedService === 'others' && customServiceName) {
-                serviceName = customServiceName;
-            } else if (selectedService === 'sunday-morning') {
-                serviceName = 'Sunday Morning Service';
-            } else if (selectedService === 'sunday-evening') {
-                serviceName = 'Sunday Evening Service';
-            } else if (selectedService === 'midweek') {
-                serviceName = 'Midweek Service';
-            }
-
+            const serviceName = getServiceDisplayName();
             const result = await generateQRToken(selectedService, currentDate, serviceName);
 
             if (result.success && result.token) {
@@ -223,6 +248,18 @@ export default function AttendanceClient() {
         }
     };
 
+    const getServiceDisplayName = () => {
+        if (selectedService === 'others') {
+            return customServiceName || 'Other Service';
+        }
+        if (selectedService === 'sunday-morning') return 'Sunday Morning Service';
+        if (selectedService === 'sunday-evening') return 'Sunday Evening Service';
+        if (selectedService === 'midweek') return 'Midweek Service';
+
+        // Dynamic fallback for any other hyphenated service IDs
+        return selectedService.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     const handleExportPDF = async () => {
         const qrElement = document.getElementById('attendance-qr');
         if (!qrElement) {
@@ -231,7 +268,7 @@ export default function AttendanceClient() {
         }
         try {
             await exportQRCodeToPDF(qrElement, {
-                serviceName: selectedService === 'others' && customServiceName ? customServiceName : selectedService,
+                serviceName: getServiceDisplayName(),
                 date: currentDate
             });
         } catch (error) {
@@ -248,7 +285,7 @@ export default function AttendanceClient() {
         }
         try {
             await exportQRCodeToPNG(qrElement, {
-                serviceName: selectedService === 'others' && customServiceName ? customServiceName : selectedService,
+                serviceName: getServiceDisplayName(),
                 date: currentDate
             });
         } catch (error) {

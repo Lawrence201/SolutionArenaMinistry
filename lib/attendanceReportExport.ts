@@ -347,6 +347,8 @@ interface AdvancedAttendanceData {
         time: string;
         service: string;
     }[];
+    ministryBreakdown?: { name: string; count: number }[];
+    genderBreakdown?: { name: string; count: number }[];
 }
 
 export const exportAdvancedAttendanceDataToPDF = async (
@@ -412,7 +414,35 @@ export const exportAdvancedAttendanceDataToPDF = async (
 
     yPosition += boxHeight + 15;
 
-    // 2. Member Attendance Ranking
+    // 2. Demographic Breakdowns (Gender & Ministry)
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Demographic Distribution', 15, yPosition);
+    yPosition += 6;
+
+    // Gender Table
+    autoTable(doc, {
+        startY: yPosition,
+        head: [['Group', 'Attendance Count']],
+        body: [
+            ...(data.genderBreakdown?.map(g => [g.name, g.count]) || []),
+            ['---', '---'],
+            ...(data.ministryBreakdown?.slice(0, 8).map(m => [m.name, m.count]) || [])
+        ],
+        columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 80 } },
+        headStyles: { fillColor: [51, 65, 85], fontSize: 9 },
+        bodyStyles: { fontSize: 8 },
+        margin: { left: 15, right: 15 },
+        theme: 'grid'
+    });
+    yPosition = (doc as any).lastAutoTable.finalY + 15;
+
+    // 3. Member Attendance Ranking
+    if (yPosition > pageHeight - 60) {
+        doc.addPage();
+        yPosition = 20;
+    }
     doc.setTextColor(15, 23, 42);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -435,7 +465,7 @@ export const exportAdvancedAttendanceDataToPDF = async (
     });
     yPosition = (doc as any).lastAutoTable.finalY + 15;
 
-    // 3. Daily Attendance Trends
+    // 4. Daily Attendance Trends
     if (yPosition > pageHeight - 60) {
         doc.addPage();
         yPosition = 20;
@@ -460,7 +490,7 @@ export const exportAdvancedAttendanceDataToPDF = async (
     });
     yPosition = (doc as any).lastAutoTable.finalY + 15;
 
-    // 4. Visitor Analysis
+    // 5. Visitor Analysis
     if (yPosition > pageHeight - 60) {
         doc.addPage();
         yPosition = 20;
