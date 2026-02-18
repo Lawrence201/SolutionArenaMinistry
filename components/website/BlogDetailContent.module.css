@@ -1,0 +1,408 @@
+.blogDetail {
+    padding: 80px 0;
+    background-color: #fff;
+}
+
+.blogContentArea {
+    margin-bottom: 40px;
+}
+
+.blogMeta {
+    margin-bottom: 30px;
+}
+
+.blogMeta img {
+    margin-bottom: 25px;
+}
+
+.metaInfo {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-size: 14px;
+    color: #3e81db;
+    font-weight: 600;
+}
+
+.metaInfo li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.metaInfo img,
+.metaInfo svg {
+    width: 16px;
+    height: 16px;
+}
+
+.mainTitle {
+    font-size: 36px;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.blogAuthor {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.authorAvatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.authorAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.authorInfo {
+    font-size: 15px;
+    color: #777;
+}
+
+.authorInfo a {
+    color: #3e81db;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 50px;
+}
+
+.content p {
+    margin-bottom: 25px;
+}
+
+.authorBox {
+    padding: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.authorBoxImg {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.authorBoxImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.authorBoxMeta h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.authorBoxMeta h3 span {
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.authorBoxMeta p {
+    color: #fff;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Sidebar Widgets */
+.sidebar {
+    padding-left: 20px;
+}
+
+.widget {
+    margin-bottom: 40px;
+    background: #fdfdfd;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+}
+
+.widget h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3e81db;
+    position: relative;
+}
+
+.sidebarArticles {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebarArticles li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.sidebarThumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebarThumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebarInfo {
+    flex-grow: 1;
+}
+
+.sidebarDate {
+    display: block;
+    font-size: 12px;
+    color: #3e81db;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.sidebarTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.widgetCategories ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.widgetCategories li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.widgetCategories li:last-child {
+    border-bottom: 0;
+}
+
+.widgetCategories a {
+    color: #444;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.widgetCategories a:hover {
+    color: #3e81db;
+}
+
+.widgetCategories span {
+    background: #3e81db;
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.popularPosts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.popularPosts li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.popularInfo a {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.popularInfo span {
+    font-size: 13px;
+    color: #777;
+}
+
+/* Comments Section */
+.commentsSection h3 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 40px;
+}
+
+.commentItem {
+    margin-bottom: 30px;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 12px;
+}
+
+.replyItem {
+    margin-left: 50px;
+    margin-top: 20px;
+    border-left: 3px solid #3e81db;
+}
+
+.commentHeader {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.userAvatar,
+.userAvatarSmall {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.userAvatar img,
+.userAvatarSmall img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholderAvatar,
+.placeholderAvatarSmall {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3e81db;
+    color: #fff;
+    font-weight: 700;
+}
+
+.userName,
+.userNameSmall {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.postDate,
+.postDateSmall {
+    font-size: 12px;
+    color: #999;
+}
+
+.commentText,
+.commentTextSmall {
+    font-size: 15px;
+    color: #555;
+    margin: 0;
+}
+
+.leaveReply h4 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 50px 0 25px;
+}
+
+.commentForm textarea {
+    width: 100%;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    background: #fdfdfd;
+    font-size: 15px;
+    resize: none;
+}
+
+.sidebarReadMore {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #3e81db;
+    text-decoration: none;
+    margin-top: 5px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.sidebarReadMore:hover {
+    color: #222;
+}
+
+.popularTitle {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.popularTitle:hover {
+    color: #3e81db;
+}
+
+@media (max-width: 991px) {
+    .sidebar {
+        padding-left: 0;
+        margin-top: 50px;
+    }
+
+    .mainTitle {
+        font-size: 28px;
+    }
+
+    .replyItem {
+        margin-left: 20px;
+    }
+}

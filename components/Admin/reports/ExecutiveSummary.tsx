@@ -57,11 +57,11 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
 
     // Chart 1: Growth Trends
     const growthTrendData = {
-        labels: data.trends.map((t: any) => t.month),
+        labels: data?.trends?.map((t: any) => t.month) || [],
         datasets: [
             {
                 label: 'New Members',
-                data: data.trends.map((t: any) => t.members),
+                data: data?.trends?.map((t: any) => t.members) || [],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 borderWidth: 2.5,
@@ -72,7 +72,7 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
             },
             {
                 label: 'Avg Attendance',
-                data: data.trends.map((t: any) => t.attendance),
+                data: data?.trends?.map((t: any) => t.attendance) || [],
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 borderWidth: 2.5,
@@ -86,9 +86,9 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
 
     // Chart 2: Ministry Distribution
     const ministryData = {
-        labels: data.ministries.map((m: any) => m.church_group),
+        labels: data?.ministries?.map((m: any) => m.church_group) || [],
         datasets: [{
-            data: data.ministries.map((m: any) => m.count),
+            data: data?.ministries?.map((m: any) => m.count) || [],
             backgroundColor: [
                 '#3b82f6', // Blue
                 '#10b981', // Green
@@ -102,10 +102,10 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
 
     // Chart 3: Financial Trends
     const financialTrendData = {
-        labels: data.trends.map((t: any) => t.month),
+        labels: data?.trends?.map((t: any) => t.month) || [],
         datasets: [{
             label: 'Income',
-            data: data.trends.map((t: any) => t.income),
+            data: data?.trends?.map((t: any) => t.income) || [],
             backgroundColor: '#10b981',
             borderRadius: 6
         }]
@@ -113,10 +113,10 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
 
     // Chart 4: Attendance Trends
     const attendanceTrendData = {
-        labels: data.trends.map((t: any) => t.month),
+        labels: data?.trends?.map((t: any) => t.month) || [],
         datasets: [{
             label: 'Avg Attendance',
-            data: data.trends.map((t: any) => t.attendance),
+            data: data?.trends?.map((t: any) => t.attendance) || [],
             borderColor: '#6366f1',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
             borderWidth: 2.5,
@@ -133,10 +133,10 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
         datasets: [{
             label: 'Count',
             data: [
-                data.engagement.active,
-                data.engagement.inactive,
-                data.engagement.visitors,
-                data.engagement.at_risk
+                data?.engagement?.active || 0,
+                data?.engagement?.inactive || 0,
+                data?.engagement?.visitors || 0,
+                data?.engagement?.at_risk || 0
             ],
             backgroundColor: [
                 '#10b981', // Green
@@ -152,35 +152,35 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
     const kpis = [
         {
             metric: 'Average Attendance',
-            current: formatNumber(data.attendance.avg_attendance),
-            previous: formatNumber(data.attendance.prev_avg_attendance),
-            change: parseFloat(data.attendance.growth_rate),
-            target: Math.round(data.membership.active * 0.75),
-            status: data.attendance.avg_attendance >= (data.membership.active * 0.75) ? 'Target Met' : 'Below Target'
+            current: formatNumber(data?.attendance?.avg_attendance || 0),
+            previous: formatNumber(data?.attendance?.prev_avg_attendance || 0),
+            change: parseFloat(data?.attendance?.growth_rate || 0),
+            target: Math.round((data?.membership?.active || 0) * 0.75),
+            status: (data?.attendance?.avg_attendance || 0) >= ((data?.membership?.active || 0) * 0.75) ? 'Target Met' : 'Below Target'
         },
         {
             metric: 'Total Income',
-            current: formatCurrency(data.financial.total_income),
-            previous: formatCurrency(data.financial.prev_total_income),
-            change: parseFloat(data.financial.income_growth),
-            target: formatCurrency(data.financial.prev_total_income * 1.05),
-            status: data.financial.income_growth >= 0 ? 'On Track' : 'Below Target'
+            current: formatCurrency(data?.financial?.total_income || 0),
+            previous: formatCurrency(data?.financial?.prev_total_income || 0),
+            change: parseFloat(data?.financial?.income_growth || 0),
+            target: formatCurrency((data?.financial?.prev_total_income || 0) * 1.05),
+            status: (data?.financial?.income_growth || 0) >= 0 ? 'On Track' : 'Below Target'
         },
         {
             metric: 'New Members',
-            current: formatNumber(data.membership.new_30d),
-            previous: formatNumber(data.membership.prev_new_30d),
-            change: parseFloat(data.membership.growth_rate),
+            current: formatNumber(data?.membership?.new_30d || 0),
+            previous: formatNumber(data?.membership?.prev_new_30d || 0),
+            change: parseFloat(data?.membership?.growth_rate || 0),
             target: 5,
-            status: data.membership.new_30d >= 5 ? 'Excellent' : data.membership.new_30d >= 3 ? 'Good' : 'Needs Improvement'
+            status: (data?.membership?.new_30d || 0) >= 5 ? 'Excellent' : (data?.membership?.new_30d || 0) >= 3 ? 'Good' : 'Needs Improvement'
         },
         {
             metric: 'Engagement Rate',
-            current: `${data.engagement.engagement_rate}%`,
+            current: `${data?.engagement?.engagement_rate || 0}%`,
             previous: '85%',
-            change: data.engagement.engagement_rate - 85,
+            change: (data?.engagement?.engagement_rate || 0) - 85,
             target: '85%',
-            status: data.engagement.engagement_rate >= 85 ? 'Exceeded' : 'Good'
+            status: (data?.engagement?.engagement_rate || 0) >= 85 ? 'Exceeded' : 'Good'
         }
     ];
 
@@ -193,9 +193,9 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
                         <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         Total Members
                     </div>
-                    <div className="sum-val">{formatNumber(data.membership.total)}</div>
+                    <div className="sum-val">{formatNumber(data?.membership?.total || 0)}</div>
                     <div className="sum-chan">
-                        {data.membership.growth_rate >= 0 ? '+' : ''}{data.membership.growth_rate.toFixed(1)}% growth | {data.membership.new_30d} new this month
+                        {(data?.membership?.growth_rate || 0) >= 0 ? '+' : ''}{(data?.membership?.growth_rate || 0).toFixed(1)}% growth | {data?.membership?.new_30d || 0} new this month
                     </div>
                 </div>
 
@@ -204,9 +204,9 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
                         <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
                         Active Engagement
                     </div>
-                    <div className="sum-val">{data.engagement.engagement_rate}%</div>
+                    <div className="sum-val">{data?.engagement?.engagement_rate || 0}%</div>
                     <div className="sum-chan">
-                        {data.engagement.active} active | {data.engagement.at_risk} at risk
+                        {data?.engagement?.active || 0} active | {data?.engagement?.at_risk || 0} at risk
                     </div>
                 </div>
 
@@ -215,9 +215,9 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
                         <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         Financial Health
                     </div>
-                    <div className="sum-val">{formatCurrency(data.financial.total_income)}</div>
+                    <div className="sum-val">{formatCurrency(data?.financial?.total_income || 0)}</div>
                     <div className="sum-chan">
-                        {data.financial.total_income > 0 ? `Score: ${data.financial.financial_health}/100` : 'Loading...'}
+                        {(data?.financial?.total_income || 0) > 0 ? `Score: ${data?.financial?.financial_health}/100` : 'Loading...'}
                     </div>
                 </div>
 
@@ -226,9 +226,9 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
                         <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         Avg Attendance
                     </div>
-                    <div className="sum-val">{formatNumber(data.attendance.avg_attendance)}</div>
+                    <div className="sum-val">{formatNumber(data?.attendance?.avg_attendance || 0)}</div>
                     <div className="sum-chan">
-                        {data.attendance.growth_rate >= 0 ? '+' : ''}{data.attendance.growth_rate}% | {data.attendance.attendance_rate}% attendance rate
+                        {(data?.attendance?.growth_rate || 0) >= 0 ? '+' : ''}{data?.attendance?.growth_rate || 0}% | {data?.attendance?.attendance_rate || 0}% attendance rate
                     </div>
                 </div>
 

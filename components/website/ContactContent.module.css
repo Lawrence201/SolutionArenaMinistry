@@ -1,0 +1,361 @@
+.contactSection {
+    padding-bottom: 80px;
+}
+
+.contactHeader {
+    padding: 80px 0;
+    background: #fff;
+}
+
+.contactHeader h2 {
+    max-width: 800px;
+    font-size: 50px;
+    font-weight: 700;
+    line-height: normal;
+    color: #111111;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.cDetail {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.countrySide {
+    flex: 0 0 150px;
+}
+
+.countrySide span {
+    font-size: 26px;
+    font-weight: 700;
+    color: #333;
+}
+
+.infoSide {
+    flex: 1;
+}
+
+.locationDetail {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.contactList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contactItem {
+    font-size: 22px;
+    color: #555555;
+    line-height: 1.4;
+    margin-bottom: 15px;
+}
+
+.contactLabel {
+    font-weight: 500;
+    color: #2b4c7e;
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.contactLink {
+    color: #3e81db;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.contactLink:hover {
+    color: #1f4372;
+}
+
+.loginRequired {
+    background: #fff;
+    padding: 60px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 60px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.iconWrapper {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.loginTitle {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.loginDesc {
+    color: #777;
+    margin-bottom: 30px;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.authButtons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.loginBtn {
+    background: #2b4764;
+    color: #fff;
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 2px solid #2b4764;
+}
+
+.loginBtn:hover {
+    background: #1f344a;
+    border-color: #1f344a;
+    color: #fff;
+}
+
+.registerBtn {
+    background: #fff;
+    color: #2b4764;
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 2px solid #2b4764;
+}
+
+.registerBtn:hover {
+    background: #2b4764;
+    color: #fff;
+}
+
+.formContainer {
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.contactForm label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.contactForm label span {
+    color: red;
+}
+
+.contactForm input,
+.contactForm select,
+.contactForm textarea {
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #e1e1e1;
+    padding: 0 20px;
+    width: 100%;
+    transition: all 0.3s;
+    font-size: 16px;
+}
+
+.contactForm textarea {
+    height: auto;
+    padding: 20px;
+    resize: vertical;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal !important;
+}
+
+.checkboxLabel input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkboxLabel span {
+    font-size: 14px;
+    color: #666;
+    font-weight: normal;
+}
+
+.mapSection {
+    margin-top: 80px;
+}
+
+.mapWrapper {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.glassBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    color: #619de5;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glassBtn:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.socialGrid {
+    margin-top: 80px;
+    padding-bottom: 20px;
+}
+
+.socialList {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.socialList li {
+    flex: initial;
+}
+
+.socialList a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 50px;
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 22px;
+    gap: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.socialList svg {
+    width: 28px;
+    height: 28px;
+    fill: white;
+}
+
+.fb {
+    background-color: #1d4b96;
+}
+
+.tw {
+    background-color: #4a89e3;
+}
+
+.ig {
+    background-color: #d629b7;
+}
+
+.yt {
+    background-color: #e51616;
+}
+
+.fb:hover {
+    background-color: #163a75;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.tw:hover {
+    background-color: #3b76c7;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.ig:hover {
+    background-color: #b8229d;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.yt:hover {
+    background-color: #c71313;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 992px) {
+    .contactHeader h2 {
+        font-size: 40px;
+    }
+
+    .socialList li {
+        flex-basis: 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    .contactHeader h2 {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contactHeader h2 {
+        font-size: 28px;
+    }
+
+    .socialList li {
+        flex-basis: 100%;
+    }
+}

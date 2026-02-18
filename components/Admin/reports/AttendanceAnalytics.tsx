@@ -210,7 +210,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Total Members
                     </div>
-                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data.total_members)}</div>
+                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data?.total_members || 0)}</div>
                     <div className="sum-chan" style={{ fontSize: '0.9rem', color: '#6b7280' }}>Registered in system</div>
                 </div>
 
@@ -223,7 +223,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Members Attended
                     </div>
-                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data.members_attended)}</div>
+                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data?.members_attended || 0)}</div>
                     <div className="sum-chan" style={{ fontSize: '0.9rem', color: '#6b7280' }}>This month</div>
                 </div>
 
@@ -235,7 +235,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Total Visitors
                     </div>
-                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data.total_visitors)}</div>
+                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data?.total_visitors || 0)}</div>
                     <div className="sum-chan" style={{ fontSize: '0.9rem', color: '#6b7280' }}>First-time guests</div>
                 </div>
 
@@ -249,7 +249,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Avg Attendance
                     </div>
-                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data.avg_attendance)}</div>
+                    <div className="sum-val" style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{formatNumber(data?.avg_attendance || 0)}</div>
                     <div className="sum-chan" style={{ fontSize: '0.9rem', color: '#6b7280' }}>Per service</div>
                 </div>
             </div>
@@ -258,12 +258,12 @@ export default function AttendanceAnalytics() {
             <div className="sum-grid" style={{ marginTop: '20px' }}>
                 <div className="met-card">
                     <div className="met-lab">Attendance Rate</div>
-                    <div className="met-val">{data.attendance_rate}%</div>
+                    <div className="met-val">{data?.attendance_rate || 0}%</div>
                     <div className="met-chan">Of total members</div>
                 </div>
                 <div className="met-card">
                     <div className="met-lab">Peak Attendance</div>
-                    <div className="met-val">{formatNumber(data.peak_attendance)}</div>
+                    <div className="met-val">{formatNumber(data?.peak_attendance || 0)}</div>
                     <div className="met-chan">Highest this month</div>
                 </div>
                 <div className="met-card">
@@ -288,7 +288,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Males
                     </div>
-                    <div className="met-val">{formatNumber(data.males_count)}</div>
+                    <div className="met-val">{formatNumber(data?.males_count || 0)}</div>
                     <div className="met-chan">Present this month</div>
                 </div>
                 <div className="met-card">
@@ -300,7 +300,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Females
                     </div>
-                    <div className="met-val">{formatNumber(data.females_count)}</div>
+                    <div className="met-val">{formatNumber(data?.females_count || 0)}</div>
                     <div className="met-chan">Present this month</div>
                 </div>
                 <div className="met-card">
@@ -310,7 +310,7 @@ export default function AttendanceAnalytics() {
                         </svg>
                         Children
                     </div>
-                    <div className="met-val">{formatNumber(data.children_count)}</div>
+                    <div className="met-val">{formatNumber(data?.children_count || 0)}</div>
                     <div className="met-chan">Under 18 years</div>
                 </div>
                 <div className="met-card">

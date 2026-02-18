@@ -24,6 +24,7 @@ export const RecentBlogs = () => {
                     const mappedBlogs = data.data.blogs.map((b: any) => ({
                         id: b.id,
                         title: b.title,
+                        slug: b.slug,
                         author: b.author,
                         published_date: b.formatted_date,
                         excerpt: b.excerpt,
@@ -68,6 +69,9 @@ export const RecentBlogs = () => {
                         }
                         .blog-meta {
                             margin-bottom: 30px;
+                            display: flex;
+                            flex-direction: column;
+                            height: 100%;
                         }
                         .blog-meta figure {
                             margin-bottom: 20px;
@@ -82,7 +86,7 @@ export const RecentBlogs = () => {
                         .blog-meta ul {
                             display: flex;
                             align-items: center;
-                            gap: 15px;
+                            justify-content: space-between;
                             list-style: none;
                             padding: 0;
                             margin-bottom: 15px;
@@ -92,7 +96,7 @@ export const RecentBlogs = () => {
                             color: #666;
                         }
                         .blog-meta ul li.date {
-                            color: #ffc266;
+                            color: #3e81db;
                             font-weight: bold;
                         }
                         .blog-meta a.font-bold {
@@ -102,10 +106,20 @@ export const RecentBlogs = () => {
                             color: #222;
                             text-decoration: none;
                             margin-bottom: 15px;
+                            line-height: 1.3;
+                            transition: color 0.3s;
+                        }
+                        .blog-meta a.font-bold:hover {
+                            color: #3e81db;
                         }
                         .blog-meta p {
                             color: #666;
                             line-height: 1.6;
+                            margin-bottom: 20px;
+                            flex-grow: 1;
+                        }
+                        .blog-meta .read-more {
+                            align-self: flex-start;
                         }
                         .loadmore {
                             margin-top: 40px;
@@ -116,21 +130,16 @@ export const RecentBlogs = () => {
                 </div>
                 <div className="row justify-content-center">
                     {blogs.length > 0 ? (
-                        blogs.map((blog, index) => {
+                        blogs.slice(0, 3).map((blog, index) => {
                             const delay = 400 + (index * 100);
                             const duration = 600 + (index * 300);
                             const excerpt = blog.excerpt && blog.excerpt.length > 120
                                 ? blog.excerpt.substring(0, 120) + '...'
                                 : blog.excerpt;
 
-                            // Correctly resolve the thumbnail path
-                            // The legacy system used: ../admin_dashboard/Add_Blogs/ + blog.thumbnail_path
-                            // In Next.js, these are stored in public/uploads/blogs/ or similar.
-                            // However, the component seems to expect them under /assets/images/ or similar.
-                            // Let's use the path as provided by the API if it starts with http or /, otherwise prepend /uploads/blogs/
                             let thumbnailSrc = blog.thumbnail;
                             if (thumbnailSrc && !thumbnailSrc.startsWith('/') && !thumbnailSrc.startsWith('http')) {
-                                thumbnailSrc = `/uploads/blogs/${thumbnailSrc}`;
+                                thumbnailSrc = `/assets/images/${thumbnailSrc.split('/').pop()}`;
                             }
 
                             return (
@@ -138,29 +147,30 @@ export const RecentBlogs = () => {
                                     <div className="blog-meta" data-aos="fade-up" data-aos-delay={delay} data-aos-duration={duration}>
                                         {thumbnailSrc && (
                                             <figure>
-                                                <img
-                                                    src={thumbnailSrc}
-                                                    alt={blog.title}
-                                                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/blog-img-1.webp' }}
-                                                />
+                                                <a href={`/blog/${(blog as any).slug}`}>
+                                                    <img
+                                                        src={thumbnailSrc}
+                                                        alt={blog.title}
+                                                        onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/blog-img-1.webp' }}
+                                                    />
+                                                </a>
                                             </figure>
                                         )}
                                         <ul>
                                             <li className="date">{blog.published_date}</li>
-                                            <li style={{ display: 'flex', alignItems: 'center' }}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                                            <li style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                                                     <circle cx="12" cy="12" r="3"></circle>
                                                 </svg>
                                                 {(blog as any).views || 0}
-                                            </li>
-                                            <li style={{ display: 'flex', alignItems: 'center' }}>
-                                                <img src="/assets/images/message.svg" alt="Message" style={{ marginRight: '5px' }} />
+                                                <img src="/assets/images/message.svg" alt="Message" style={{ marginLeft: '10px' }} />
                                                 {blog.comment_count || 0}
                                             </li>
                                         </ul>
-                                        <a href={`/blog-detail.html?id=${blog.id}`} className="font-bold">{blog.title}</a>
+                                        <a href={`/blog/${(blog as any).slug}`} className="font-bold">{blog.title}</a>
                                         <p>{excerpt}</p>
+                                        <a href={`/blog/${(blog as any).slug}`} className="theme-btn read-more">Read More</a>
                                     </div>
                                 </div>
                             );
@@ -173,7 +183,7 @@ export const RecentBlogs = () => {
                 </div>
 
                 <div className="d-flex justify-content-center loadmore">
-                    <a href="/blog.html" className="theme-btn">View All Posts</a>
+                    <a href="/blog" className="theme-btn">View All Posts</a>
                 </div>
             </div>
         </section>

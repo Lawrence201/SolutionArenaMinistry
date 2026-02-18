@@ -99,7 +99,7 @@ export default function FinancialAnalytics() {
                         </svg>
                         Net Income
                     </div>
-                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data.total_income)}</div>
+                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data?.total_income || 0)}</div>
                     <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>All Income Sources (All Time)</div>
                 </div>
 
@@ -110,7 +110,7 @@ export default function FinancialAnalytics() {
                         </svg>
                         Net Expenses
                     </div>
-                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data.total_expenses)}</div>
+                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data?.total_expenses || 0)}</div>
                     <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>Expenses + Withdrawals</div>
                 </div>
 
@@ -121,7 +121,7 @@ export default function FinancialAnalytics() {
                         </svg>
                         Net Balance
                     </div>
-                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data.net_income)}</div>
+                    <div style={{ fontSize: '42px', fontWeight: 700, color: '#1e293b' }}>{formatShortVal(data?.net_income || 0)}</div>
                     <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>Available Balance</div>
                 </div>
             </div>
@@ -137,7 +137,7 @@ export default function FinancialAnalytics() {
                         YoY Income Growth
                     </div>
                     <div style={{ fontSize: '32px', fontWeight: 800, color: '#1e293b' }}>
-                        {Number(data.yoy_growth) >= 0 ? '+' : ''}{data.yoy_growth}%
+                        {Number(data?.yoy_growth || 0) >= 0 ? '+' : ''}{data?.yoy_growth || 0}%
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 12, height: 12 }}>
@@ -151,7 +151,7 @@ export default function FinancialAnalytics() {
                         background: '#1e293b', color: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
                         fontWeight: 600, pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 10, visibility: 'hidden'
                     }} className="chart-tooltip">
-                        This Year: {formatCurrency(data.this_year_income)} | Last Year: {formatCurrency(data.last_year_income)}
+                        This Year: {formatCurrency(data?.this_year_income || 0)} | Last Year: {formatCurrency(data?.last_year_income || 0)}
                     </div>
                 </div>
 
@@ -179,7 +179,7 @@ export default function FinancialAnalytics() {
                         </svg>
                         Financial Health Score
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#ef4444' }}>{data.financial_health}</div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#ef4444' }}>{data?.financial_health || 0}</div>
                     <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>out of 100</div>
                 </div>
 
@@ -191,7 +191,7 @@ export default function FinancialAnalytics() {
                         </svg>
                         Expense Ratio
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#1e293b' }}>{data.expense_ratio}%</div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#1e293b' }}>{data?.expense_ratio || 0}%</div>
                     <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>of total income</div>
                 </div>
             </div>
@@ -281,7 +281,7 @@ export default function FinancialAnalytics() {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                             <span style={{ color: '#1e293b', fontWeight: 650 }}>Healthy Flow</span>
-                            <span style={{ color: '#10b981', fontWeight: 700 }}>+₵{((data.total_income * 0.7)).toFixed(0)}</span>
+                            <span style={{ color: '#10b981', fontWeight: 700 }}>+₵{((data?.total_income || 0) * 0.7).toFixed(0)}</span>
                         </div>
                     </div>
 
@@ -307,11 +307,11 @@ export default function FinancialAnalytics() {
                         <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>Real-time budget tracking</div>
                         <div style={{ position: 'relative', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b', zIndex: 2 }}>
-                                {((data.total_expenses / (extendedData?.budget_utilization || 1)) * 100).toFixed(1)}%
+                                {((data?.total_expenses || 0) / (extendedData?.budget_utilization || 1) * 100).toFixed(1)}%
                             </div>
                             <svg style={{ position: 'absolute', width: '80px', height: '80px', transform: 'rotate(-90deg)' }}>
                                 <circle cx="40" cy="40" r="35" fill="none" stroke="#f1f5f9" strokeWidth="6" />
-                                <circle cx="40" cy="40" r="35" fill="none" stroke="#f59e0b" strokeWidth="6" strokeDasharray="220" strokeDashoffset={220 - (220 * (data.total_expenses / (extendedData?.budget_utilization || 1)))} />
+                                <circle cx="40" cy="40" r="35" fill="none" stroke="#f59e0b" strokeWidth="6" strokeDasharray="220" strokeDashoffset={220 - (220 * ((data?.total_expenses || 0) / (extendedData?.budget_utilization || 1)))} />
                             </svg>
                         </div>
                     </div>
@@ -321,8 +321,8 @@ export default function FinancialAnalytics() {
                     <div className="sum-card" style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                         <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>Year-over-Year Comparison</h4>
                         <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>This Year vs Last Year</div>
-                        <div style={{ fontSize: '28px', fontWeight: 800, color: Number(data.yoy_growth) >= 0 ? '#10b981' : '#ef4444' }}>
-                            {Number(data.yoy_growth) >= 0 ? '+' : ''}{data.yoy_growth}%
+                        <div style={{ fontSize: '28px', fontWeight: 800, color: Number(data?.yoy_growth || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                            {Number(data?.yoy_growth || 0) >= 0 ? '+' : ''}{data?.yoy_growth || 0}%
                         </div>
                         <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>Revenue delta analysis</div>
                     </div>
@@ -359,7 +359,7 @@ export default function FinancialAnalytics() {
                         <DoughnutChart data={{
                             labels: ['Offerings', 'Tithes', 'Project', 'Welfare', 'Expenses'],
                             datasets: [{
-                                data: [data.offerings, data.tithes, data.project_offerings, data.welfare, data.expenses],
+                                data: [data?.offerings || 0, data?.tithes || 0, data?.project_offerings || 0, data?.welfare || 0, data?.expenses || 0],
                                 backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
                                 borderWidth: 2,
                                 borderColor: 'white'
@@ -372,10 +372,10 @@ export default function FinancialAnalytics() {
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>Monthly Trends</h3>
                     <div style={{ height: '300px' }}>
                         <LineChart data={{
-                            labels: data.monthly_trends?.map((t: any) => t.month),
+                            labels: data?.monthly_trends?.map((t: any) => t.month) || [],
                             datasets: [
-                                { label: 'Income', data: data.monthly_trends?.map((t: any) => t.income), borderColor: '#10b981', backgroundColor: '#10b98120', tension: 0.4, fill: true },
-                                { label: 'Expenses', data: data.monthly_trends?.map((t: any) => t.expenses), borderColor: '#ef4444', backgroundColor: '#ef444420', tension: 0.4, fill: true }
+                                { label: 'Income', data: data?.monthly_trends?.map((t: any) => t.income) || [], borderColor: '#10b981', backgroundColor: '#10b98120', tension: 0.4, fill: true },
+                                { label: 'Expenses', data: data?.monthly_trends?.map((t: any) => t.expenses) || [], borderColor: '#ef4444', backgroundColor: '#ef444420', tension: 0.4, fill: true }
                             ]
                         }} height={300} />
                     </div>

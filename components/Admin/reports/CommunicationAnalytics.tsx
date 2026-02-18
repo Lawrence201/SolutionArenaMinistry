@@ -34,10 +34,10 @@ export default function CommunicationAnalytics() {
     if (!data) return <div className="error-state">Failed to load communication analytics</div>;
 
     const messageVolumeChart = {
-        labels: data.timeline.slice(-14).map((t: any) => new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+        labels: data?.timeline?.slice(-14).map((t: any) => new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) || [],
         datasets: [{
             label: 'Messages Sent',
-            data: data.timeline.slice(-14).map((t: any) => t.messages),
+            data: data?.timeline?.slice(-14).map((t: any) => t.messages) || [],
             borderColor: chartColors.primary,
             backgroundColor: `${chartColors.primary}20`,
             borderWidth: 2,
@@ -47,9 +47,9 @@ export default function CommunicationAnalytics() {
     };
 
     const channelChart = {
-        labels: Object.keys(data.channel_distribution),
+        labels: Object.keys(data?.channel_distribution || {}),
         datasets: [{
-            data: Object.values(data.channel_distribution) as number[],
+            data: Object.values(data?.channel_distribution || {}) as number[],
             backgroundColor: [chartColors.primary, chartColors.success, chartColors.warning],
             borderWidth: 0,
             hoverOffset: 10
@@ -57,10 +57,10 @@ export default function CommunicationAnalytics() {
     };
 
     const messageTypeChart = {
-        labels: Object.keys(data.by_type),
+        labels: Object.keys(data?.by_type || {}),
         datasets: [{
             label: 'Message Count',
-            data: Object.values(data.by_type) as number[],
+            data: Object.values(data?.by_type || {}) as number[],
             backgroundColor: [chartColors.primary, chartColors.success, chartColors.warning, chartColors.purple],
             borderRadius: 8,
             barThickness: 40
@@ -85,9 +85,9 @@ export default function CommunicationAnalytics() {
                     <div className="met-icon" style={{ backgroundColor: `${chartColors.primary}20`, color: chartColors.primary }}>✉️</div>
                     <div className="met-info">
                         <p className="met-label">Total Messages</p>
-                        <h2 className="met-value">{formatNumber(data.totals.total_messages)}</h2>
-                        <p className={`tre-ind ${data.totals.growth_rate >= 0 ? 'tre-up' : 'tre-down'}`}>
-                            {data.totals.growth_rate >= 0 ? '↑' : '↓'} {Math.abs(data.totals.growth_rate)}%
+                        <h2 className="met-value">{formatNumber(data?.totals?.total_messages || 0)}</h2>
+                        <p className={`tre-ind ${(data?.totals?.growth_rate || 0) >= 0 ? 'tre-up' : 'tre-down'}`}>
+                            {(data?.totals?.growth_rate || 0) >= 0 ? '↑' : '↓'} {Math.abs(data?.totals?.growth_rate || 0)}%
                         </p>
                     </div>
                 </div>
@@ -96,7 +96,7 @@ export default function CommunicationAnalytics() {
                     <div className="met-icon" style={{ backgroundColor: `${chartColors.success}20`, color: chartColors.success }}>📨</div>
                     <div className="met-info">
                         <p className="met-label">Avg Open Rate</p>
-                        <h2 className="met-value">{formatPercentage(data.totals.avg_open_rate)}</h2>
+                        <h2 className="met-value">{formatPercentage(data?.totals?.avg_open_rate || 0)}</h2>
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@ export default function CommunicationAnalytics() {
                     <div className="met-icon" style={{ backgroundColor: `${chartColors.warning}20`, color: chartColors.warning }}>📥</div>
                     <div className="met-info">
                         <p className="met-label">Inbox Count</p>
-                        <h2 className="met-value">{formatNumber(data.totals.inbox_count)}</h2>
+                        <h2 className="met-value">{formatNumber(data?.totals?.inbox_count || 0)}</h2>
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@ export default function CommunicationAnalytics() {
                     <div className="met-icon" style={{ backgroundColor: `${chartColors.purple}20`, color: chartColors.purple }}>👥</div>
                     <div className="met-info">
                         <p className="met-label">Active Users</p>
-                        <h2 className="met-value">{formatNumber(data.totals.active_users)}</h2>
+                        <h2 className="met-value">{formatNumber(data?.totals?.active_users || 0)}</h2>
                     </div>
                 </div>
             </div>
@@ -121,19 +121,19 @@ export default function CommunicationAnalytics() {
             <div className="secondary-metrics">
                 <div className="metric-item">
                     <p className="metric-label">Email Sent</p>
-                    <p className="metric-value">{formatNumber(data.totals.email_sent)}</p>
+                    <p className="metric-value">{formatNumber(data?.totals?.email_sent || 0)}</p>
                 </div>
                 <div className="metric-item">
                     <p className="metric-label">SMS Sent</p>
-                    <p className="metric-value">{formatNumber(data.totals.sms_sent)}</p>
+                    <p className="metric-value">{formatNumber(data?.totals?.sms_sent || 0)}</p>
                 </div>
                 <div className="metric-item">
                     <p className="metric-label">Push Sent</p>
-                    <p className="metric-value">{formatNumber(data.totals.push_sent)}</p>
+                    <p className="metric-value">{formatNumber(data?.totals?.push_sent || 0)}</p>
                 </div>
                 <div className="metric-item">
                     <p className="metric-label">Scheduled</p>
-                    <p className="metric-value">{formatNumber(data.totals.scheduled_messages)}</p>
+                    <p className="metric-value">{formatNumber(data?.totals?.scheduled_messages || 0)}</p>
                 </div>
             </div>
 
@@ -170,14 +170,14 @@ export default function CommunicationAnalytics() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.recent_messages.length === 0 ? (
+                        {(data?.recent_messages || []).length === 0 ? (
                             <tr>
                                 <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
                                     No messages sent yet
                                 </td>
                             </tr>
                         ) : (
-                            data.recent_messages.map((msg: any, idx: number) => (
+                            (data?.recent_messages || []).map((msg: any, idx: number) => (
                                 <tr key={idx}>
                                     <td className="tab-nam">{msg.title}</td>
                                     <td><span className="badg badg-inff">{msg.type}</span></td>
