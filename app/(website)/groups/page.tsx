@@ -7,7 +7,7 @@ import GroupsContent from "@/components/website/GroupsContent";
 
 const GroupsPage = () => {
     return (
-        <main>
+        <main className="website-page">
             <Header />
             {/* Banner Section */}
             <section className="banner position-relative" style={{ minHeight: "400px" }}>
