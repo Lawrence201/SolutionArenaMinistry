@@ -81,7 +81,7 @@ export default function OverviewTab() {
 
     // --- Line Chart Logic ---
     const lineChartPoints = useMemo(() => {
-        if (!data?.trends) return null;
+        if (!data?.trends || data.trends.length === 0) return null;
 
         const chartHeight = 250;
         const chartPadding = 30;
@@ -112,7 +112,7 @@ export default function OverviewTab() {
         const pointsData: any[] = [];
 
         data.trends.forEach((t, i) => {
-            const x = xPositions[i];
+            const x = xPositions[i] || 0;
             const incomeY = chartHeight - ((Math.max(t.income, 0) / roundedMax) * (chartHeight - chartPadding)) + 20;
             const expenseY = chartHeight - ((Math.max(t.expenses, 0) / roundedMax) * (chartHeight - chartPadding)) + 20;
             const balanceY = chartHeight - ((Math.max(t.balance, 0) / roundedMax) * (chartHeight - chartPadding)) + 20;
@@ -142,7 +142,7 @@ export default function OverviewTab() {
 
     // --- Pie Chart Logic ---
     const pieData = useMemo(() => {
-        if (!data?.categories) return null;
+        if (!data?.categories || data.categories.length === 0) return null;
         const hasData = data.categories.some(c => c.value > 0);
         if (!hasData) return null;
 

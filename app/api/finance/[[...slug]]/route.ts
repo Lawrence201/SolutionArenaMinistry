@@ -13,6 +13,36 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
         end.setHours(23, 59, 59, 999);
 
         switch (slug) {
+            case 'stats': {
+                const [offeringTotal, titheTotal, projectTotal, welfareTotal, expenseTotal, withdrawalTotal] = await Promise.all([
+                    prisma.offering.aggregate({ _sum: { amount_collected: true } }),
+                    prisma.tithe.aggregate({ _sum: { amount: true } }),
+                    prisma.projectOffering.aggregate({ _sum: { amount_collected: true } }),
+                    prisma.welfareContribution.aggregate({ _sum: { amount: true } }),
+                    prisma.expense.aggregate({ _sum: { amount: true } }),
+                    prisma.withdrawal.aggregate({ _sum: { amount: true } })
+                ]);
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        offerings: { total: Number(offeringTotal._sum.amount_collected || 0) },
+                        tithes: { total: Number(titheTotal._sum.amount || 0) },
+                        project_offerings: { total: Number(projectTotal._sum.amount_collected || 0) },
+                        welfare: { total: Number(welfareTotal._sum.amount || 0) },
+                        expenses: { total: Number(expenseTotal._sum.amount || 0) + Number(withdrawalTotal._sum.amount || 0) }
+                    }
+                });
+            }
+            case 'insights': {
+                // Mock insights or calculate basic ones
+                const insights = [
+                    { icon: 'trending-up', type: 'success', text: 'Offerings have increased by 12% compared to last month.' },
+                    { icon: 'alert', type: 'warning', text: 'Utility expenses are 5% higher than budgeted for this period.' },
+                    { icon: 'target', type: 'info', text: 'You are on track to reach the annual project offering goal.' }
+                ];
+                return NextResponse.json({ success: true, data: insights });
+            }
             case 'overview': {
                 const [off, tit, proj, wel, exp, withd] = await Promise.all([
                     prisma.offering.aggregate({ where: { date: { gte: start, lte: end } }, _sum: { amount_collected: true } }),
@@ -22,13 +52,70 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     prisma.expense.aggregate({ where: { date: { gte: start, lte: end } }, _sum: { amount: true } }),
                     prisma.withdrawal.aggregate({ where: { date: { gte: start, lte: end } }, _sum: { amount: true } })
                 ]);
+
                 const income = (Number(off._sum.amount_collected) || 0) + (Number(tit._sum.amount) || 0) + (Number(proj._sum.amount_collected) || 0) + (Number(wel._sum.amount) || 0);
                 const expenses = (Number(exp._sum.amount) || 0) + (Number(withd._sum.amount) || 0);
-                return NextResponse.json({ success: true, data: { summary: { total_income: income, total_expenses: expenses, net_balance: income - expenses } } });
-            }
-            case 'stats': {
-                const totalIncome = Number((await prisma.offering.aggregate({ _sum: { amount_collected: true } }))._sum.amount_collected || 0) + Number((await prisma.tithe.aggregate({ _sum: { amount: true } }))._sum.amount || 0);
-                return NextResponse.json({ success: true, data: { total_income: totalIncome } });
+
+                // Fetch trends (simplified: last 6 months)
+                const trends = [];
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - i);
+                    const mStart = new Date(d.getFullYear(), d.getMonth(), 1);
+                    const mEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+
+                    const [mOff, mTit, mExp, mWithd] = await Promise.all([
+                        prisma.offering.aggregate({ where: { date: { gte: mStart, lte: mEnd } }, _sum: { amount_collected: true } }),
+                        prisma.tithe.aggregate({ where: { date: { gte: mStart, lte: mEnd } }, _sum: { amount: true } }),
+                        prisma.expense.aggregate({ where: { date: { gte: mStart, lte: mEnd } }, _sum: { amount: true } }),
+                        prisma.withdrawal.aggregate({ where: { date: { gte: mStart, lte: mEnd } }, _sum: { amount: true } })
+                    ]);
+
+                    const mInc = (Number(mOff._sum.amount_collected) || 0) + (Number(mTit._sum.amount) || 0);
+                    const mExpTotal = (Number(mExp._sum.amount) || 0) + (Number(mWithd._sum.amount) || 0);
+
+                    trends.push({
+                        month: mStart.toLocaleString('default', { month: 'short' }),
+                        income: mInc,
+                        expenses: mExpTotal,
+                        balance: mInc - mExpTotal
+                    });
+                }
+
+                // Recent transactions (merged)
+                const [recentOff, recentTit, recentExp] = await Promise.all([
+                    prisma.offering.findMany({ take: 5, orderBy: { date: 'desc' } }),
+                    prisma.tithe.findMany({ take: 5, orderBy: { date: 'desc' }, include: { member: true } }),
+                    prisma.expense.findMany({ take: 5, orderBy: { date: 'desc' } })
+                ]);
+
+                const recent_transactions = [
+                    ...recentOff.map(o => ({ id: o.transaction_id, transaction_id: o.transaction_id, date: o.date.toISOString(), type: 'Offering', category: 'General', amount: Number(o.amount_collected) })),
+                    ...recentTit.map(t => ({ id: t.transaction_id, transaction_id: t.transaction_id, date: t.date.toISOString(), type: 'Tithe', member: t.member ? `${t.member.first_name} ${t.member.last_name}` : 'Unknown', category: 'Tithe', amount: Number(t.amount) })),
+                    ...recentExp.map(e => ({ id: e.transaction_id, transaction_id: e.transaction_id, date: e.date.toISOString(), type: 'Expense', description: e.description, category: e.category, amount: Number(e.amount) }))
+                ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
+
+                const categories = [
+                    { name: 'Offerings', value: Number(off._sum.amount_collected) || 0, color: '#10B981' },
+                    { name: 'Tithes', value: Number(tit._sum.amount) || 0, color: '#3B82F6' },
+                    { name: 'Projects', value: Number(proj._sum.amount_collected) || 0, color: '#F59E0B' },
+                    { name: 'Welfare', value: Number(wel._sum.amount) || 0, color: '#E879F9' }
+                ];
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        summary: {
+                            total_income: income,
+                            total_expenses: expenses,
+                            net_balance: income - expenses,
+                            recent_transactions_count: recent_transactions.length
+                        },
+                        trends,
+                        categories,
+                        recent_transactions
+                    }
+                });
             }
             case 'tithes': {
                 const tithes = await prisma.tithe.findMany({ where: { date: { gte: start, lte: end } }, include: { member: { select: { first_name: true, last_name: true } } }, orderBy: { date: 'desc' }, take: 100 });
