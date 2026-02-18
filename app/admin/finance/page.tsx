@@ -140,11 +140,11 @@ export default function FinancePage() {
                         <h2>AI-Powered Insights</h2>
                     </div>
                     <div className="cf-alerts-layout">
-                        {loading ? (
+                        {loadingInsights ? (
                             <div className="cf-alert-tile" style={{ textAlign: 'center', padding: '20px', gridColumn: '1 / -1', borderLeft: 'none', display: 'block' }}>
                                 <p style={{ color: '#94a3b8' }}>Loading insights...</p>
                             </div>
-                        ) : insights.length > 0 ? (
+                        ) : (insights && insights.length > 0) ? (
                             insights.map((insight, index) => (
                                 <div key={index} className={`cf-alert-tile cf-${insight.type}`}>
                                     <span className="cf-alert-symbol">
