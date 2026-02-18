@@ -5,10 +5,10 @@ import styles from "./GroupsContent.module.css";
 
 const GroupsContent = () => {
     const families = [
-        { name: "The DUNAMIS Family", img: "/assets/images/dunamis.jpg" },
-        { name: "The JUDAH Family", img: "/assets/images/judah.jpg" },
-        { name: "The KARIS Family", img: "/assets/images/karis.jpg" },
-        { name: "The KABOD Family", img: "/assets/images/kabod.jpg" },
+        { name: "The DUNAMIS Family", img: "/assets/images/dunamis.jpeg" },
+        { name: "The JUDAH Family", img: "/assets/images/judah.jpeg" },
+        { name: "The KARIS Family", img: "/assets/images/karis.jpeg" },
+        { name: "The KABOD Family", img: "/assets/images/kabod.jpeg" },
     ];
 
     return (
