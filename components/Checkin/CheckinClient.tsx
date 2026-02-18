@@ -243,7 +243,7 @@ export default function CheckinClient() {
 
                     {/* Selection */}
                     {currentScreen === 'selection' && (
-                        <div className="selection-screen">
+                        <div id="selection-screen">
                             <div className="center-container">
                                 <img src="/assets/Logo.PNG" alt="Solution Arena Ministry" className="heading-image" />
                                 <h1>Solution Arena Ministry</h1>
@@ -252,12 +252,12 @@ export default function CheckinClient() {
                                 </p>
                             </div>
 
-                            <button className="btn-primary" onClick={() => setCurrentScreen('member')}>
+                            <button className="btn-primary" id="member-btn" onClick={() => setCurrentScreen('member')}>
                                 <UserCheck size={20} />
                                 Check in as Member
                             </button>
 
-                            <button className="btn-secondary" onClick={() => setCurrentScreen('visitor')}>
+                            <button className="btn-secondary" id="visitor-btn" onClick={() => setCurrentScreen('visitor')}>
                                 <UserPlus size={20} />
                                 Check in as Visitor
                             </button>
@@ -266,8 +266,8 @@ export default function CheckinClient() {
 
                     {/* Member Form */}
                     {currentScreen === 'member' && (
-                        <div className="form-container active">
-                            <button className="back-btn" onClick={() => setCurrentScreen('selection')}>
+                        <div id="member-form" className="form-container active">
+                            <button className="back-btn" id="back-member" onClick={() => setCurrentScreen('selection')}>
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
@@ -283,6 +283,7 @@ export default function CheckinClient() {
                                     <label>Email Address *</label>
                                     <input
                                         type="email"
+                                        id="memberEmail"
                                         className="form-control"
                                         placeholder="Enter your email"
                                         value={memberEmail}
@@ -295,6 +296,7 @@ export default function CheckinClient() {
                                     <label>Phone Number * (10 digits)</label>
                                     <input
                                         type="tel"
+                                        id="memberPhone"
                                         className="form-control"
                                         placeholder="0XXXXXXXXX"
                                         value={memberPhone}
@@ -305,7 +307,7 @@ export default function CheckinClient() {
                                 </div>
 
                                 {memberError && (
-                                    <div className="error-message">
+                                    <div className="error-message" id="member-error">
                                         <AlertCircle size={24} />
                                         <p>{memberError}</p>
                                     </div>
@@ -313,7 +315,8 @@ export default function CheckinClient() {
 
                                 <button
                                     type="submit"
-                                    className="submit-btn btn-primary"
+                                    className="submit-btn"
+                                    id="memberSubmit"
                                     disabled={memberLoading}
                                 >
                                     {memberLoading ? (
@@ -334,8 +337,8 @@ export default function CheckinClient() {
 
                     {/* Visitor Form */}
                     {currentScreen === 'visitor' && (
-                        <div className="form-container active">
-                            <button className="back-btn" onClick={() => setCurrentScreen('selection')}>
+                        <div id="visitor-form" className="form-container active">
+                            <button className="back-btn" id="back-visitor" onClick={() => setCurrentScreen('selection')}>
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
@@ -351,6 +354,7 @@ export default function CheckinClient() {
                                     <label>Full Name *</label>
                                     <input
                                         type="text"
+                                        id="visitorName"
                                         className="form-control"
                                         placeholder="Enter your full name"
                                         value={visitorName}
@@ -363,6 +367,7 @@ export default function CheckinClient() {
                                     <label>Phone Number * (10 digits)</label>
                                     <input
                                         type="tel"
+                                        id="visitorPhone"
                                         className="form-control"
                                         placeholder="0XXXXXXXXX"
                                         value={visitorPhone}
@@ -376,6 +381,7 @@ export default function CheckinClient() {
                                     <label>Email Address</label>
                                     <input
                                         type="email"
+                                        id="visitorEmail"
                                         className="form-control"
                                         placeholder="Enter your email"
                                         value={visitorEmail}
@@ -386,6 +392,7 @@ export default function CheckinClient() {
                                 <div className="form-group">
                                     <label>How did you hear about us?</label>
                                     <select
+                                        id="visitorSource"
                                         className="form-control"
                                         value={visitorSource}
                                         onChange={(e) => setVisitorSource(e.target.value)}
@@ -402,6 +409,7 @@ export default function CheckinClient() {
                                 <div className="form-group">
                                     <label>What did you come here for?</label>
                                     <select
+                                        id="visitorPurpose"
                                         className="form-control"
                                         value={visitorPurpose}
                                         onChange={(e) => setVisitorPurpose(e.target.value)}
@@ -414,7 +422,7 @@ export default function CheckinClient() {
                                 </div>
 
                                 {visitorError && (
-                                    <div className="error-message">
+                                    <div className="error-message" id="visitor-error">
                                         <AlertCircle size={24} />
                                         <p>{visitorError}</p>
                                     </div>
@@ -422,7 +430,8 @@ export default function CheckinClient() {
 
                                 <button
                                     type="submit"
-                                    className="submit-btn btn-primary"
+                                    className="submit-btn"
+                                    id="visitorSubmit"
                                     disabled={visitorLoading}
                                 >
                                     {visitorLoading ? (
@@ -441,115 +450,115 @@ export default function CheckinClient() {
                         </div>
                     )}
 
-                    {/* Member Success */}
+                    {/* ──────────────────────────────────────────────── */}
+                    {/* Member Success – exact original structure       */}
+                    {/* ──────────────────────────────────────────────── */}
                     {currentScreen === 'member-success' && memberData && (
-                        <div className="success-container">
-                            <div className="success-card">
-                                <div className="check-icon">
-                                    <img src="/assets/Logo.PNG" alt="Solution Arena Ministry" className="heading-image" />
-                                </div>
-
-                                <div className="member-badge">MEMBER</div>
-
-                                {memberData.photo ? (
-                                    <img
-                                        src={memberData.photo}
-                                        alt={memberData.name}
-                                        className="member-photo"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = '/assets/Logo.PNG';
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="visitor-avatar">
-                                        <span>{getInitials(memberData.name)}</span>
-                                    </div>
-                                )}
-
-                                <h2>{memberData.name}</h2>
-                                <p className="member-email">{memberData.email}</p>
-
-                                <div className="info-grid">
-                                    <div className="info-item">
-                                        <div className="info-label">Phone</div>
-                                        <div className="info-value">{memberData.phone}</div>
-                                    </div>
-                                    <div className="info-item">
-                                        <div className="info-label">Check-in Time</div>
-                                        <div className="info-value">{memberData.checkInTime}</div>
-                                    </div>
-                                </div>
-
-                                <div className={`status-badge ${alreadyCheckedIn ? 'already' : ''}`}>
-                                    <CheckCircle size={18} />
-                                    <span>
-                                        {alreadyCheckedIn ? 'Already Checked In' : 'Check-in Successful'}
-                                    </span>
-                                </div>
-
-                                <p className="instruction-text" style={{
-                                    marginTop: '20px',
-                                    color: alreadyCheckedIn ? '#f59e0b' : '#64748b',
-                                    fontSize: '14px'
-                                }}>
-                                    {alreadyCheckedIn
-                                        ? 'You were already checked in for this service.'
-                                        : 'Show this screen to an usher'}
-                                </p>
-
-                                <button className="done-btn" onClick={resetToSelection}>
-                                    Done
-                                </button>
+                        <div id="member-success-card" className="success-card">
+                            <div className="check-icon">
+                                <img src="/assets/Logo.PNG" alt="Solution Arena Ministry" className="heading-image" />
                             </div>
+
+                            <div className="member-badge">MEMBER</div>
+
+                            {memberData.photo ? (
+                                <img
+                                    src={memberData.photo}
+                                    alt={memberData.name}
+                                    className="member-photo"
+                                    onError={(e) => (e.currentTarget.src = '/assets/Logo.PNG')}
+                                />
+                            ) : (
+                                <div className="visitor-avatar">
+                                    <span>{getInitials(memberData.name)}</span>
+                                </div>
+                            )}
+
+                            <h2 id="successMemberName">{memberData.name}</h2>
+                            <p className="member-email" id="successMemberEmail">{memberData.email}</p>
+
+                            <div className="info-grid">
+                                <div className="info-item">
+                                    <div className="info-label">Phone</div>
+                                    <div className="info-value" id="successMemberPhone">{memberData.phone}</div>
+                                </div>
+                                <div className="info-item">
+                                    <div className="info-label">Check-in Time</div>
+                                    <div className="info-value" id="successCheckInTime">{memberData.checkInTime}</div>
+                                </div>
+                            </div>
+
+                            <div className={`status-badge ${alreadyCheckedIn ? 'already' : ''}`}>
+                                <CheckCircle size={18} />
+                                <span>
+                                    {alreadyCheckedIn ? 'Already Checked In' : 'Check-in Successful'}
+                                </span>
+                            </div>
+
+                            <p style={{
+                                marginTop: '20px',
+                                color: alreadyCheckedIn ? '#f59e0b' : '#64748b',
+                                fontSize: '14px'
+                            }}>
+                                {alreadyCheckedIn
+                                    ? 'You were already checked in for this service.'
+                                    : 'Show this screen to an usher'}
+                            </p>
+
+                            <button className="done-btn" onClick={resetToSelection}>
+                                Done
+                            </button>
                         </div>
                     )}
 
-                    {/* Visitor Success */}
+                    {/* ──────────────────────────────────────────────── */}
+                    {/* Visitor Success – exact original structure      */}
+                    {/* ──────────────────────────────────────────────── */}
                     {currentScreen === 'visitor-success' && visitorData && (
-                        <div className="success-container">
-                            <div className="success-card">
-                                <div className="check-icon">
-                                    <img src="/assets/Logo.PNG" alt="Solution Arena Ministry" className="heading-image" />
-                                </div>
-
-                                <div className="member-badge visitor-badge">VISITOR</div>
-
-                                <div className="visitor-avatar">
-                                    <span>{getInitials(visitorData.name)}</span>
-                                </div>
-
-                                <h2>{visitorData.name}</h2>
-                                <p className="member-email">Welcome to Solution Arena Ministry!</p>
-
-                                <div className="info-grid">
-                                    <div className="info-item">
-                                        <div className="info-label">Phone</div>
-                                        <div className="info-value">{visitorData.phone}</div>
-                                    </div>
-                                    <div className="info-item">
-                                        <div className="info-label">Check-in Time</div>
-                                        <div className="info-value">{visitorData.checkInTime}</div>
-                                    </div>
-                                </div>
-
-                                <div className="status-badge">
-                                    <CheckCircle size={18} />
-                                    <span>Check-in Successful</span>
-                                </div>
-
-                                <p className="instruction-text">
-                                    Show this screen to an usher
-                                </p>
-
-                                <button className="done-btn" onClick={resetToSelection}>
-                                    Done
-                                </button>
+                        <div id="visitor-success-card" className="success-card">
+                            <div className="check-icon">
+                                <img src="/assets/Logo.PNG" alt="Solution Arena Ministry" className="heading-image" />
                             </div>
+
+                            <div className="member-badge visitor-badge">VISITOR</div>
+
+                            <div className="visitor-avatar">
+                                <span>{getInitials(visitorData.name)}</span>
+                            </div>
+
+                            <h2 id="successVisitorName">{visitorData.name}</h2>
+                            <p className="member-email" id="successVisitorEmail">
+                                {visitorData.email || 'Welcome to Solution Arena Ministry!'}
+                            </p>
+
+                            <div className="info-grid">
+                                <div className="info-item">
+                                    <div className="info-label">Phone</div>
+                                    <div className="info-value" id="successVisitorPhone">{visitorData.phone}</div>
+                                </div>
+                                <div className="info-item">
+                                    <div className="info-label">Check-in Time</div>
+                                    <div className="info-value" id="successVisitorCheckInTime">{visitorData.checkInTime}</div>
+                                </div>
+                            </div>
+
+                            <div className="status-badge">
+                                <CheckCircle size={18} />
+                                <span>Check-in Successful</span>
+                            </div>
+
+                            <p style={{ marginTop: '20px', color: '#64748b', fontSize: '14px' }}>
+                                Show this screen to an usher
+                            </p>
+
+                            <button className="done-btn" onClick={resetToSelection}>
+                                Done
+                            </button>
                         </div>
                     )}
 
                     <div className="footer-text">
-                        <span className="main-text">Solution Arena Ministry © 2025 | Attendance</span>
+                        <span className="main-text">Solution Arena Ministry © 2026 | Attendance</span>
                         <span className="created-by">Created by <strong>Lawrence Egyin</strong></span>
                     </div>
 
