@@ -667,111 +667,109 @@ jQuery(document).ready(function ($) {
 
   preloader = document.getElementById('preloader');
 
-  let progressBar = document.getElementById('progress-bar'),
-    images = document.images,
-    imagesAmount = images.length,
-    imagesLoaded = 0,
-    barCtx = progressBar.getContext('2d'),
-    circleCenterX = progressBar.width / 2,
-    circleCenterY = progressBar.height / 2,
-    circleRadius = circleCenterX - settings.lineWidth,
-    degreesPerPercent = 3.6,
-    currentProgress = 0,
-    showedProgress = 0,
-    progressStep = 0,
-    progressDelta = 0,
-    startTime = null,
-    running;
+  if (preloader) {
+    let progressBar = document.getElementById('progress-bar'),
+      images = document.images,
+      imagesAmount = images.length,
+      imagesLoaded = 0,
+      circleCenterX = 0,
+      circleCenterY = 0,
+      circleRadius = 0,
+      barCtx = null;
 
-  (function () {
-
-    return requestAnimationFrame
-      || mozRequestAnimationFrame
-      || webkitRequestAnimationFrame
-      || oRequestAnimationFrame
-      || msRequestAnimationFrame
-      || function (callback) {
-        setTimeout(callback, 1000 / 60);
-      };
-
-  })();
-
-  Math.radians = function (degrees) {
-    return degrees * Math.PI / 180;
-  };
-
-
-  progressBar.style.opacity = settings.progressOpacity;
-  barCtx.strokeStyle = settings.progressColor;
-  barCtx.lineWidth = settings.lineWidth;
-  barCtx.lineCap = settings.lineCap;
-  let angleMultiplier = (Math.abs(settings.startDegree) + Math.abs(settings.finalDegree)) / 360;
-  let startAngle = Math.radians(settings.startDegree);
-  document.body.style.overflowY = 'hidden';
-  preloader.style.backgroundColor = settings.preloaderBackground;
-
-
-  for (let i = 0; i < imagesAmount; i++) {
-
-    let imageClone = new Image();
-    imageClone.onload = onImageLoad;
-    imageClone.onerror = onImageLoad;
-    imageClone.src = images[i].src;
-
-  }
-
-  function onImageLoad() {
-
-    if (running === true) running = false;
-
-    imagesLoaded++;
-
-    if (imagesLoaded >= imagesAmount) hidePreloader();
-
-    progressStep = showedProgress;
-    currentProgress = ((100 / imagesAmount) * imagesLoaded) << 0;
-    progressDelta = currentProgress - showedProgress;
-
-    setTimeout(function () {
-
-      if (startTime === null) startTime = performance.now();
-      running = true;
-      animate();
-
-    }, 10);
-
-  }
-
-  function animate() {
-
-    if (running === false) {
-      startTime = null;
-      return;
+    if (progressBar) {
+      barCtx = progressBar.getContext('2d');
+      circleCenterX = progressBar.width / 2;
+      circleCenterY = progressBar.height / 2;
+      circleRadius = circleCenterX - settings.lineWidth;
     }
 
-    let timeDelta = Math.min(1, (performance.now() - startTime) / settings.preloaderAnimationDuration);
-    showedProgress = progressStep + (progressDelta * timeDelta);
+    let degreesPerPercent = 3.6,
+      currentProgress = 0,
+      showedProgress = 0,
+      progressStep = 0,
+      progressDelta = 0,
+      startTime = null,
+      running;
 
-    if (timeDelta <= 1) {
+    (function () {
+      return window.requestAnimationFrame
+        || window.mozRequestAnimationFrame
+        || window.webkitRequestAnimationFrame
+        || window.oRequestAnimationFrame
+        || window.msRequestAnimationFrame
+        || function (callback) {
+          setTimeout(callback, 1000 / 60);
+        };
+    })();
 
+    Math.radians = function (degrees) {
+      return degrees * Math.PI / 180;
+    };
 
-      barCtx.clearRect(0, 0, progressBar.width, progressBar.height);
-      barCtx.beginPath();
-      barCtx.arc(circleCenterX, circleCenterY, circleRadius, startAngle, (Math.radians(showedProgress * degreesPerPercent) * angleMultiplier) + startAngle);
-      barCtx.stroke();
-      requestAnimationFrame(animate);
-
-    } else {
-      startTime = null;
+    if (progressBar) {
+      progressBar.style.opacity = settings.progressOpacity;
     }
 
-  }
+    if (barCtx) {
+      barCtx.strokeStyle = settings.progressColor;
+      barCtx.lineWidth = settings.lineWidth;
+      barCtx.lineCap = settings.lineCap;
+    }
 
-  function hidePreloader() {
-    setTimeout(function () {
-      $("body").addClass("page-loaded");
-      document.body.style.overflowY = '';
-    }, settings.preloaderAnimationDuration + 100);
+    let angleMultiplier = (Math.abs(settings.startDegree) + Math.abs(settings.finalDegree)) / 360;
+    let startAngle = Math.radians(settings.startDegree);
+    document.body.style.overflowY = 'hidden';
+    preloader.style.backgroundColor = settings.preloaderBackground;
+
+    for (let i = 0; i < imagesAmount; i++) {
+      let imageClone = new Image();
+      imageClone.onload = onImageLoad;
+      imageClone.onerror = onImageLoad;
+      imageClone.src = images[i].src;
+    }
+
+    function onImageLoad() {
+      if (running === true) running = false;
+      imagesLoaded++;
+      if (imagesLoaded >= imagesAmount) hidePreloader();
+      progressStep = showedProgress;
+      currentProgress = ((100 / imagesAmount) * imagesLoaded) << 0;
+      progressDelta = currentProgress - showedProgress;
+      setTimeout(function () {
+        if (startTime === null) startTime = performance.now();
+        running = true;
+        animate();
+      }, 10);
+    }
+
+    function animate() {
+      if (running === false) {
+        startTime = null;
+        return;
+      }
+      let timeDelta = Math.min(1, (performance.now() - startTime) / settings.preloaderAnimationDuration);
+      showedProgress = progressStep + (progressDelta * timeDelta);
+
+      if (timeDelta <= 1) {
+        if (barCtx && progressBar) {
+          barCtx.clearRect(0, 0, progressBar.width, progressBar.height);
+          barCtx.beginPath();
+          barCtx.arc(circleCenterX, circleCenterY, circleRadius, startAngle, (Math.radians(showedProgress * degreesPerPercent) * angleMultiplier) + startAngle);
+          barCtx.stroke();
+        }
+        requestAnimationFrame(animate);
+      } else {
+        startTime = null;
+      }
+    }
+
+    function hidePreloader() {
+      setTimeout(function () {
+        $("body").addClass("page-loaded");
+        document.body.style.overflowY = '';
+      }, settings.preloaderAnimationDuration + 100);
+    }
   }
   var resizeTimer;
 

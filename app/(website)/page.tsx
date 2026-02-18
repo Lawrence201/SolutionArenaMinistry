@@ -19,8 +19,6 @@ import Preloader from "@/components/website/Preloader";
 export default function WebsiteHomePage() {
     return (
         <main className="website-page">
-            <Preloader />
-            <WelcomeModal />
             <Header />
             <Hero />
             <Fellowship />

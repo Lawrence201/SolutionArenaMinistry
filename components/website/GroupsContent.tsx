@@ -7,7 +7,7 @@ const GroupsContent = () => {
     const families = [
         { name: "The DUNAMIS Family", img: "/assets/images/dunamis.jpg" },
         { name: "The JUDAH Family", img: "/assets/images/judah.jpg" },
-        { name: "The KARIS Family", img: "/assets/images/karis .jpg" },
+        { name: "The KARIS Family", img: "/assets/images/karis.jpg" },
         { name: "The KABOD Family", img: "/assets/images/kabod.jpg" },
     ];
 

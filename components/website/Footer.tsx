@@ -164,12 +164,12 @@ const Footer = () => {
                         <div className="col-lg-3 col-md-6 col-sm-12">
                             <h2 className="text-white">Quick Links</h2>
                             <ul className="quick-links">
-                                <li><a href="/sermons.html">Our Sermons</a></li>
+                                <li><a href="/sermons">Our Sermons</a></li>
                                 <li><a href="/about-us">About Us</a></li>
-                                <li><a href="/events.html">Our Events</a></li>
-                                <li><a href="/blogs.html">Our Blogs</a></li>
-                                <li><a href="/contact-us.html">Contact Us</a></li>
-                                <li><a href="/pastor-detail.html">Pastor Details</a></li>
+                                <li><a href="/events">Our Events</a></li>
+                                <li><a href="/blog">Our Blogs</a></li>
+                                <li><a href="/contact-us">Contact Us</a></li>
+                                <li><a href="/pastors">Pastor Details</a></li>
                             </ul>
                             <style dangerouslySetInnerHTML={{
                                 __html: `
@@ -195,7 +195,7 @@ const Footer = () => {
                                     <li key={event.id}>
                                         <img src={event.image_path} alt={event.name} style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px" }} />
                                         <div className="event-content">
-                                            <h6><a href={`/event-detail.html?id=${event.id}`} className="text-white">{event.name}</a></h6>
+                                            <h6><a href={`/events/${event.id}`} className="text-white">{event.name}</a></h6>
                                             <span className="text-white" style={{ fontSize: "14px", fontWeight: "bold", position: "relative", paddingLeft: "25px" }}>
                                                 <img src="/assets/images/calendar-clr.svg" alt="calendar" style={{ width: "18px", position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)" }} />
                                                 {event.start_date}
