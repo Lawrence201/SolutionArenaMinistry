@@ -82,12 +82,21 @@ const Preloader = () => {
 
         document.body.style.overflowY = 'hidden';
 
+        // SAFETY: Force load after 1.5s max to avoid hanging on slow network or broken images
+        const safetyFinality = setTimeout(() => {
+            if (!isLoaded) {
+                setIsLoaded(true);
+                document.body.style.overflowY = '';
+                console.warn("Preloader: Forced hide after timeout");
+            }
+        }, 1500);
+
         if (imagesAmount === 0) {
             setProgress(100);
             setTimeout(() => {
                 setIsLoaded(true);
                 document.body.style.overflowY = '';
-            }, 1000);
+            }, 500);
         } else {
             imagesArray.forEach(img => {
                 if (!img) return; // Null check
@@ -101,6 +110,7 @@ const Preloader = () => {
         }
 
         return () => {
+            clearTimeout(safetyFinality);
             imagesArray.forEach(img => {
                 if (img) {
                     img.removeEventListener('load', onImageLoad);

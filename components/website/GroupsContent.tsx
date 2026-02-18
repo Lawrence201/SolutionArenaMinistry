@@ -117,7 +117,7 @@ const GroupsContent = () => {
                                         </svg>
                                     </a>
                                 </div>
-                                <img src="/assets/images/ambassors.JPG" alt="Choir Group" className={styles.largeImg} />
+                                <img src="/assets/images/ambassors.JPG" alt="Media Group" className={styles.largeImg} />
                             </div>
                         </div>
                     </div>
@@ -133,7 +133,7 @@ const GroupsContent = () => {
                         <h2>Our Media Crew</h2>
                     </div>
                     <div className={styles.longRect}>
-                        <img src="/assets/images/media.JPG" alt="Media Crew Banner" />
+                        <img src="/assets/images/media.JPG" alt="Media Group Long" />
                     </div>
                 </div>
             </section>
