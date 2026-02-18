@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./About.module.css";
+import PastoralSlider from "./PastoralSlider";
+import MinistersSection from "./MinistersSection";
 
 const About = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -438,6 +440,10 @@ const About = () => {
                     </div>
                 </div>
             </section>
+
+            <PastoralSlider />
+
+            <MinistersSection />
 
             {/* Tailwind CDN */}
             <script src="https://cdn.tailwindcss.com"></script>

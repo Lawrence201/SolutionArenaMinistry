@@ -91,8 +91,8 @@ export default function VisitorAnalytics() {
                         </svg>
                         TOTAL VISITORS
                     </div>
-                    <div className="sum-val">{data.total_visitors}</div>
-                    <div className="sum-chan">{data.new_this_week} new visitors this week</div>
+                    <div className="sum-val">{data?.total_visitors || 0}</div>
+                    <div className="sum-chan">{data?.new_this_week || 0} new visitors this week</div>
                 </div>
 
                 {/* 2. PENDING FOLLOW-UPS */}
@@ -104,7 +104,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         PENDING FOLLOW-UPS
                     </div>
-                    <div className="sum-val" style={{ color: '#6366f1' }}>{data.pending_follow_ups}</div>
+                    <div className="sum-val" style={{ color: '#6366f1' }}>{data?.pending_follow_ups || 0}</div>
                     <div className="sum-chan" style={{ color: '#10b981' }}>Needs attention</div>
                 </div>
 
@@ -117,8 +117,8 @@ export default function VisitorAnalytics() {
                         </svg>
                         CONVERSION RATE
                     </div>
-                    <div className="sum-val" style={{ color: '#f59e0b' }}>{data.conversion_rate}%</div>
-                    <div className="sum-chan" style={{ color: '#10b981' }}>{data.converted_count} new members</div>
+                    <div className="sum-val" style={{ color: '#f59e0b' }}>{data?.conversion_rate || 0}%</div>
+                    <div className="sum-chan" style={{ color: '#10b981' }}>{data?.converted_count || 0} new members</div>
                 </div>
 
                 {/* 4. RETURNING VISITORS */}
@@ -130,7 +130,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         RETURNING VISITORS
                     </div>
-                    <div className="sum-val" style={{ color: '#10b981' }}>{data.returning_visitors}</div>
+                    <div className="sum-val" style={{ color: '#10b981' }}>{data?.returning_visitors || 0}</div>
                     <div className="sum-chan" style={{ color: '#10b981' }}>Visited more than once</div>
                 </div>
 
@@ -143,7 +143,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         NEW THIS WEEK
                     </div>
-                    <div className="sum-val" style={{ color: '#3b82f6' }}>{data.new_this_week}</div>
+                    <div className="sum-val" style={{ color: '#3b82f6' }}>{data?.new_this_week || 0}</div>
                     <div className="sum-chan" style={{ color: '#10b981' }}>Last 7 days</div>
                 </div>
 
@@ -155,7 +155,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         CONTACTED
                     </div>
-                    <div className="sum-val" style={{ color: '#6366f1' }}>{data.contacted_count}</div>
+                    <div className="sum-val" style={{ color: '#6366f1' }}>{data?.contacted_count || 0}</div>
                     <div className="sum-chan" style={{ color: '#10b981' }}>Follow-up made</div>
                 </div>
 
@@ -170,7 +170,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         SCHEDULED
                     </div>
-                    <div className="sum-val" style={{ color: '#f59e0b' }}>{data.scheduled_count}</div>
+                    <div className="sum-val" style={{ color: '#f59e0b' }}>{data?.scheduled_count || 0}</div>
                     <div className="sum-chan" style={{ color: '#10b981' }}>Appointments set</div>
                 </div>
 
@@ -184,7 +184,7 @@ export default function VisitorAnalytics() {
                         </svg>
                         URGENT FOLLOW-UPS
                     </div>
-                    <div className="sum-val" style={{ color: '#10b981' }}>{data.urgent_count}</div>
+                    <div className="sum-val" style={{ color: '#10b981' }}>{data?.urgent_count || 0}</div>
                     <div className="sum-chan" style={{ color: '#16a34a' }}>Over 3 days old</div>
                 </div>
             </div>
@@ -289,7 +289,7 @@ export default function VisitorAnalytics() {
                                                         visitor.status === 'completed' ? '#065f46' :
                                                             visitor.status === 'no_response' ? '#075985' : '#475569'
                                         }}>
-                                            {visitor.status.charAt(0)?.toUpperCase() + visitor.status.slice(1)}
+                                            {visitor.status?.charAt(0)?.toUpperCase() + visitor.status?.slice(1)}
                                         </span>
                                     </td>
                                     <td style={{ padding: '16px', fontSize: '14px', color: '#64748b' }}>{visitor.assigned_to}</td>

@@ -1,0 +1,30 @@
+﻿.next/dev/types/validator.ts(432,31): error TS2344: Type 'typeof import("C:/xampp/htdocs/Church_Management_System/Church_Management_System/app/api/website/blogs/[slug]/comments/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/website/blogs/[slug]/comments">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: Request, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ success: boolean; data: ({ user: { first_name: string; last_name: string; profile_picture: string | null; }; replies: ({ ...; } & { ...; })[]; } & { ...; })[]; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+.next/dev/types/validator.ts(441,31): error TS2344: Type 'typeof import("C:/xampp/htdocs/Church_Management_System/Church_Management_System/app/api/website/blogs/[slug]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/website/blogs/[slug]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: Request, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ success: boolean; data: { blog: { comments: ({ user: { first_name: string; last_name: string; profile_picture: string | null; }; replies: ({ ...; } & { ...; })[]; } & { ...; })[]; } & { ...; }; recentPosts: { ...; }[]; popularPo...' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+.next/types/validator.ts(432,31): error TS2344: Type 'typeof import("C:/xampp/htdocs/Church_Management_System/Church_Management_System/app/api/website/blogs/[slug]/comments/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/website/blogs/[slug]/comments">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: Request, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ success: boolean; data: ({ user: { first_name: string; last_name: string; profile_picture: string | null; }; replies: ({ ...; } & { ...; })[]; } & { ...; })[]; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+.next/types/validator.ts(441,31): error TS2344: Type 'typeof import("C:/xampp/htdocs/Church_Management_System/Church_Management_System/app/api/website/blogs/[slug]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/website/blogs/[slug]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: Request, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ success: boolean; data: { blog: { comments: ({ user: { first_name: string; last_name: string; profile_picture: string | null; }; replies: ({ ...; } & { ...; })[]; } & { ...; })[]; } & { ...; }; recentPosts: { ...; }[]; popularPo...' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+app/(website)/contact/page.tsx(8,14): error TS2304: Cannot find name 'InnerBanner'.
+app/(website)/contact/page.tsx(13,14): error TS2304: Cannot find name 'ContactContent'.
