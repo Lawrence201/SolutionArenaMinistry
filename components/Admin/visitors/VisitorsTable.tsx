@@ -8,9 +8,10 @@ interface VisitorsTableProps {
     onEdit: (visitor: Visitor) => void;
     onAssign: (visitor: Visitor) => void;
     onDelete: (visitorId: number) => void;
+    onConvertToMember: (visitor: Visitor) => void;
 }
 
-const VisitorsTable: React.FC<VisitorsTableProps> = ({ visitors, onEdit, onAssign, onDelete }) => {
+const VisitorsTable: React.FC<VisitorsTableProps> = ({ visitors, onEdit, onAssign, onDelete, onConvertToMember }) => {
 
     const getBadgeClass = (status: string | null) => {
         if (!status) return styles.cfBadge;
@@ -28,9 +29,9 @@ const VisitorsTable: React.FC<VisitorsTableProps> = ({ visitors, onEdit, onAssig
     const isUrgent = (visitor: any) => {
         if (visitor.follow_up_status !== 'pending') return false;
         if (!visitor.last_visit_date) return false;
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-        return new Date(visitor.last_visit_date) >= threeDaysAgo;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return new Date(visitor.last_visit_date) >= thirtyDaysAgo;
     };
 
     const getSourceBadgeClass = (source: string | null) => {
@@ -162,6 +163,18 @@ const VisitorsTable: React.FC<VisitorsTableProps> = ({ visitors, onEdit, onAssig
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                                                     <path d="m15 5 4 4"></path>
+                                                </svg>
+                                            </button>
+                                            <button
+                                                className={styles.cfBtn}
+                                                style={{ padding: '6px', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#10b981', background: '#f0fdf4' }}
+                                                title="Convert to Member"
+                                                onClick={() => onConvertToMember(visitor)}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="9" cy="7" r="4"></circle>
+                                                    <polyline points="16 11 18 13 22 9"></polyline>
                                                 </svg>
                                             </button>
                                             <button

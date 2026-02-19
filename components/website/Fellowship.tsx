@@ -15,7 +15,7 @@ const Fellowship = () => {
                             <span>
                                 <img src="/assets/images/mission.png" alt="Wedding" />
                             </span>
-                            <h3><a href="JavaScript:void(0)">Our Mission</a></h3>
+                            <h3><a href="#" onClick={(e) => e.preventDefault()}>Our Mission</a></h3>
                             <p className="mx-auto">SOLUTION Arena Ministry is a commission with a divine mandate to present
                                 Jesus the Solutionist to the world and conform
                                 all men into His image.</p>
@@ -28,7 +28,7 @@ const Fellowship = () => {
                             <span>
                                 <img src="/assets/images/pray.svg" alt="Pray" />
                             </span>
-                            <h3><a href="JavaScript:void(0)">Our Vision</a></h3>
+                            <h3><a href="#" onClick={(e) => e.preventDefault()}>Our Vision</a></h3>
                             <p className="mx-auto">Our vision is to make God's people useful on earth and prepared for Heaven
                                 through the teachings and
                                 exhortation of God's Word.</p>
@@ -41,7 +41,7 @@ const Fellowship = () => {
                             <span>
                                 <img src="/assets/images/handshake.png" alt="Bird" />
                             </span>
-                            <h3><a href="JavaScript:void(0)">Our Greetings</a></h3>
+                            <h3><a href="#" onClick={(e) => e.preventDefault()}>Our Greetings</a></h3>
                             <p className="mx-auto">Love God Love The Church, Love The Pastor Love Everyone. This teaches us to
                                 Love God first, give honor to the Pastor and love everyone</p>
                         </div>

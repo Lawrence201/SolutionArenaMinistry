@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import LineChart from './charts/LineChart';
+import BarChart from './charts/BarChart';
+import DoughnutChart from './charts/DoughnutChart';
 
 export default function VisitorAnalytics() {
     const [data, setData] = useState<any>(null);
     const [trendData, setTrendData] = useState<any>(null);
+    const [funnelData, setFunnelData] = useState<any>(null);
+    const [sourceData, setSourceData] = useState<any>(null);
     const [recentVisitors, setRecentVisitors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -23,7 +27,34 @@ export default function VisitorAnalytics() {
                 recentRes.json()
             ]);
 
-            if (stats.success) setData(stats.data);
+            if (stats.success) {
+                setData(stats.data);
+
+                // Format Funnel Data
+                setFunnelData({
+                    labels: ['First Visit', 'Second Visit', 'Regular', 'Member'],
+                    datasets: [{
+                        data: [
+                            stats.data.funnel.first_visit,
+                            stats.data.funnel.second_visit,
+                            stats.data.funnel.regular,
+                            stats.data.funnel.members
+                        ],
+                        backgroundColor: ['#ec4899', '#8b5cf6', '#3b82f6', '#10b981'],
+                        borderRadius: 8
+                    }]
+                });
+
+                // Format Source Data
+                const sources = stats.data.by_source;
+                setSourceData({
+                    labels: Object.keys(sources).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+                    datasets: [{
+                        data: Object.values(sources),
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6']
+                    }]
+                });
+            }
             if (trends.success) {
                 setTrendData({
                     labels: trends.data.map((d: any) => d.label),
@@ -186,6 +217,62 @@ export default function VisitorAnalytics() {
                     </div>
                     <div className="sum-val" style={{ color: '#10b981' }}>{data?.urgent_count || 0}</div>
                     <div className="sum-chan" style={{ color: '#16a34a' }}>Over 3 days old</div>
+                </div>
+            </div>
+
+            {/* Top Charts Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+                {/* Follow-Up Status */}
+                <div className="sum-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '1rem', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                    <div style={{ marginBottom: '24px' }}>
+                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>Follow-Up Status</h3>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>Visitor engagement pipeline</p>
+                    </div>
+                    <div style={{ height: '300px' }}>
+                        {funnelData ? (
+                            <BarChart
+                                data={funnelData}
+                                height={300}
+                                options={{
+                                    indexAxis: 'y' as const,
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                                        y: { grid: { display: false } }
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Loading funnel data...</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Visitor Sources */}
+                <div className="sum-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '1rem', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                    <div style={{ marginBottom: '24px' }}>
+                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>Visitor Sources</h3>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>How they heard about us</p>
+                    </div>
+                    <div style={{ height: '300px' }}>
+                        {sourceData ? (
+                            <DoughnutChart
+                                data={sourceData}
+                                height={300}
+                                options={{
+                                    plugins: {
+                                        legend: {
+                                            position: 'right' as const,
+                                            labels: { boxWidth: 12, padding: 15, font: { size: 12 } }
+                                        }
+                                    },
+                                    cutout: '60%'
+                                }}
+                            />
+                        ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Loading source data...</div>
+                        )}
+                    </div>
                 </div>
             </div>
 

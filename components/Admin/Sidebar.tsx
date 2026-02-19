@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import "./admin.css";
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
     // Toggle sidebar for mobile
@@ -19,6 +20,18 @@ export default function Sidebar() {
             } else {
                 sidebar.classList.remove('open');
             }
+        }
+    };
+
+    const handleLogout = () => {
+        if (typeof window !== 'undefined' && window.confirm('Are you sure you want to logout?')) {
+            // Clear any local storage that might be used for auth
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+            // Redirect to login page
+            router.push('/login');
         }
     };
 
@@ -322,7 +335,7 @@ export default function Sidebar() {
                     </div>
 
                     <div className="menu-section">
-                        <div onClick={() => console.log('Logout')} className="menu-item" style={{ color: '#ef4444', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
+                        <div onClick={handleLogout} className="menu-item" style={{ cursor: 'pointer', color: '#ef4444', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
                             <span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

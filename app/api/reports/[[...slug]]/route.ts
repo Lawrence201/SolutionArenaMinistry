@@ -207,7 +207,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     });
                 }
 
-                const [total, newWeekly, pending, converted, returning, contacted, scheduled, urgent] = await Promise.all([
+                const [total, newWeekly, pending, converted, returning, contacted, scheduled, urgent, bySource] = await Promise.all([
                     prisma.visitor.count(),
                     prisma.visitor.count({ where: { created_at: { gte: sevenDaysAgo } } }),
                     prisma.visitor.count({ where: { follow_up_status: 'pending' } }),
@@ -215,9 +215,44 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     prisma.visitor.count({ where: { visit_count: { gt: 1 } } }),
                     prisma.visitor.count({ where: { follow_up_status: 'contacted' } }),
                     prisma.visitor.count({ where: { follow_up_status: 'scheduled' } }),
-                    prisma.visitor.count({ where: { follow_up_status: 'pending', created_at: { lte: threeDaysAgo } } })
+                    prisma.visitor.count({ where: { follow_up_status: 'pending', created_at: { lte: threeDaysAgo } } }),
+                    prisma.visitor.groupBy({
+                        by: ['source'],
+                        _count: { _all: true },
+                        where: { NOT: { source: null } }
+                    })
                 ]);
-                return NextResponse.json({ success: true, data: { total_visitors: total, new_this_week: newWeekly, pending_follow_ups: pending, conversion_rate: total > 0 ? Math.round((converted / total) * 100) : 0, converted_count: converted, returning_visitors: returning, contacted_count: contacted, scheduled_count: scheduled, urgent_count: urgent } });
+
+                // Calculate funnel data
+                const firstVisit = total;
+                const secondVisit = returning;
+                const regular = await prisma.visitor.count({ where: { visit_count: { gte: 3 } } });
+                const members = converted;
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        total_visitors: total,
+                        new_this_week: newWeekly,
+                        pending_follow_ups: pending,
+                        conversion_rate: total > 0 ? Math.round((converted / total) * 100) : 0,
+                        converted_count: converted,
+                        returning_visitors: returning,
+                        contacted_count: contacted,
+                        scheduled_count: scheduled,
+                        urgent_count: urgent,
+                        by_source: bySource.reduce((acc: any, curr) => {
+                            if (curr.source) acc[curr.source] = curr._count._all;
+                            return acc;
+                        }, {}),
+                        funnel: {
+                            first_visit: firstVisit,
+                            second_visit: secondVisit,
+                            regular: regular,
+                            members: members
+                        }
+                    }
+                });
             }
 
             case 'attendance': {
@@ -343,6 +378,47 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                 return NextResponse.json({ success: true, data: { total_income: income, total_expenses: expenses, net_income: income - expenses } });
             }
 
+            case 'birthdays': {
+                const monthlyData: any[] = await prisma.$queryRaw`
+                    SELECT EXTRACT(MONTH FROM date_of_birth)::int as month, COUNT(*)::int as count
+                    FROM members
+                    WHERE date_of_birth IS NOT NULL
+                    GROUP BY month
+                    ORDER BY month
+                `;
+
+                const months = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                const chartData = months.map((monthName, index) => {
+                    const monthNum = index + 1;
+                    const found = monthlyData.find(d => d.month === monthNum);
+                    return {
+                        month: monthNum,
+                        month_name: monthName,
+                        count: found ? found.count : 0
+                    };
+                });
+
+                const totalBirthdays = chartData.reduce((sum, item) => sum + item.count, 0);
+                let highestMonth = chartData[0];
+                chartData.forEach(d => {
+                    if (d.count > highestMonth.count) highestMonth = d;
+                });
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        monthly: chartData,
+                        total_birthdays: totalBirthdays,
+                        highest_month: highestMonth,
+                        average_per_month: totalBirthdays > 0 ? (totalBirthdays / 12).toFixed(1) : 0
+                    }
+                });
+            }
+
             case 'insights': {
                 const insights = [
                     { type: "success", icon: "trending-up", text: "Membership has grown by 8% this month.", priority: 1, module: "Members" },
@@ -353,12 +429,101 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
             }
 
             case 'blogs': {
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+                const [
+                    total, published, drafts, featured,
+                    currMonth, prevMonth,
+                    recentPosts, categories, authors
+                ] = await Promise.all([
+                    prisma.blog.count(),
+                    prisma.blog.count({ where: { status: 'published' } }),
+                    prisma.blog.count({ where: { status: 'draft' } }),
+                    prisma.blog.count({ where: { is_featured: true } }),
+                    prisma.blog.count({ where: { created_at: { gte: currentMonthStart } } }),
+                    prisma.blog.count({ where: { created_at: { gte: prevMonthStart, lte: prevMonthEnd } } }),
+                    prisma.blog.findMany({ take: 10, orderBy: { created_at: 'desc' } }),
+                    prisma.blog.groupBy({
+                        by: ['category'],
+                        _count: { _all: true },
+                        orderBy: { _count: { category: 'desc' } }
+                    }),
+                    prisma.blog.groupBy({
+                        by: ['author'],
+                        _count: { _all: true },
+                        orderBy: { _count: { author: 'desc' } },
+                        take: 5
+                    })
+                ]);
+
+                // Calculate growth
+                let growth = 0;
+                if (prevMonth > 0) {
+                    growth = Math.round(((currMonth - prevMonth) / prevMonth) * 100);
+                } else if (currMonth > 0) {
+                    growth = 100;
+                }
+
+                // Monthly trends (last 12 months)
+                const trends = [];
+                for (let i = 11; i >= 0; i--) {
+                    const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
+                    const count = await prisma.blog.count({
+                        where: { created_at: { gte: start, lte: end } }
+                    });
+                    trends.push({
+                        month: start.toLocaleString('en-US', { month: 'short', year: 'numeric' }),
+                        count
+                    });
+                }
+
+                // Average posts per month
+                const firstPost = await prisma.blog.findFirst({ orderBy: { created_at: 'asc' } });
+                let avgPerMonth = 0;
+                if (firstPost) {
+                    const monthsDiff = Math.max(1, (now.getFullYear() - firstPost.created_at.getFullYear()) * 12 + (now.getMonth() - firstPost.created_at.getMonth()) + 1);
+                    avgPerMonth = Number((total / monthsDiff).toFixed(1));
+                }
+
                 return NextResponse.json({
                     success: true,
                     data: {
-                        total_blogs: await prisma.blog.count(),
-                        published_blogs: await prisma.blog.count({ where: { status: 'published' } }),
-                        draft_blogs: await prisma.blog.count({ where: { status: 'draft' } })
+                        total_posts: total,
+                        published_posts: published,
+                        draft_posts: drafts,
+                        featured_posts: featured,
+                        posts_this_month: currMonth,
+                        month_growth: growth,
+                        category_distribution: categories.map(c => ({
+                            name: c.category || 'Uncategorized',
+                            count: c._count._all
+                        })),
+                        status_distribution: [
+                            { name: 'Published', count: published },
+                            { name: 'Draft', count: drafts }
+                        ],
+                        monthly_trends: trends,
+                        top_authors: authors.map(a => ({
+                            name: a.author || 'Anonymous',
+                            posts: a._count._all
+                        })),
+                        recent_posts: recentPosts.map(p => ({
+                            id: p.id,
+                            title: p.title,
+                            author: p.author || 'Anonymous',
+                            category: p.category || 'Uncategorized',
+                            status: p.status,
+                            is_featured: p.is_featured,
+                            date: p.published_at?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) ||
+                                p.created_at.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        })),
+                        total_categories: categories.length,
+                        total_authors: authors.length,
+                        avg_posts_per_month: avgPerMonth
                     }
                 });
             }
