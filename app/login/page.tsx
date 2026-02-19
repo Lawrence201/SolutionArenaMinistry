@@ -43,8 +43,31 @@ const LoginContent = () => {
   // ─── Handlers (simplified) ──────────────────────────────────────
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // your fetch logic here
-    toast.success("Login simulation");
+
+    if (!loginEmail || !loginPassword) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
+    const toastId = toast.loading("Verifying credentials...");
+
+    try {
+      const result = await signIn("credentials", {
+        email: loginEmail,
+        password: loginPassword,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Invalid email or password", { id: toastId });
+      } else {
+        toast.success("Login successful!", { id: toastId });
+        router.push("/admin/dashboard");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An unexpected error occurred", { id: toastId });
+    }
   };
 
   return (

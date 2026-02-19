@@ -120,6 +120,10 @@ export const RecentBlogs = () => {
                         }
                         .blog-meta .read-more {
                             align-self: flex-start;
+                            padding: 8px 18px;
+                            font-size: 13px;
+                            min-width: unset;
+                            line-height: normal;
                         }
                         .loadmore {
                             margin-top: 40px;
