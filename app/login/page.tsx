@@ -24,15 +24,10 @@ const LoginContent = () => {
 
   const [isRegistering, setIsRegistering] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Login fields
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  // Register fields (Only email needed for state if we had a form, but we're going Google-only)
-  const [registerEmail, setRegisterEmail] = useState("");
 
   useEffect(() => {
     if (searchParams?.get("register") === "true") {
@@ -50,15 +45,6 @@ const LoginContent = () => {
     e.preventDefault();
     // your fetch logic here
     toast.success("Login simulation");
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (registerPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    toast.success("Register simulation");
   };
 
   return (
