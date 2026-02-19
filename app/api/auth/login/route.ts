@@ -50,6 +50,13 @@ export async function POST(req: NextRequest) {
                 );
             }
 
+            if (!user.password) {
+                return NextResponse.json(
+                    { success: false, message: 'Invalid credentials' },
+                    { status: 401 }
+                );
+            }
+
             const isPasswordValid = await verifyPassword(password, user.password);
             if (isPasswordValid) {
                 return NextResponse.json({

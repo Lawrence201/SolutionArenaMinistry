@@ -17,7 +17,7 @@ export async function GET(
                             select: {
                                 first_name: true,
                                 last_name: true,
-                                profile_picture: true,
+                                image: true,
                             },
                         },
                         replies: {
@@ -26,7 +26,7 @@ export async function GET(
                                     select: {
                                         first_name: true,
                                         last_name: true,
-                                        profile_picture: true,
+                                        image: true,
                                     },
                                 }
                             }
