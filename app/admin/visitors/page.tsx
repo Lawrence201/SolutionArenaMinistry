@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { prisma } from '@/lib/prisma';
 import VisitorsClient from './VisitorsClient';
 
@@ -14,5 +14,9 @@ export default async function VisitorsPage() {
         }
     });
 
-    return <VisitorsClient initialVisitors={visitors} />;
+    return (
+        <Suspense fallback={<div>Loading visitors...</div>}>
+            <VisitorsClient initialVisitors={visitors} />
+        </Suspense>
+    );
 }

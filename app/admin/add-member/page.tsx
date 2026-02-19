@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import './add-member.css';
 
@@ -93,9 +93,10 @@ const ministriesList = [
     { id: 'Youth', label: 'Youth Ministry' },
 ];
 
-export default function AddMemberPage() {
+function AddMemberForm() {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
+    // ... existing state ...
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<FormErrors>({});
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -107,6 +108,8 @@ export default function AddMemberPage() {
 
     const totalSteps = 5;
     const searchParams = useSearchParams();
+
+
 
     // Handle pre-fill from visitor conversion
     useEffect(() => {
@@ -1267,3 +1270,12 @@ export default function AddMemberPage() {
         </div>
     );
 }
+
+export default function AddMemberPage() {
+    return (
+        <Suspense fallback={<div className="add-member-container">Loading form...</div>}>
+            <AddMemberForm />
+        </Suspense>
+    );
+}
+
