@@ -33,7 +33,7 @@ const RecentSermons = () => {
     useEffect(() => {
         const fetchSermons = async () => {
             try {
-                const response = await fetch('/api/website/sermons?limit=3');
+                const response = await fetch('/api/website/sermons?limit=4');
                 const data = await response.json();
                 if (data.success) {
                     setSermons(data.data);
@@ -199,7 +199,7 @@ const RecentSermons = () => {
                 </div>
 
                 <div className="d-flex justify-content-center loadmore">
-                    <a href="/sermons" className="theme-btn">Go to our Sermons</a>
+                    <a href="/sermons" className="theme-btn">View more</a>
                 </div>
             </div>
         </section>

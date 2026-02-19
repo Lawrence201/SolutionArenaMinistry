@@ -108,18 +108,18 @@ const UpcomingEvents = () => {
                 color: #666;
                 text-transform: none;
                 letter-spacing: normal;
-                font-size: 16px;
-                margin-bottom: 8px;
+                font-size: 20px;
+                margin-bottom: 12px;
                 font-weight: 400;
-                max-width: 800px;
+                max-width: 850px;
             }
             .events-carousal .heading h2 {
-                font-size: 42px;
-                font-weight: 700;
+                font-size: 54px;
+                font-weight: 800;
                 color: #1a1a1a;
                 margin: 0;
-                line-height: 1.2;
-                max-width: 800px;
+                line-height: 1.1;
+                max-width: 900px;
             }
             
             #eventsCarouselContainer {
@@ -257,6 +257,22 @@ const UpcomingEvents = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+                <div className="d-flex justify-content-center" style={{ marginTop: '60px' }}>
+                    <a href="/about-us" className="theme-btn" style={{
+                        padding: '18px 45px',
+                        fontSize: '18px',
+                        fontWeight: '700',
+                        backgroundColor: '#1a1a1a',
+                        color: '#fff',
+                        borderRadius: '50px',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: 'none',
+                        textDecoration: 'none'
+                    }}>More About Us</a>
                 </div>
             </div>
         </section>

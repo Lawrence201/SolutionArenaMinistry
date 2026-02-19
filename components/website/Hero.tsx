@@ -33,7 +33,8 @@ const Hero = () => {
       <div className="hero-one-slider">
         <div>
           <div className="hero-slide-content">
-            <img src="/assets/images/Month.png" alt="hero-one-slider" />
+            <img src="/assets/images/Month.jpeg" alt="hero-one-slider" />
+            
           </div>
         </div>
 
@@ -76,13 +77,13 @@ const Hero = () => {
           transform: scale(1);
         }
         .hero-one-slider .slick-active img {
-          animation: ken-burns-in 8s 1 ease-in-out forwards;
+          /* Animation removed as per user request */
         }
         .hero-slide-content::after {
           content: "";
           position: absolute;
           inset: 0;
-          background: rgba(20, 20, 20, 0.5); /* Legacy charcoal overlay */
+          background: rgba(20, 20, 20, 0.7); /* Legacy charcoal overlay */
           pointer-events: none;
           z-index: 1;
         }
@@ -96,15 +97,6 @@ const Hero = () => {
           width: 100%;
           padding: 0 15px;
           animation: fadeInUpSD 2s forwards;
-        }
-
-        @keyframes ken-burns-in {
-          0% {
-            transform: scale(1);
-          }
-          100% {
-            transform: scale(1.15); /* Zoom IN */
-          }
         }
 
         @keyframes fadeInUpSD {
