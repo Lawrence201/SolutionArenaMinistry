@@ -31,7 +31,7 @@ const VisitorStats: React.FC<VisitorStatsProps> = ({
                 </div>
                 <div className={styles.cfStatUnit}>
                     <h2 className={styles.cfColorSecondary}>{newVisitors}</h2>
-                    <p>New This Week</p>
+                    <p>New This Month</p>
                 </div>
                 <div className={styles.cfStatUnit}>
                     <h2 style={{ color: '#ef4444' }}>{urgentFollowups}</h2>

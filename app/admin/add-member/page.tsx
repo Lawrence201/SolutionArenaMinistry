@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import './add-member.css';
 
 // Types
@@ -106,6 +106,31 @@ export default function AddMemberPage() {
     const [isSectionOpen, setIsSectionOpen] = useState(true);
 
     const totalSteps = 5;
+    const searchParams = useSearchParams();
+
+    // Handle pre-fill from visitor conversion
+    useEffect(() => {
+        const fromVisitor = searchParams.get('from_visitor');
+        if (fromVisitor) {
+            const visitorName = searchParams.get('name') || '';
+            const visitorPhone = searchParams.get('phone') || '';
+            const visitorEmail = searchParams.get('email') || '';
+
+            // Split name into first and last if possible
+            const nameParts = visitorName.split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+
+            setFormData(prev => ({
+                ...prev,
+                firstName,
+                lastName,
+                phone: visitorPhone,
+                email: visitorEmail,
+                membershipType: 'Full Member' // Defaulting to full member upon conversion
+            }));
+        }
+    }, [searchParams]);
 
     // Handle input changes
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

@@ -54,7 +54,7 @@ const PastoralSlider = () => {
                                 <a
                                     key={image.id}
                                     className={`${styles.nextSlide} ${activeSlide === image.id ? styles.navActive : ""}`}
-                                    href="JavaScript:void(0)"
+                                    href="#"
                                     onClick={() => handleSlideClick(image.src, image.id)}
                                 >
                                     <img

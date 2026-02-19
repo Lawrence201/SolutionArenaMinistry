@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './visitors.module.css';
 import { assignVisitor } from '@/app/actions/visitor';
+import { searchMembers } from '@/app/actions/memberActions';
 import { Visitor } from '@prisma/client';
 
 interface AssignVisitorModalProps {
@@ -14,12 +15,32 @@ interface AssignVisitorModalProps {
 
 const AssignVisitorModal: React.FC<AssignVisitorModalProps> = ({ isOpen, onClose, onSuccess, visitor }) => {
     const [loading, setLoading] = useState(false);
-    const [memberName, setMemberName] = useState(''); // Using text input for now as per legacy potentially, or simulated select
+    const [loadingMembers, setLoadingMembers] = useState(false);
+    const [memberName, setMemberName] = useState('');
+    const [members, setMembers] = useState<{ id: number; name: string; photo?: string | null; role?: string | null }[]>([]);
+    const [showDropdown, setShowDropdown] = useState(false);
     const [notes, setNotes] = useState('');
 
-    // Simulating members based on legacy code or just a text input if no member list provided
-    // Legacy had: <select id="assignMemberId"><option value="">Select a member...</option></select>
-    // We'll use a text input for simplified "Assign To" string as per schema, or a mock select
+    React.useEffect(() => {
+        const fetchMembers = async () => {
+            if (memberName.length < 2) {
+                setMembers([]);
+                setShowDropdown(false);
+                return;
+            }
+
+            setLoadingMembers(true);
+            const result = await searchMembers(memberName);
+            if (result.success && result.data) {
+                setMembers(result.data);
+                setShowDropdown(result.data.length > 0);
+            }
+            setLoadingMembers(false);
+        };
+
+        const timer = setTimeout(fetchMembers, 300);
+        return () => clearTimeout(timer);
+    }, [memberName]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         if (!visitor) return;
@@ -56,21 +77,53 @@ const AssignVisitorModal: React.FC<AssignVisitorModalProps> = ({ isOpen, onClose
                 </div>
                 <div className={styles.cfModalContent}>
                     <form id="assignVisitorForm" onSubmit={handleSubmit}>
-                        <div>
+                        <div style={{ position: 'relative' }}>
                             <label className={styles.formLabel}>Assign to (Member Name) *</label>
-                            {/* 
-                   Ideally this should be a searchable select of members.
-                   For now, matching schema 'assigned_to' which is a String, 
-                   we allow typing a name.
-               */}
                             <input
                                 type="text"
                                 required
                                 className={styles.formInput}
-                                placeholder="Enter member name"
+                                placeholder="Start typing member name..."
                                 value={memberName}
-                                onChange={(e) => setMemberName(e.target.value)}
+                                onChange={(e) => {
+                                    setMemberName(e.target.value);
+                                    if (!showDropdown && e.target.value.length >= 2) setShowDropdown(true);
+                                }}
+                                onFocus={() => memberName.length >= 2 && setShowDropdown(true)}
                             />
+                            {loadingMembers && (
+                                <div style={{ position: 'absolute', right: '12px', top: '38px' }}>
+                                    <div className={styles.spinnerSmall}></div>
+                                </div>
+                            )}
+                            {showDropdown && members.length > 0 && (
+                                <div className={styles.searchDropdown}>
+                                    {members.map((member) => (
+                                        <div
+                                            key={member.id}
+                                            className={styles.dropdownItem}
+                                            onClick={() => {
+                                                setMemberName(member.name);
+                                                setShowDropdown(false);
+                                            }}
+                                        >
+                                            <div className={styles.memberSmallCard}>
+                                                <div className={styles.memberSmallIcon}>
+                                                    {member.photo ? (
+                                                        <img src={member.photo} alt={member.name} />
+                                                    ) : (
+                                                        <span>{member.name.charAt(0)}</span>
+                                                    )}
+                                                </div>
+                                                <div className={styles.memberSmallInfo}>
+                                                    <h4>{member.name}</h4>
+                                                    <p>{member.role || 'Member'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div style={{ marginTop: '16px' }}>
                             <label className={styles.formLabel}>Notes</label>

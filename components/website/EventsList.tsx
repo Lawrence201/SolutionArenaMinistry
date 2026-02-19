@@ -79,7 +79,7 @@ const EventsList = () => {
 
                 {events.length > 0 && (
                     <div className="d-flex justify-content-center loadmore">
-                        <a href="JavaScript:void(0)" className="theme-btn">
+                        <a href="#" onClick={(e) => e.preventDefault()} className="theme-btn">
                             Load More
                         </a>
                     </div>

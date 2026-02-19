@@ -3,40 +3,21 @@
 import React, { useEffect, useState } from "react";
 import styles from "./WelcomeModal.module.css";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const WelcomeModal = () => {
+    const { status } = useSession();
     const [showModal, setShowModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const checkSession = async () => {
-            try {
-                // Try to fetch session from a compatible endpoint
-                // If migration is in progress, this might be a PHP endpoint or a new Next.js API route
-                const response = await fetch('/auth/check_session.php');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.isLoggedIn) {
-                        setIsLoading(false);
-                        return;
-                    }
-                }
-            } catch (error) {
-                // If fetch fails (e.g. 404), we assume not logged in and show modal
-                console.log("Session check failed, assuming guest.");
-            }
-
-            // If not logged in or check failed, show modal after delay
+        // If not logged in, show modal after delay
+        if (status === "unauthenticated") {
             const timer = setTimeout(() => {
                 setShowModal(true);
-                setIsLoading(false);
             }, 2000);
-
             return () => clearTimeout(timer);
-        };
-
-        checkSession();
-    }, []);
+        }
+    }, [status]);
 
     const dismissModal = () => {
         setShowModal(false);

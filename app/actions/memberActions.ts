@@ -312,6 +312,41 @@ export async function getMembers(filters: MemberFilters = {}) {
     }
 }
 
+export async function searchMembers(query: string) {
+    try {
+        const members = await prisma.member.findMany({
+            where: {
+                OR: [
+                    { first_name: { contains: query, mode: 'insensitive' } },
+                    { last_name: { contains: query, mode: 'insensitive' } },
+                ],
+                status: 'Active'
+            },
+            select: {
+                member_id: true,
+                first_name: true,
+                last_name: true,
+                photo_path: true,
+                leadership_role: true
+            },
+            take: 10
+        });
+
+        return {
+            success: true,
+            data: members.map(m => ({
+                id: m.member_id,
+                name: `${m.first_name} ${m.last_name}`,
+                photo: m.photo_path,
+                role: m.leadership_role
+            }))
+        };
+    } catch (error) {
+        console.error('Error searching members:', error);
+        return { success: false, error: 'Failed to search members' };
+    }
+}
+
 export type MemberInsight = {
     type: 'success' | 'warning' | 'info' | 'error';
     icon: 'trending-up' | 'trending-down' | 'users' | 'alert' | 'calendar' | 'user-check';

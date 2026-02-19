@@ -395,9 +395,9 @@ const About = () => {
                                     <p className="font-bold text-white">Assistant Pastor</p>
                                     <div className="social">
                                         <ul className="social-medias">
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
-                                            <li><a href="JavaScript:void(0)"><i className="fab fa-x-twitter"></i></a></li>
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-x-twitter"></i></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -412,9 +412,9 @@ const About = () => {
                                     <p className="font-bold text-white">Senior Pastor</p>
                                     <div className="social">
                                         <ul className="social-medias">
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
-                                            <li><a href="JavaScript:void(0)"><i className="fab fa-x-twitter"></i></a></li>
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-x-twitter"></i></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -429,9 +429,9 @@ const About = () => {
                                     <p className="font-bold text-white">Assistant Pastor</p>
                                     <div className="social">
                                         <ul className="social-medias">
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
-                                            <li><a href="JavaScript:void(0)"><i className="fab fa-x-twitter"></i></a></li>
-                                            <li><a href="JavaScript:void(0)"><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/facebook.svg" alt="facebook" /></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-x-twitter"></i></a></li>
+                                            <li><a href="#" onClick={(e) => e.preventDefault()}><img src="/assets/images/instagram.svg" alt="instagram" /></a></li>
                                         </ul>
                                     </div>
                                 </div>

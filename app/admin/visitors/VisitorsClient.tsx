@@ -78,17 +78,15 @@ const VisitorsClient: React.FC<VisitorsClientProps> = ({ initialVisitors }) => {
 
     // Derived Stats
     const totalVisitors = visitors.length;
-    // New this week: created in last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const newVisitors = visitors.filter(v => v.created_at >= sevenDaysAgo).length;
+    // New this month: created in last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const newVisitors = visitors.filter(v => v.created_at >= thirtyDaysAgo).length;
 
     const pendingFollowups = visitors.filter(v => v.follow_up_status === 'pending').length;
     const contactedCount = visitors.filter(v => v.follow_up_status === 'contacted').length;
     const scheduledCount = visitors.filter(v => v.follow_up_status === 'scheduled').length;
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    const urgentFollowups = visitors.filter(v => v.follow_up_status === 'pending' && v.last_visit_date && v.last_visit_date >= threeDaysAgo).length;
+    const urgentFollowups = visitors.filter(v => v.follow_up_status === 'pending' && v.last_visit_date && v.last_visit_date >= thirtyDaysAgo).length;
     const returningVisitors = visitors.filter(v => v.attendance.length > 1).length;
     const convertedMembers = visitors.filter(v => v.converted_to_member === true).length;
     const conversionRate = totalVisitors > 0 ? Math.round((convertedMembers / totalVisitors) * 100) + '%' : '0%';
@@ -117,6 +115,16 @@ const VisitorsClient: React.FC<VisitorsClientProps> = ({ initialVisitors }) => {
 
     const handleRefresh = () => {
         router.refresh();
+    };
+
+    const handleConvertToMember = (visitor: Visitor) => {
+        const params = new URLSearchParams({
+            from_visitor: visitor.visitor_id.toString(),
+            name: visitor.name,
+            phone: visitor.phone,
+            email: visitor.email || ''
+        });
+        window.location.href = `/admin/add-member?${params.toString()}`;
     };
 
     return (
@@ -205,6 +213,7 @@ const VisitorsClient: React.FC<VisitorsClientProps> = ({ initialVisitors }) => {
                 onEdit={handleEditClick}
                 onAssign={handleAssignClick}
                 onDelete={handleDeleteClick}
+                onConvertToMember={handleConvertToMember}
             />
 
             <AddVisitorModal

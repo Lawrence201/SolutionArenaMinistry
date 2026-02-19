@@ -6,6 +6,8 @@ import FinancialAnalytics from '@/components/Admin/reports/FinancialAnalytics';
 import AttendanceAnalytics from '@/components/Admin/reports/AttendanceAnalytics';
 import VisitorAnalytics from '@/components/Admin/reports/VisitorAnalytics';
 import CommunicationAnalytics from '@/components/Admin/reports/CommunicationAnalytics';
+import BirthdayAnalytics from '@/components/Admin/reports/BirthdayAnalytics';
+import BlogAnalytics from '@/components/Admin/reports/BlogAnalytics';
 import KeyInsights from '@/components/Admin/reports/KeyInsights';
 import './reports.css';
 
@@ -128,25 +130,11 @@ export default function ReportsPage() {
                 </div>
 
                 <div className={`tab-pann ${activeTab === 'birthdays' ? 'acti' : ''}`}>
-                    {activeTab === 'birthdays' && (
-                        <div className="placeholder-content">
-                            <div className="placeholder-icon">🎂</div>
-                            <h3>Birthday Analytics</h3>
-                            <p>Upcoming birthdays and celebration tracking</p>
-                            <p className="coming-soon">Coming Soon</p>
-                        </div>
-                    )}
+                    {activeTab === 'birthdays' && <BirthdayAnalytics />}
                 </div>
 
                 <div className={`tab-pann ${activeTab === 'blogs' ? 'acti' : ''}`}>
-                    {activeTab === 'blogs' && (
-                        <div className="placeholder-content">
-                            <div className="placeholder-icon">📝</div>
-                            <h3>Blog Analytics</h3>
-                            <p>Content performance and engagement metrics</p>
-                            <p className="coming-soon">Coming Soon</p>
-                        </div>
-                    )}
+                    {activeTab === 'blogs' && <BlogAnalytics />}
                 </div>
 
                 <div className={`tab-pann ${activeTab === 'communication' ? 'acti' : ''}`}>

@@ -1,8 +1,17 @@
-"use client";
-
-import React from "react";
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 const Header = () => {
+  const { data: session } = useSession();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const userFirstName = session?.user?.name?.split(" ")[0] || "Friend";
+  const profilePic = session?.user?.image || "/assets/images/user-profile.svg";
+
   return (
     <header className="header-one">
       <style dangerouslySetInnerHTML={{
@@ -21,15 +30,37 @@ const Header = () => {
             <div className="col-lg-9">
               <ul className="login">
                 <li className="auth-links" id="auth-links-desktop">
-                  <a href="/login" id="login-link-desktop">
-                    <img src="/assets/images/user-profile.svg" alt="User Profile" />
-                    Login
-                  </a>
-                  <span className="divider" id="divider-desktop">|</span>
-                  <a href="/login?register=true" id="register-link-desktop">Register</a>
+                  {!mounted ? (
+                    <a href="/login">
+                      <img src="/assets/images/user-profile.svg" alt="User Profile" />
+                      Login
+                    </a>
+                  ) : session ? (
+                    <>
+                      <a href="#" className="user-greeting" style={{ textDecoration: 'none', cursor: 'default' }} onClick={(e) => e.preventDefault()}>
+                        <img
+                          src={profilePic}
+                          alt="User Profile"
+                          style={{ width: '25px', height: '25px', borderRadius: '50%', verticalAlign: 'middle', marginRight: '5px', objectFit: 'cover' }}
+                        />
+                        Love God, {userFirstName}
+                      </a>
+                      <span className="divider" style={{ margin: '0 8px', color: 'whitesmoke' }}>|</span>
+                      <a href="#" onClick={(e) => { e.preventDefault(); signOut(); }} style={{ color: 'whitesmoke', textDecoration: 'none' }}>Logout</a>
+                    </>
+                  ) : (
+                    <>
+                      <a href="/login" id="login-link-desktop">
+                        <img src="/assets/images/user-profile.svg" alt="User Profile" />
+                        Login
+                      </a>
+                      <span className="divider" id="divider-desktop">|</span>
+                      <a href="/login?register=true" id="register-link-desktop">Register</a>
+                    </>
+                  )}
                 </li>
                 <li>
-                  <a href="JavaScript:void(0)">
+                  <a href="#" onClick={(e) => e.preventDefault()}>
                     <img src="/assets/images/bell.svg" alt="Bell" className="vibrate-bell" />
                     Deadly commited to SAM and the kingdom business.
                   </a>
@@ -129,20 +160,11 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="desktop-nav" id="stickyHeader" style={{ backgroundColor: 'transparent' }}>
-        <div className="container" style={{ position: 'relative' }}>
+      <div className="desktop-nav" id="stickyHeader">
+        <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <nav style={{
-                backgroundColor: 'white',
-                marginTop: '10px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                padding: '10px 40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
+              <nav>
                 <div className="full-logo">
                   <div className="logo">
                     <a href="/">
@@ -219,10 +241,10 @@ const Header = () => {
                     align-items: center;
                   }
                   .logo-text {
-                    text-align: left;
+                    text-align: center;
                     position: relative;
                     top: 10px;
-                    left: 5px;
+                    left: -20px;
                   }
                   .logo-text h1 {
                     font-size: 16px;
@@ -283,26 +305,29 @@ const Header = () => {
                   <ul>
                     <li><a href="/">Home</a></li>
                     <li className="menu-item-has-children">
-                      <a href="JavaScript:void(0)">Pages</a>
+                      <a href="#" onClick={(e) => e.preventDefault()}>Pages</a>
                       <ul className="sub-menu">
                         <li><a href="/about-us">About</a></li>
                         <li><a href="/groups">Groups</a></li>
                         <li><a href="/pastors">Pastor Detail</a></li>
                       </ul>
                     </li>
-                    <li className="menu-item-has-children"><a href="JavaScript:void(0)">Sermons</a>
+                    <li className="menu-item-has-children">
+                      <a href="#" onClick={(e) => e.preventDefault()}>Sermons</a>
                       <ul className="sub-menu">
                         <li><a href="/sermons">Our Sermons</a></li>
                       </ul>
                     </li>
-                    <li className="menu-item-has-children"><a href="JavaScript:void(0)">Events</a>
+                    <li className="menu-item-has-children">
+                      <a href="#" onClick={(e) => e.preventDefault()}>Events</a>
                       <ul className="sub-menu">
                         <li><a href="/events">Our Events</a></li>
                         <li><a href="/gallery">Gallery</a></li>
                       </ul>
                     </li>
                     <li><a href="/contact-us">Contact</a></li>
-                    <li className="menu-item-has-children"><a href="JavaScript:void(0)">Blog</a>
+                    <li className="menu-item-has-children">
+                      <a href="#" onClick={(e) => e.preventDefault()}>Blog</a>
                       <ul className="sub-menu">
                         <li><a href="/blog">Our Blog</a></li>
                       </ul>
@@ -366,8 +391,8 @@ const Header = () => {
                 `}} />
 
                 <div className="donation">
-                  <a href="JavaScript:void(0)" className="theme-btn" data-bs-toggle="modal"
-                    data-bs-target="#staticBackdrop">Donate</a>
+                  <a href="#" className="theme-btn" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop" onClick={(e) => e.preventDefault()}>Donate</a>
                 </div>
 
                 <div id="nav-icon4">
@@ -458,26 +483,30 @@ const Header = () => {
 
         <ul>
           <li><a href="/">Home</a></li>
-          <li className="menu-item-has-children"><a href="JavaScript:void(0)">Pages</a>
+          <li className="menu-item-has-children">
+            <a href="#" onClick={(e) => e.preventDefault()}>Pages</a>
             <ul className="sub-menu">
               <li><a href="/about-us">About</a></li>
               <li><a href="/groups">Groups</a></li>
               <li><a href="/pastors">Pastor Detail</a></li>
             </ul>
           </li>
-          <li className="menu-item-has-children"><a href="JavaScript:void(0)">Sermons</a>
+          <li className="menu-item-has-children">
+            <a href="#" onClick={(e) => e.preventDefault()}>Sermons</a>
             <ul className="sub-menu">
               <li><a href="/sermons">Our Sermons</a></li>
             </ul>
           </li>
-          <li className="menu-item-has-children"><a href="JavaScript:void(0)">Events</a>
+          <li className="menu-item-has-children">
+            <a href="#" onClick={(e) => e.preventDefault()}>Events</a>
             <ul className="sub-menu">
               <li><a href="/events">Our Events</a></li>
               <li><a href="/gallery">Gallery</a></li>
             </ul>
           </li>
           <li><a href="/contact-us">Contact</a></li>
-          <li className="menu-item-has-children"><a href="JavaScript:void(0)">Blog</a>
+          <li className="menu-item-has-children">
+            <a href="#" onClick={(e) => e.preventDefault()}>Blog</a>
             <ul className="sub-menu">
               <li><a href="/blog">Our Blog</a></li>
             </ul>
@@ -485,15 +514,38 @@ const Header = () => {
         </ul>
 
         <li className="auth-buttons" id="auth-links-mobile">
-          <a href="/login" id="login-link-mobile">
-            <img src="/assets/images/user-profile.svg" alt="User Profile" />
-            Login
-          </a>
-          <span className="divider" id="divider-mobile">|</span>
-          <a href="/login?register=true" className="btn-auth register-btn"
-            id="register-link-mobile">
-            Register
-          </a>
+          {!mounted ? (
+            <a href="/login" id="login-link-mobile">
+              <img src="/assets/images/user-profile.svg" alt="User Profile" />
+              Login
+            </a>
+          ) : session ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+              <a href="#" className="user-greeting-mobile" style={{ textDecoration: 'none', cursor: 'default', display: 'flex', alignItems: 'center', color: '#333' }} onClick={(e) => e.preventDefault()}>
+                <img
+                  src={profilePic}
+                  alt="User Profile"
+                  style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginRight: '8px', objectFit: 'cover' }}
+                />
+                <span style={{ fontWeight: 500, fontSize: '14px' }}>Love God, {userFirstName}</span>
+              </a>
+              <span className="divider" style={{ margin: '0 12px', height: '20px', width: '1px', backgroundColor: '#ddd' }}></span>
+              <a href="#" onClick={(e) => { e.preventDefault(); signOut(); }} style={{ color: '#666', textDecoration: 'none', fontSize: '14px', fontWeight: 500, padding: '4px 8px', borderRadius: '4px' }}>
+                <i className="fa fa-sign-out" style={{ marginRight: '4px' }}></i> Logout
+              </a>
+            </div>
+          ) : (
+            <>
+              <a href="/login" id="login-link-mobile">
+                <img src="/assets/images/user-profile.svg" alt="User Profile" />
+                Login
+              </a>
+              <span className="divider" id="divider-mobile">|</span>
+              <a href="/login?register=true" className="btn-auth register-btn" id="register-link-mobile">
+                Register
+              </a>
+            </>
+          )}
         </li>
 
         <style dangerouslySetInnerHTML={{
@@ -545,7 +597,7 @@ const Header = () => {
           }
         `}} />
 
-        <a href="JavaScript:void(0)" id="res-cross"></a>
+        <a href="#" id="res-cross" onClick={(e) => e.preventDefault()}></a>
       </div>
     </header>
   );
