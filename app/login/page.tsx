@@ -62,7 +62,22 @@ const LoginContent = () => {
         toast.error("Invalid email or password", { id: toastId });
       } else {
         toast.success("Login successful!", { id: toastId });
-        router.push("/admin/dashboard");
+
+        // Fetch the updated session to determine the user's role
+        try {
+          const sessionRes = await fetch("/api/auth/session");
+          const sessionData = await sessionRes.json();
+          const role = sessionData?.user?.role;
+
+          if (role === "admin") {
+            router.push("/admin/dashboard");
+          } else {
+            router.push("/"); // Regular members go to the website
+          }
+        } catch {
+          // Fallback: if we can't read the session, assume admin (credentials are typically for admins)
+          router.push("/admin/dashboard");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
