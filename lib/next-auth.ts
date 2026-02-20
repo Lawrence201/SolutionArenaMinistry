@@ -16,12 +16,14 @@ console.log("[Auth.js] Env Check:", {
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-    // The PrismaAdapter handles user/account creation for OAuth (Google) flows.
-    // DATABASE_URL must be set in Vercel for this to work.
-    adapter: PrismaAdapter(prisma),
+    // NOTE: PrismaAdapter removed intentionally.
+    // With JWT session strategy, the adapter is NOT needed for session handling.
+    // The adapter was causing the Google OAuth callback to crash (500 Configuration error)
+    // because it tried to write to the database on every Google login.
+    // To re-enable DB persistence for Google users, ensure DATABASE_URL is set in Vercel
+    // and uncomment: adapter: PrismaAdapter(prisma),
     secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "sam_auth_secret_2024_church_mgmt",
     trustHost: true,
-    // Enable debug in ALL environments to capture errors in Vercel logs
     debug: true,
     providers: [
         Google({
