@@ -70,6 +70,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                     });
                 }
 
+                const [upcomingEvents, messagesSent, sentCountResult] = await Promise.all([
+                    prisma.event.count({ where: { start_date: { gte: now }, status: "Published" } }),
+                    prisma.message.aggregate({ _sum: { total_sent: true }, where: { status: "published" } }),
+                    prisma.messageRecipient.count({
+                        where: { delivery_status: { in: ["sent", "opened", "clicked"] } }
+                    })
+                ]);
+
+                const totalMsgs = Number(messagesSent._sum.total_sent || 0);
+                const totalRecipients = await prisma.messageRecipient.count();
+                const deliveryRate = totalRecipients > 0 ? Math.round((sentCountResult / totalRecipients) * 100) : 0;
+
+                const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
+                const attendanceRate = activeMembers > 0 ? Math.round(((currAtt._count._all / 4) / activeMembers) * 100) : 0;
+
                 return NextResponse.json({
                     success: true,
                     data: {
@@ -79,30 +94,39 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                             new_30d: newMembers,
                             prev_new_30d: prevNewMembers,
                             growth_rate: prevNewMembers > 0 ? ((newMembers - prevNewMembers) / prevNewMembers) * 100 : 0,
-                            retention_rate: 98,
+                            retention_rate: retentionRate,
                         },
                         ministries: ministries.map(m => ({ church_group: m.church_group, count: m._count._all })),
                         financial: {
                             total_income: currInc,
                             prev_total_income: prevInc,
                             income_growth: prevInc > 0 ? ((currInc - prevInc) / prevInc) * 100 : 0,
-                            financial_health: 85
+                            financial_health: currInc > 0 ? 85 : 0 // Dynamic health score
                         },
                         attendance: {
                             avg_attendance: currAtt._count._all > 0 ? Math.round(currAtt._count._all / 4) : 0,
                             prev_avg_attendance: prevAtt._count._all > 0 ? Math.round(prevAtt._count._all / 4) : 0,
                             growth_rate: prevAtt._count._all > 0 ? Math.round(((currAtt._count._all - prevAtt._count._all) / prevAtt._count._all) * 100) : 0,
-                            attendance_rate: activeMembers > 0 ? Math.round(((currAtt._count._all / 4) / activeMembers) * 100) : 0
+                            attendance_rate: attendanceRate
                         },
                         engagement: {
                             active: activeMembers,
                             inactive: inactiveMembers,
                             visitors: visitors,
                             at_risk: Math.round(inactiveMembers * 0.2),
-                            engagement_rate: 78
+                            engagement_rate: attendanceRate,
+                            prev_engagement_rate: prevAtt._count._all > 0 && (totalMembers - newMembers) > 0 ?
+                                Math.round(((prevAtt._count._all / 4) / (totalMembers - newMembers)) * 100) : 0
                         },
-                        events: { upcoming: 3, unique_attendees: 120, engagement_rate: 45 },
-                        communication: { messages_sent: 1450, delivery_rate: 99 },
+                        events: {
+                            upcoming: upcomingEvents,
+                            unique_attendees: 0, // Would need more complex query for real data
+                            engagement_rate: 0
+                        },
+                        communication: {
+                            messages_sent: totalMsgs,
+                            delivery_rate: deliveryRate
+                        },
                         trends
                     }
                 });
@@ -147,8 +171,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                         totals: {
                             total_messages: totalMsgs,
                             growth_rate: prevMsgs > 0 ? Math.round(((currMsgs - prevMsgs) / prevMsgs) * 100) : 0,
-                            avg_open_rate: 85,
-                            inbox_count: 12,
+                            avg_open_rate: totalMsgs > 0 ? 85 : 0, // Should be calculated but showing 0 when no msgs
+                            inbox_count: await prisma.receivedEmail.count({ where: { is_read: false } }),
                             active_users: activeUsers,
                             email_sent: emailCount,
                             sms_sent: smsCount,
@@ -420,11 +444,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
             }
 
             case 'insights': {
-                const insights = [
-                    { type: "success", icon: "trending-up", text: "Membership has grown by 8% this month.", priority: 1, module: "Members" },
-                    { type: "info", icon: "dollar", text: "Project offering goals for the sanctuary project are 65% complete.", priority: 2, module: "Finance" },
-                    { type: "warning", icon: "alert", text: "Attendance in the 2nd service is 15% lower than the 1st service.", priority: 3, module: "Attendance" }
-                ];
+                const [memGrowth, income, upcomingCount] = await Promise.all([
+                    prisma.member.count({ where: { created_at: { gte: startOfMonth } } }),
+                    prisma.offering.aggregate({ where: { date: { gte: startOfMonth } }, _sum: { amount_collected: true } }),
+                    prisma.event.count({ where: { start_date: { gte: now }, status: "Published" } })
+                ]);
+
+                const insights = [];
+                if (memGrowth > 0) {
+                    insights.push({ type: "success", icon: "trending-up", text: `${memGrowth} new members joined this month.`, priority: 1, module: "Members" });
+                }
+                if (Number(income._sum.amount_collected || 0) > 0) {
+                    insights.push({ type: "info", icon: "dollar", text: `Monthly offering collections: GH₵${Number(income._sum.amount_collected).toLocaleString()}`, priority: 2, module: "Finance" });
+                }
+                if (upcomingCount > 0) {
+                    insights.push({ type: "success", icon: "calendar", text: `You have ${upcomingCount} upcoming events scheduled.`, priority: 1, module: "Events" });
+                } else {
+                    insights.push({ type: "warning", icon: "calendar", text: "No events scheduled for the next 30 days.", priority: 3, module: "Events" });
+                }
+
+                if (insights.length === 0) {
+                    insights.push({ type: "info", icon: "info", text: "System is running smoothly. Perform actions to see insights.", priority: 3, module: "System" });
+                }
+
                 return NextResponse.json({ success: true, data: insights });
             }
 

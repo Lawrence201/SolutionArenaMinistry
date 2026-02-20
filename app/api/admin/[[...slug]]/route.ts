@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { saveFile, deleteFile } from "@/lib/storage";
 import { BlogStatus, EventType, EventCategory, EventStatus, GalleryCategory, GalleryStatus, MediaType, Blog, Event, Sermon } from "@prisma/client";
+import { logActivity } from "@/lib/activity";
 
 /**
  * Consolidated Admin API Handler
@@ -47,22 +48,6 @@ const getTimeAgo = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-const logActivity = async (type: string, title: string, description: string, relatedId?: number) => {
-    try {
-        await prisma.activityLog.create({
-            data: {
-                activity_type: type as any,
-                title,
-                description,
-                related_id: relatedId,
-                icon_type: type,
-                created_by: "Admin"
-            }
-        });
-    } catch (e) {
-        console.error('Failed to log activity:', e);
-    }
-};
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
     try {
@@ -209,7 +194,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
             case 'recent-activities': {
                 const activities = await prisma.activityLog.findMany({ orderBy: { created_at: 'desc' }, take: 10 });
-                return NextResponse.json({ success: true, data: activities.map(a => ({ ...a, time_ago: getTimeAgo(a.created_at) })) });
+                return NextResponse.json({ success: true, data: activities.map(a => ({ ...a, id: a.activity_id, time_ago: getTimeAgo(a.created_at) })) });
             }
 
             case 'upcoming-events': {
@@ -332,6 +317,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
                 const withdrawn = Number((await prisma.withdrawal.aggregate({ where: { account_type }, _sum: { amount: true } }))._sum.amount || 0);
                 if (total - withdrawn < amount) return NextResponse.json({ success: false, message: "Insufficient funds" }, { status: 400 });
                 const wd = await prisma.withdrawal.create({ data: { transaction_id: `WD-${Date.now()}`, account_type, amount, recipient, purpose, authorized_by: body.authorized_by, date: new Date(date) } });
+                await logActivity('other', 'Funds Withdrawn', `Withdrawal of GH₵${amount} from ${account_type} account authorized by ${body.authorized_by}.`);
                 return NextResponse.json({ success: true, data: wd });
             }
 

@@ -148,15 +148,20 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
         }]
     };
 
-    // KPI Table Calculation Logic
+    const activeCount = data?.membership?.active || 0;
+    const engagementRate = data?.engagement?.engagement_rate || 0;
+    const prevEngagementRate = data?.engagement?.prev_engagement_rate || 0;
+
     const kpis = [
         {
             metric: 'Average Attendance',
             current: formatNumber(data?.attendance?.avg_attendance || 0),
             previous: formatNumber(data?.attendance?.prev_avg_attendance || 0),
             change: parseFloat(data?.attendance?.growth_rate || 0),
-            target: Math.round((data?.membership?.active || 0) * 0.75),
-            status: (data?.attendance?.avg_attendance || 0) >= ((data?.membership?.active || 0) * 0.75) ? 'Target Met' : 'Below Target'
+            target: Math.round(activeCount * 0.75),
+            status: activeCount > 0
+                ? ((data?.attendance?.avg_attendance || 0) >= (activeCount * 0.75) ? 'Target Met' : 'Below Target')
+                : 'No Active Members'
         },
         {
             metric: 'Total Income',
@@ -164,7 +169,7 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
             previous: formatCurrency(data?.financial?.prev_total_income || 0),
             change: parseFloat(data?.financial?.income_growth || 0),
             target: formatCurrency((data?.financial?.prev_total_income || 0) * 1.05),
-            status: (data?.financial?.income_growth || 0) >= 0 ? 'On Track' : 'Below Target'
+            status: (data?.financial?.total_income || 0) > 0 ? 'On Track' : 'No Income'
         },
         {
             metric: 'New Members',
@@ -172,15 +177,15 @@ export default function ExecutiveSummary({ onDataLoad }: ExecutiveSummaryProps) 
             previous: formatNumber(data?.membership?.prev_new_30d || 0),
             change: parseFloat(data?.membership?.growth_rate || 0),
             target: 5,
-            status: (data?.membership?.new_30d || 0) >= 5 ? 'Excellent' : (data?.membership?.new_30d || 0) >= 3 ? 'Good' : 'Needs Improvement'
+            status: (data?.membership?.new_30d || 0) >= 5 ? 'Excellent' : (data?.membership?.new_30d || 0) >= 1 ? 'Good' : 'Needs Growth'
         },
         {
             metric: 'Engagement Rate',
-            current: `${data?.engagement?.engagement_rate || 0}%`,
-            previous: '85%',
-            change: (data?.engagement?.engagement_rate || 0) - 85,
+            current: `${engagementRate}%`,
+            previous: `${prevEngagementRate}%`,
+            change: engagementRate - prevEngagementRate,
             target: '85%',
-            status: (data?.engagement?.engagement_rate || 0) >= 85 ? 'Exceeded' : 'Good'
+            status: engagementRate >= 85 ? 'Exceeded' : (engagementRate > 0 ? 'Good' : 'Needs Engagement')
         }
     ];
 
