@@ -5,25 +5,28 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-// Debug environment variables (redacted for security in logs)
-if (process.env.NODE_ENV !== "production") {
-    console.log("Auth Config Check:", {
-        hasGoogleId: !!process.env.GOOGLE_CLIENT_ID,
-        hasGoogleSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-        hasAuthSecret: !!process.env.AUTH_SECRET,
-        hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
-    });
-}
+// Always log env check to Vercel (values are boolean, not the actual secrets)
+console.log("[Auth.js] Env Check:", {
+    hasGoogleId: !!process.env.GOOGLE_CLIENT_ID,
+    hasGoogleSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+    hasAuthSecret: !!process.env.AUTH_SECRET,
+    hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
+    hasDatabaseUrl: !!process.env.DATABASE_URL,
+    nodeEnv: process.env.NODE_ENV,
+});
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    // The PrismaAdapter handles user/account creation for OAuth (Google) flows.
+    // DATABASE_URL must be set in Vercel for this to work.
     adapter: PrismaAdapter(prisma),
     secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "sam_auth_secret_2024_church_mgmt",
-    // Add trustHost for Vercel deployment stability
     trustHost: true,
+    // Enable debug in ALL environments to capture errors in Vercel logs
+    debug: true,
     providers: [
         Google({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
         Credentials({
             name: "Credentials",
@@ -39,46 +42,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const email = credentials.email as string;
                 const password = credentials.password as string;
 
-                // 1. Try User table first
-                let user = await prisma.user.findUnique({
-                    where: { email }
-                });
+                try {
+                    // 1. Try User table first
+                    const user = await prisma.user.findUnique({
+                        where: { email }
+                    });
 
-                if (user && user.password) {
-                    const isPasswordValid = await bcrypt.compare(password, user.password);
-                    if (isPasswordValid) {
-                        return {
-                            id: String(user.id),
-                            email: user.email,
-                            name: user.name,
-                            role: user.role,
-                        };
+                    if (user && user.password) {
+                        const isPasswordValid = await bcrypt.compare(password, user.password);
+                        if (isPasswordValid) {
+                            return {
+                                id: String(user.id),
+                                email: user.email,
+                                name: user.name,
+                                role: user.role,
+                            };
+                        }
                     }
-                }
 
-                // 2. Try AdminAccount table if user not found or password invalid in User table
-                const admin = await prisma.adminAccount.findUnique({
-                    where: { admin_email: email }
-                });
+                    // 2. Try AdminAccount table
+                    const admin = await prisma.adminAccount.findUnique({
+                        where: { admin_email: email }
+                    });
 
-                if (admin) {
-                    const isPasswordValid = await bcrypt.compare(password, admin.admin_password);
-                    if (isPasswordValid) {
-                        return {
-                            id: `admin-${admin.admin_id}`,
-                            email: admin.admin_email,
-                            name: admin.admin_name,
-                            role: "admin", // Explicitly set role to admin
-                        };
+                    if (admin) {
+                        const isPasswordValid = await bcrypt.compare(password, admin.admin_password);
+                        if (isPasswordValid) {
+                            return {
+                                id: `admin-${admin.admin_id}`,
+                                email: admin.admin_email,
+                                name: admin.admin_name,
+                                role: "admin",
+                            };
+                        }
                     }
+                } catch (err) {
+                    console.error("[Auth.js] DB error during credentials authorize:", err);
+                    return null;
                 }
 
                 return null;
             }
         }),
     ],
-    // Add debug logging in development
-    debug: process.env.NODE_ENV === "development",
     pages: {
         signIn: "/login",
     },
@@ -90,8 +96,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (session.user && token) {
                 // @ts-ignore
                 session.user.id = token.sub;
-
-                // Custom name parsing for the header
                 const fullName = session.user.name || "";
                 const firstName = fullName.split(" ")[0] || "";
                 // @ts-ignore
@@ -109,7 +113,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return token;
         },
         async signIn({ user, account, profile }) {
-            // If we need to perform extra logic during first-time signup
             return true;
         },
     },
