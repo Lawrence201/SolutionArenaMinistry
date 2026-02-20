@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { logActivity } from '@/lib/activity';
 
 // ============= TYPES =============
 
@@ -332,6 +333,7 @@ export async function deleteAttendance(attendanceId: number): Promise<{ success:
         });
 
         if (deleted) {
+            await logActivity('other', 'Attendance record deleted', `An attendance record for ${deleted.member_id ? 'a member' : 'a visitor'} was removed.`);
             return { success: true, message: 'Attendance record deleted successfully' };
         }
         return { success: false, message: 'Record not found or already deleted' };
@@ -415,6 +417,12 @@ export async function verifyAndCheckInMember(
                 status: 'present'
             }
         });
+
+        await logActivity(
+            'member_added', // Mapping to presence as well
+            'Member Check-in',
+            `${member.first_name} ${member.last_name} checked in for ${serviceId.replace('-', ' ')}.`
+        );
 
         return {
             success: true,
@@ -508,6 +516,12 @@ export async function registerVisitor(
                     status: 'visitor'
                 }
             });
+
+            await logActivity(
+                'other',
+                'Visitor Check-in',
+                `${visitor.name} checked in as a ${isReturning ? 'returning' : 'new'} visitor.`
+            );
         }
 
         const message = isReturning
