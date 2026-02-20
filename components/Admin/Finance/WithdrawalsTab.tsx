@@ -357,7 +357,7 @@ export default function WithdrawalsTab() {
                                         </td>
                                     </tr>
                                 ) : filteredRecords.map((record) => (
-                                    <tr key={record.id}>
+                                    <tr key={record.transaction_id}>
                                         <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#475569' }}>{record.transaction_id}</td>
                                         <td>{new Date(record.date).toLocaleDateString()}</td>
                                         <td>

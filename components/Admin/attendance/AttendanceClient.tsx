@@ -755,35 +755,6 @@ export default function AttendanceClient() {
                                 <h2>Live Attendance</h2>
                                 <p>Viewing member check-ins for {currentDate}</p>
                             </div>
-                            <div className="find-filter">
-                                <input
-                                    type="text"
-                                    className="find-input"
-                                    placeholder="Search by name..."
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                />
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="filter-choice"
-                                >
-                                    <option value="">All Status</option>
-                                    <option value="present">Present</option>
-                                    <option value="late">Late</option>
-                                </select>
-                                <select
-                                    value={ministryFilter}
-                                    onChange={(e) => setMinistryFilter(e.target.value)}
-                                    className="filter-choice"
-                                >
-                                    <option value="">All Ministries</option>
-                                    <option value="General">General</option>
-                                    <option value="Choir">Choir</option>
-                                    <option value="Usher">Usher</option>
-                                    <option value="Protocol">Protocol</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div className="table-wrap">
@@ -791,6 +762,7 @@ export default function AttendanceClient() {
                                 <thead>
                                     <tr>
                                         <th>NAME</th>
+                                        <th>EMAIL ADDRESS</th>
                                         <th>PHONE NUMBER</th>
                                         <th>CHECK-IN TIME</th>
                                         <th>STATUS</th>
@@ -800,14 +772,14 @@ export default function AttendanceClient() {
                                 <tbody>
                                     {isLoading ? (
                                         <tr>
-                                            <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>Loading records...</td>
+                                            <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>Loading records...</td>
                                         </tr>
                                     ) : filteredAttendance.length === 0 ? (
                                         <tr>
-                                            <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>No records found</td>
+                                            <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>No records found</td>
                                         </tr>
                                     ) : (
-                                        getPaginatedData(filteredAttendance, 'live').map(item => (
+                                        filteredAttendance.map(item => (
                                             <tr key={item.attendanceId}>
                                                 <td>
                                                     <div className="member-cell">
@@ -826,10 +798,10 @@ export default function AttendanceClient() {
                                                         )}
                                                         <div className="member-info">
                                                             <span className="member-name">{item.name}</span>
-                                                            <span className="member-role">{item.email || 'No email'}</span>
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td><span className="email-text">{item.email || 'N/A'}</span></td>
                                                 <td><span className="phone-text">{item.phone || 'N/A'}</span></td>
                                                 <td><span className="time-badge">{item.checkInTime}</span></td>
                                                 <td>
@@ -845,32 +817,6 @@ export default function AttendanceClient() {
                             </table>
                         </div>
 
-                        {/* Pagination */}
-                        {getTotalPages(filteredAttendance.length) > 1 && (
-                            <div className="pagination">
-                                <button
-                                    disabled={currentPage.live === 1}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, live: prev.live - 1 }))}
-                                >
-                                    Previous
-                                </button>
-                                {Array.from({ length: getTotalPages(filteredAttendance.length) }, (_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        className={currentPage.live === i + 1 ? 'active' : ''}
-                                        onClick={() => setCurrentPage(prev => ({ ...prev, live: i + 1 }))}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    disabled={currentPage.live === getTotalPages(filteredAttendance.length)}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, live: prev.live + 1 }))}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -883,13 +829,6 @@ export default function AttendanceClient() {
                                 <p>Recorded visitor check-ins for {currentDate}</p>
                             </div>
                             <div className="find-filter">
-                                <input
-                                    type="text"
-                                    className="find-input"
-                                    placeholder="Search visitors..."
-                                    value={visitorSearch}
-                                    onChange={(e) => setVisitorSearch(e.target.value)}
-                                />
                                 <button className="vox-btn vox-btn-main" onClick={() => setShowVisitorModal(true)}>
                                     <UserPlus size={18} />
                                     Register Visitor
@@ -919,7 +858,7 @@ export default function AttendanceClient() {
                                             <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>No visitor records found</td>
                                         </tr>
                                     ) : (
-                                        getPaginatedData(filteredVisitors, 'visitors').map(item => (
+                                        filteredVisitors.map(item => (
                                             <tr key={item.id}>
                                                 <td>
                                                     <div className="member-cell">
@@ -944,32 +883,6 @@ export default function AttendanceClient() {
                             </table>
                         </div>
 
-                        {/* Pagination */}
-                        {getTotalPages(filteredVisitors.length) > 1 && (
-                            <div className="pagination">
-                                <button
-                                    disabled={currentPage.visitors === 1}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, visitors: prev.visitors - 1 }))}
-                                >
-                                    Previous
-                                </button>
-                                {Array.from({ length: getTotalPages(filteredVisitors.length) }, (_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        className={currentPage.visitors === i + 1 ? 'active' : ''}
-                                        onClick={() => setCurrentPage(prev => ({ ...prev, visitors: i + 1 }))}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    disabled={currentPage.visitors === getTotalPages(filteredVisitors.length)}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, visitors: prev.visitors + 1 }))}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -980,15 +893,6 @@ export default function AttendanceClient() {
                             <div className="track-title">
                                 <h2>Absent Members</h2>
                                 <p>Members not yet checked in for {currentDate}</p>
-                            </div>
-                            <div className="find-filter">
-                                <input
-                                    type="text"
-                                    className="find-input"
-                                    placeholder="Search absent members..."
-                                    value={absentSearch}
-                                    onChange={(e) => setAbsentSearch(e.target.value)}
-                                />
                             </div>
                         </div>
 
@@ -1013,7 +917,7 @@ export default function AttendanceClient() {
                                             <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>Everyone is present!</td>
                                         </tr>
                                     ) : (
-                                        getPaginatedData(filteredAbsent, 'absent').map(item => (
+                                        filteredAbsent.map(item => (
                                             <tr key={item.memberId}>
                                                 <td>
                                                     <div className="member-cell">
@@ -1032,7 +936,6 @@ export default function AttendanceClient() {
                                                         )}
                                                         <div className="member-info">
                                                             <span className="member-name">{item.name}</span>
-                                                            <span className="member-role">{item.ministry || 'General'}</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1050,33 +953,6 @@ export default function AttendanceClient() {
                                 </tbody>
                             </table>
                         </div>
-
-                        {/* Pagination */}
-                        {getTotalPages(filteredAbsent.length) > 1 && (
-                            <div className="pagination">
-                                <button
-                                    disabled={currentPage.absent === 1}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, absent: prev.absent - 1 }))}
-                                >
-                                    Previous
-                                </button>
-                                {Array.from({ length: getTotalPages(filteredAbsent.length) }, (_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        className={currentPage.absent === i + 1 ? 'active' : ''}
-                                        onClick={() => setCurrentPage(prev => ({ ...prev, absent: i + 1 }))}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    disabled={currentPage.absent === getTotalPages(filteredAbsent.length)}
-                                    onClick={() => setCurrentPage(prev => ({ ...prev, absent: prev.absent + 1 }))}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>

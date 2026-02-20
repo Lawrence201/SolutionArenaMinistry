@@ -342,6 +342,8 @@ interface AdvancedAttendanceData {
     }[];
     rawLogs: {
         name: string;
+        phone: string | null;
+        email: string | null;
         type: 'Member' | 'Visitor';
         date: string;
         time: string;

@@ -129,3 +129,30 @@ export function calculateFinancialHealth(income: number, expenses: number): numb
     if (ratio >= -0.2) return 20;
     return 0;
 }
+
+/**
+ * Recursively search and convert Prisma Decimal objects to standard numbers
+ * This is required when passing data from Server Components to Client Components
+ */
+export function serializeDecimal(data: any): any {
+    if (data === null || data === undefined) return data;
+
+    // Handle Prisma Decimal (which are instances of Decimal.js)
+    if (typeof data === 'object' && data.constructor && (data.constructor.name === 'Decimal' || data.d)) {
+        return parseFloat(data.toString());
+    }
+
+    // Handle Array
+    if (Array.isArray(data)) {
+        return data.map(item => serializeDecimal(item));
+    }
+
+    // Handle Object (but not Dates or other special objects we want to keep)
+    if (typeof data === 'object' && !(data instanceof Date)) {
+        return Object.fromEntries(
+            Object.entries(data).map(([key, value]) => [key, serializeDecimal(value)])
+        );
+    }
+
+    return data;
+}

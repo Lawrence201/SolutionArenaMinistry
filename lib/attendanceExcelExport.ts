@@ -31,6 +31,8 @@ interface AdvancedAttendanceData {
     }[];
     rawLogs: {
         name: string;
+        phone: string | null;
+        email: string | null;
         type: 'Member' | 'Visitor';
         date: string;
         time: string;
@@ -43,7 +45,21 @@ interface AdvancedAttendanceData {
 export const exportAttendanceToExcel = (data: AdvancedAttendanceData, startDate: string, endDate: string) => {
     const workbook = XLSX.utils.book_new();
 
-    // 1. Summary Sheet
+    // 1. Consolidated Projection Report (Requested "Payroll" Style)
+    const reportHeaders = ['Name', 'Category', 'Email', 'Phone', 'Date', 'Time', 'Service'];
+    const reportRows = data.rawLogs.map(r => [
+        r.name,
+        r.type,
+        r.email || '-',
+        r.phone || '-',
+        r.date,
+        r.time,
+        r.service
+    ]);
+    const reportSheet = XLSX.utils.aoa_to_sheet([reportHeaders, ...reportRows]);
+    XLSX.utils.book_append_sheet(workbook, reportSheet, 'Full Projection Report');
+
+    // 2. Summary Sheet
     const summaryData = [
         ['ATTENDANCE SUMMARY REPORT'],
         ['Period:', `${startDate} to ${endDate}`],
@@ -59,21 +75,13 @@ export const exportAttendanceToExcel = (data: AdvancedAttendanceData, startDate:
         ...(data.genderBreakdown?.map(g => [g.name, g.count]) || [])
     ];
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Stats Summary');
 
-    // 2. Member Attendance Ranking
+    // 3. Member Attendance Ranking
     const memberHeaders = ['Member Name', 'Ministry', 'Attendance Count', 'Attendance Percentage (%)'];
     const memberRows = data.memberAttendance.map(m => [m.name, m.ministry, m.count, `${m.percentage}%`]);
     const memberSheet = XLSX.utils.aoa_to_sheet([memberHeaders, ...memberRows]);
     XLSX.utils.book_append_sheet(workbook, memberSheet, 'Member Rankings');
-
-    // 3. Ministry Breakdown
-    if (data.ministryBreakdown) {
-        const ministryHeaders = ['Ministry / Group', 'Total Attendance Count'];
-        const ministryRows = data.ministryBreakdown.map(m => [m.name, m.count]);
-        const ministrySheet = XLSX.utils.aoa_to_sheet([ministryHeaders, ...ministryRows]);
-        XLSX.utils.book_append_sheet(workbook, ministrySheet, 'Ministry Stats');
-    }
 
     // 4. Daily Breakdown
     const dailyHeaders = ['Date', 'Members', 'Visitors', 'Total Attendance'];
@@ -87,19 +95,22 @@ export const exportAttendanceToExcel = (data: AdvancedAttendanceData, startDate:
     const visitorSheet = XLSX.utils.aoa_to_sheet([visitorHeaders, ...visitorRows]);
     XLSX.utils.book_append_sheet(workbook, visitorSheet, 'Visitor Analysis');
 
-    // 6. Raw Audit Logs
-    const rawHeaders = ['Name', 'Category', 'Date', 'Time', 'Service'];
-    const rawRows = data.rawLogs.map(r => [r.name, r.type, r.date, r.time, r.service]);
-    const rawSheet = XLSX.utils.aoa_to_sheet([rawHeaders, ...rawRows]);
-    XLSX.utils.book_append_sheet(workbook, rawSheet, 'Raw Analysis Logs');
-
-    // Set column widths for better readability
+    // Set column widths
+    const reportColWidths = [
+        { wch: 30 }, // Name
+        { wch: 12 }, // Category
+        { wch: 25 }, // Email
+        { wch: 15 }, // Phone
+        { wch: 15 }, // Date
+        { wch: 12 }, // Time
+        { wch: 30 }  // Service
+    ];
+    reportSheet['!cols'] = reportColWidths;
     summarySheet['!cols'] = [{ wch: 35 }, { wch: 20 }];
     memberSheet['!cols'] = [{ wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 25 }];
     dailySheet['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];
     visitorSheet['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 15 }];
-    rawSheet['!cols'] = [{ wch: 30 }, { wch: 12 }, { wch: 15 }, { wch: 12 }, { wch: 30 }];
 
     // Export
-    XLSX.writeFile(workbook, `Advanced_Attendance_Report_${startDate}_${endDate}.xlsx`);
+    XLSX.writeFile(workbook, `Professional_Attendance_Report_${startDate}_${endDate}.xlsx`);
 };
