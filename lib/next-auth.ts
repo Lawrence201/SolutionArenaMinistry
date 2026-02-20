@@ -5,9 +5,19 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// Debug environment variables (redacted for security in logs)
+if (process.env.NODE_ENV !== "production") {
+    console.log("Auth Config Check:", {
+        hasGoogleId: !!process.env.GOOGLE_CLIENT_ID,
+        hasGoogleSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+        hasAuthSecret: !!process.env.AUTH_SECRET,
+        hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
+    });
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
-    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "sam_auth_secret_2024_church_mgmt",
     // Add trustHost for Vercel deployment stability
     trustHost: true,
     providers: [
