@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+    // Add trustHost for Vercel deployment stability
     trustHost: true,
     providers: [
         Google({
