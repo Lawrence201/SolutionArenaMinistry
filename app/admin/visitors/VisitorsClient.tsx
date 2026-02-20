@@ -47,9 +47,9 @@ const VisitorsClient: React.FC<VisitorsClientProps> = ({ initialVisitors }) => {
                 // "New" logic: visits in last 7 days + visit_count === 1
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                filtered = filtered.filter(v => v.attendance.length === 1 && v.created_at >= sevenDaysAgo);
+                filtered = filtered.filter(v => (v.visit_count || 0) === 1 && v.created_at >= sevenDaysAgo);
             } else if (filter === 'returning') {
-                filtered = filtered.filter(v => v.attendance.length > 1);
+                filtered = filtered.filter(v => (v.visit_count || 0) > 1);
             } else if (filter === 'converted') {
                 filtered = filtered.filter(v => v.converted_to_member === true);
             } else if (filter === 'urgent') {
@@ -87,7 +87,7 @@ const VisitorsClient: React.FC<VisitorsClientProps> = ({ initialVisitors }) => {
     const contactedCount = visitors.filter(v => v.follow_up_status === 'contacted').length;
     const scheduledCount = visitors.filter(v => v.follow_up_status === 'scheduled').length;
     const urgentFollowups = visitors.filter(v => v.follow_up_status === 'pending' && v.last_visit_date && v.last_visit_date >= thirtyDaysAgo).length;
-    const returningVisitors = visitors.filter(v => v.attendance.length > 1).length;
+    const returningVisitors = visitors.filter(v => (v.visit_count || 0) > 1).length;
     const convertedMembers = visitors.filter(v => v.converted_to_member === true).length;
     const conversionRate = totalVisitors > 0 ? Math.round((convertedMembers / totalVisitors) * 100) + '%' : '0%';
 

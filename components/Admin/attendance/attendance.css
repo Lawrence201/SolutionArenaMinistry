@@ -666,7 +666,21 @@
     border-radius: 16px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    overflow: auto;
+    max-height: 600px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Hide scrollbar for Chrome/Safari if desired, or keep thin */
+.table-wrap::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 table {
@@ -684,6 +698,9 @@ th {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 td {

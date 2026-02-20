@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 interface Offering {
     id: string;
+    transaction_id: string;
     date: string;
     service_type: string;
     service_time: string;
@@ -221,7 +222,7 @@ export default function OfferingsTab() {
                                         </tr>
                                     ) : (
                                         filteredOfferings.map((off) => (
-                                            <tr key={off.id} className="eorp_exprow">
+                                            <tr key={off.transaction_id} className="eorp_exprow">
                                                 <td>{new Date(off.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</td>
                                                 <td>
                                                     <div className="eorp_expdesc">

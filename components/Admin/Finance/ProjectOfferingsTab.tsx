@@ -210,7 +210,7 @@ export default function ProjectOfferingsTab() {
                                         </tr>
                                     ) : (
                                         filteredRecords.map(record => (
-                                            <tr key={record.id} className="eorp_exprow">
+                                            <tr key={record.transaction_id} className="eorp_exprow">
                                                 <td>{new Date(record.date).toLocaleDateString()}</td>
                                                 <td>
                                                     <div className="eorp_expdesc">

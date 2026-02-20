@@ -690,6 +690,8 @@ export async function getAdvancedAttendanceData(
         }[];
         rawLogs: {
             name: string;
+            phone: string | null;
+            email: string | null;
             type: 'Member' | 'Visitor';
             date: string;
             time: string;
@@ -791,6 +793,8 @@ export async function getAdvancedAttendanceData(
         // 6. Raw Logs
         const rawLogs = attendance.map(a => ({
             name: a.member_id ? `${a.member?.first_name} ${a.member?.last_name}` : (a.visitor?.name || 'Unknown'),
+            phone: a.member_id ? a.member?.phone || null : a.visitor?.phone || null,
+            email: a.member_id ? a.member?.email || null : a.visitor?.email || null,
             type: (a.member_id ? 'Member' : 'Visitor') as 'Member' | 'Visitor',
             date: a.check_in_date.toISOString().split('T')[0],
             time: a.check_in_time ? a.check_in_time.toTimeString().slice(0, 8) : '',

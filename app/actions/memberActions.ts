@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { Member } from '@prisma/client';
 import { startOfMonth, endOfMonth, subMonths, startOfWeek, subWeeks, endOfWeek } from 'date-fns';
 import { prisma } from '@/lib/prisma';
+import { serializeDecimal } from '@/lib/reportUtils';
 
 
 export type MemberStats = {
@@ -305,7 +306,7 @@ export async function getMembers(filters: MemberFilters = {}) {
             };
         });
 
-        return enrichedMembers;
+        return serializeDecimal(enrichedMembers);
     } catch (error) {
         console.error('Error fetching members:', error);
         return [];
@@ -520,7 +521,7 @@ export async function getMemberInsights(): Promise<{ success: boolean; data: Mem
         }
 
         insights.sort((a, b) => a.priority - b.priority);
-        return { success: true, data: insights.slice(0, 6) };
+        return serializeDecimal({ success: true, data: insights.slice(0, 6) });
 
 
     } catch (error) {

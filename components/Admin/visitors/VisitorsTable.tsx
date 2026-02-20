@@ -119,10 +119,11 @@ const VisitorsTable: React.FC<VisitorsTableProps> = ({ visitors, onEdit, onAssig
                                         </span>
                                     </td>
                                     <td>
-                                        <span style={{ fontWeight: 600, color: '#1e293b', marginLeft: '12px' }}>{visitor.attendance.length}</span>
+                                        <span style={{ fontWeight: 600, color: '#1e293b', marginLeft: '12px' }}>{visitor.visit_count || visitor.attendance?.length || 0}</span>
                                     </td>
                                     <td>
-                                        {visitor.last_visit_date ? format(new Date(visitor.last_visit_date), 'MMM d, yyyy') : 'N/A'}
+                                        {visitor.last_visit_date ? format(new Date(visitor.last_visit_date), 'MMM d, yyyy') :
+                                            visitor.created_at ? format(new Date(visitor.created_at), 'MMM d, yyyy') : 'N/A'}
                                     </td>
                                     <td>
                                         <span className={getBadgeClass(visitor.follow_up_status)}>

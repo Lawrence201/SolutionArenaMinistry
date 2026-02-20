@@ -471,7 +471,7 @@ export default function MemberPaymentsTab() {
                                             </thead>
                                             <tbody>
                                                 {history.welfare.length > 0 ? history.welfare.map((item, index) => (
-                                                    <tr key={item.welfare_id}>
+                                                    <tr key={item.transaction_id}>
                                                         <td>{index + 1}</td>
                                                         <td>{formatDate(item.date)}</td>
                                                         <td style={{ color: '#e879f9', fontWeight: 600 }}>{formatCurrency(item.amount)}</td>
