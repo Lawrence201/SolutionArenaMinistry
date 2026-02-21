@@ -1,27 +1,171 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import styles from "./ContactContent.module.css";
 
-const ContactContent = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+const ContactForm = () => {
+    const { data: session, status } = useSession();
+    const searchParams = useSearchParams();
+
+    // Form State
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [inquiryType, setInquiryType] = useState("");
+    const [subject, setSubject] = useState("");
+    const [message, setMessage] = useState("");
+    const [othersSpecify, setOthersSpecify] = useState("");
+    const [agreed, setAgreed] = useState(false);
 
     useEffect(() => {
-        // In the legacy, this fetched auth/check_session.php
-        // In the current project, we might use next-auth or similar
-        // For now, I'll simulate a logged-out state or mock the check
-        const checkSession = async () => {
-            try {
-                // Mock session check
-                setIsLoggedIn(false);
-            } catch (error) {
-                console.error("Error checking session:", error);
-            }
-        };
-        checkSession();
-    }, []);
+        if (session?.user) {
+            setFullName(session.user.name || "");
+            setEmail(session.user.email || "");
+        }
+    }, [session]);
+
+    useEffect(() => {
+        const inquiryParam = searchParams.get("inquiry");
+        const subjectParam = searchParams.get("subject");
+
+        if (inquiryParam) setInquiryType(inquiryParam);
+        if (subjectParam) setSubject(subjectParam);
+    }, [searchParams]);
+
+    if (status === "loading") return <div className="text-center py-5">Loading...</div>;
+
+    if (status === "unauthenticated") {
+        return (
+            <div className={styles.loginRequired}>
+                <div className={styles.iconWrapper}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2b4764" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                </div>
+                <h3 className={styles.loginTitle}>Login Required</h3>
+                <p className={styles.loginDesc}>Please login or register with your Google account to send us a message or book a seat.</p>
+                <div className={styles.authButtons}>
+                    <a href="/login" className={styles.loginBtn}>LOGIN</a>
+                    <a href="/register" className={styles.registerBtn}>REGISTER</a>
+                </div>
+            </div>
+        );
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // Handle form submission logic here
+        console.log("Submitting:", { fullName, email, phone, inquiryType, subject, message, othersSpecify });
+        alert("Thank you! Your message has been sent.");
+    };
+
+    return (
+        <div className={styles.formContainer}>
+            <form className={styles.contactForm} onSubmit={handleSubmit}>
+                <div className="row">
+                    <div className="col-md-6 mb-4">
+                        <label>Full Name <span>*</span></label>
+                        <input
+                            type="text"
+                            placeholder="John Doe"
+                            required
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 mb-4">
+                        <label>Email Address <span>*</span></label>
+                        <input
+                            type="email"
+                            placeholder="john@example.com"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 mb-4">
+                        <label>Phone Number</label>
+                        <input
+                            type="tel"
+                            placeholder="+233 534829203"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 mb-4">
+                        <label>Inquiry Type <span>*</span></label>
+                        <select
+                            required
+                            value={inquiryType}
+                            onChange={(e) => setInquiryType(e.target.value)}
+                        >
+                            <option value="" disabled>Select Inquiry Type</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="prayer">Prayer Request</option>
+                            <option value="membership">Membership Information</option>
+                            <option value="events">Event Details</option>
+                            <option value="pastoral">Pastoral Care</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+                    {inquiryType === "others" && (
+                        <div className="col-12 mb-4">
+                            <label>Please Specify <span>*</span></label>
+                            <input
+                                type="text"
+                                placeholder="Please specify your inquiry type"
+                                required
+                                value={othersSpecify}
+                                onChange={(e) => setOthersSpecify(e.target.value)}
+                            />
+                        </div>
+                    )}
+                    <div className="col-12 mb-4">
+                        <label>Subject <span>*</span></label>
+                        <input
+                            type="text"
+                            placeholder="How can we help you?"
+                            required
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-12 mb-4">
+                        <label>Message <span>*</span></label>
+                        <textarea
+                            placeholder="Write your message here..."
+                            rows={5}
+                            required
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                        ></textarea>
+                    </div>
+                    <div className="col-12 mb-4">
+                        <label className={styles.checkboxLabel}>
+                            <input
+                                type="checkbox"
+                                required
+                                checked={agreed}
+                                onChange={(e) => setAgreed(e.target.checked)}
+                            />
+                            <span>I agree to send this message</span>
+                        </label>
+                    </div>
+                    <div className="col-12">
+                        <button type="submit" className="theme-btn w-100">Send Message</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+const ContactContent = () => {
 
     const handleGetDirections = () => {
         if (navigator.geolocation) {
@@ -112,78 +256,9 @@ const ContactContent = () => {
                     </div>
 
                     <div className="col-lg-6 col-md-12 col-sm-12">
-                        {!isLoggedIn ? (
-                            <div className={styles.loginRequired}>
-                                <div className={styles.iconWrapper}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2b4764" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="8.5" cy="7" r="4"></circle>
-                                        <line x1="20" y1="8" x2="20" y2="14"></line>
-                                        <line x1="23" y1="11" x2="17" y2="11"></line>
-                                    </svg>
-                                </div>
-                                <h3 className={styles.loginTitle}>Login Required</h3>
-                                <p className={styles.loginDesc}>Please login or register to send us a message.</p>
-                                <div className={styles.authButtons}>
-                                    <a href="/login" className={styles.loginBtn}>LOGIN</a>
-                                    <a href="/register" className={styles.registerBtn}>REGISTER</a>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className={styles.formContainer}>
-                                <form className={styles.contactForm}>
-                                    <div className="row">
-                                        <div className="col-md-6 mb-4">
-                                            <label>Full Name <span>*</span></label>
-                                            <input type="text" placeholder="John Doe" required />
-                                        </div>
-                                        <div className="col-md-6 mb-4">
-                                            <label>Email Address <span>*</span></label>
-                                            <input type="email" placeholder="john@example.com" required />
-                                        </div>
-                                        <div className="col-md-6 mb-4">
-                                            <label>Phone Number</label>
-                                            <input type="tel" placeholder="+233 534829203" />
-                                        </div>
-                                        <div className="col-md-6 mb-4">
-                                            <label>Inquiry Type <span>*</span></label>
-                                            <select required value={inquiryType} onChange={(e) => setInquiryType(e.target.value)}>
-                                                <option value="" disabled>Select Inquiry Type</option>
-                                                <option value="general">General Inquiry</option>
-                                                <option value="prayer">Prayer Request</option>
-                                                <option value="membership">Membership Information</option>
-                                                <option value="events">Event Details</option>
-                                                <option value="pastoral">Pastoral Care</option>
-                                                <option value="others">Others</option>
-                                            </select>
-                                        </div>
-                                        {inquiryType === "others" && (
-                                            <div className="col-12 mb-4">
-                                                <label>Please Specify <span>*</span></label>
-                                                <input type="text" placeholder="Please specify your inquiry type" required />
-                                            </div>
-                                        )}
-                                        <div className="col-12 mb-4">
-                                            <label>Subject <span>*</span></label>
-                                            <input type="text" placeholder="How can we help you?" required />
-                                        </div>
-                                        <div className="col-12 mb-4">
-                                            <label>Message <span>*</span></label>
-                                            <textarea placeholder="Write your message here..." rows={5} required></textarea>
-                                        </div>
-                                        <div className="col-12 mb-4">
-                                            <label className={styles.checkboxLabel}>
-                                                <input type="checkbox" required />
-                                                <span>I agree to send this message</span>
-                                            </label>
-                                        </div>
-                                        <div className="col-12">
-                                            <button type="submit" className="theme-btn w-100">Send Message</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
+                        <Suspense fallback={<div className="text-center py-5">Loading Form...</div>}>
+                            <ContactForm />
+                        </Suspense>
                     </div>
                 </div>
 

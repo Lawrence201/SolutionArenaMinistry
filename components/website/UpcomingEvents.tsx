@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface Event {
     id: number;
@@ -247,19 +248,19 @@ const UpcomingEvents = () => {
                                 />
                                 <div className="event-data">
                                     <p className="location">{event.location}</p>
-                                    <h4><a href={`/event-detail.html?id=${event.id}`}>{event.name}</a></h4>
+                                    <h4><Link href={`/events/${event.id}`}>{event.name}</Link></h4>
                                     <ul>
                                         <li><img src="/assets/images/calendar.svg" alt="calendar" /> {event.start_date}</li>
                                         <li><img src="/assets/images/clock.svg" alt="clock" /> {event.time_range}</li>
                                     </ul>
-                                    <a className="theme-btn" href={`/event-detail.html?id=${event.id}`}>VIEW DETAILS</a>
+                                    <Link className="theme-btn" href={`/events/${event.id}`}>VIEW DETAILS</Link>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
                 <div className="d-flex justify-content-center" style={{ marginTop: '60px' }}>
-                    <a href="/about-us" className="theme-btn" style={{
+                    <a href="/events" className="theme-btn" style={{
                         padding: '18px 45px',
                         fontSize: '18px',
                         fontWeight: '700',
@@ -272,7 +273,7 @@ const UpcomingEvents = () => {
                         justifyContent: 'center',
                         border: 'none',
                         textDecoration: 'none'
-                    }}>More About Us</a>
+                    }}>VIEW MORE</a>
                 </div>
             </div>
         </section>

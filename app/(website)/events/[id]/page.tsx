@@ -249,14 +249,13 @@ const EventDetailPage = async ({ params }: PageProps) => {
                         color: '#333'
                       }}>
                         {event.contact_person_image ? (
-                          <img src={event.contact_person_image} alt="Contact" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={event.contact_person_image} alt="Contact" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                         ) : (
                           event.contact_person?.charAt(0) || 'C'
                         )}
                       </div>
                       <div>
                         <h3 className="text-white" style={{ fontSize: '26px', margin: 0, fontWeight: 700, fontFamily: 'Poppins, sans-serif', lineHeight: '30px' }}>{event.contact_person || "Event Organizer"}</h3>
-                        <p className="text-white" style={{ margin: 0, opacity: 0.9, fontSize: '18px', fontWeight: 500, lineHeight: '30px' }}>Event Contact Person</p>
                         {(event.contact_email || event.contact_phone) && (
                           <p className="text-white" style={{ margin: 0, opacity: 0.7, fontSize: '14px', marginTop: '5px' }}>
                             {event.contact_email} {event.contact_email && event.contact_phone ? '/' : ''} {event.contact_phone}
@@ -521,9 +520,9 @@ const EventDetailPage = async ({ params }: PageProps) => {
   }
   
   .register-now .d-flex > div:first-child {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 20px !important;
   }
 
   .register-now .d-flex > div:first-child > div:first-child {
@@ -531,6 +530,11 @@ const EventDetailPage = async ({ params }: PageProps) => {
     height: 65px !important;
     border: 3px solid #3c1e5e !important;
     box-shadow: 0 0 15px rgba(102, 51, 153, 0.6) !important;
+  }
+  
+  .register-now .d-flex > div:first-child > div:first-child img {
+    object-fit: cover !important;
+    object-position: top !important;
   }
   
   .register-now h3 {
@@ -631,7 +635,9 @@ const EventDetailPage = async ({ params }: PageProps) => {
   }
 
   .register-now .d-flex > div:first-child {
-    gap: 10px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 15px !important;
   }
 
   .register-now h3 {
@@ -739,6 +745,7 @@ const EventDetailPage = async ({ params }: PageProps) => {
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
+    gap: 10px !important;
   }
 
   .event-detail .event-meta ul > li svg {

@@ -103,7 +103,7 @@ const EventsList = () => {
         }
 
         .events .theme-btn:hover {
-          background: #edb109;
+          background: #133869;
           color: #fff;
         }
 

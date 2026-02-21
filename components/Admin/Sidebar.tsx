@@ -30,8 +30,8 @@ export default function Sidebar() {
             localStorage.removeItem('token');
             sessionStorage.clear();
 
-            // Redirect to login page
-            router.push('/login');
+            // Redirect to login page with hard refresh
+            window.location.href = '/login';
         }
     };
 
