@@ -576,34 +576,37 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
                 // Handle Departments
                 const depts = formData?.getAll('departments[]') as string[];
-                if (depts && depts.length > 0) {
-                    for (const deptName of depts) {
-                        if (deptName === 'None') continue;
-                        const dept = await prisma.department.findFirst({ where: { department_name: deptName as any } });
-                        if (dept) {
-                            await prisma.memberDepartment.create({
-                                data: {
-                                    member_id: member.member_id,
-                                    department_id: dept.department_id
-                                }
-                            });
-                        }
+                const validDepts = depts?.filter(d => d && d !== 'None' && d !== 'none') || [];
+                if (validDepts.length > 0) {
+                    const departments = await prisma.department.findMany({
+                        where: { department_name: { in: validDepts as any[] } }
+                    });
+
+                    if (departments.length > 0) {
+                        await prisma.memberDepartment.createMany({
+                            data: departments.map(d => ({
+                                member_id: member.member_id,
+                                department_id: d.department_id
+                            }))
+                        });
                     }
                 }
 
                 // Handle Ministries
                 const mins = formData?.getAll('ministries[]') as string[];
-                if (mins && mins.length > 0) {
-                    for (const minName of mins) {
-                        const min = await prisma.ministry.findFirst({ where: { ministry_name: minName as any } });
-                        if (min) {
-                            await prisma.memberMinistry.create({
-                                data: {
-                                    member_id: member.member_id,
-                                    ministry_id: min.ministry_id
-                                }
-                            });
-                        }
+                const validMins = mins?.filter(m => m && m !== 'None' && m !== 'none') || [];
+                if (validMins.length > 0) {
+                    const ministries = await prisma.ministry.findMany({
+                        where: { ministry_name: { in: validMins as any[] } }
+                    });
+
+                    if (ministries.length > 0) {
+                        await prisma.memberMinistry.createMany({
+                            data: ministries.map(m => ({
+                                member_id: member.member_id,
+                                ministry_id: m.ministry_id
+                            }))
+                        });
                     }
                 }
 
