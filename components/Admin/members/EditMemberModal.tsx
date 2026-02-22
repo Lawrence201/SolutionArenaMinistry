@@ -34,14 +34,18 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                 city: member.city || '',
                 region: member.region || '',
                 gps_address: member.gps_address || '',
-                emergency_name: member.emergency_name || '',
-                emergency_phone: member.emergency_phone || '',
-                emergency_relation: member.emergency_relation || '',
+                emergency_name: member.emergencyContacts && member.emergencyContacts.length > 0 ? member.emergencyContacts[0].emergency_name : (member.emergency_name || ''),
+                emergency_phone: member.emergencyContacts && member.emergencyContacts.length > 0 ? member.emergencyContacts[0].emergency_phone : (member.emergency_phone || ''),
+                emergency_relation: member.emergencyContacts && member.emergencyContacts.length > 0 ? member.emergencyContacts[0].emergency_relation : (member.emergency_relation || ''),
                 status: member.status || 'Active',
                 church_group: member.church_group || '',
-                departments: member.departments || '',
+                departments: member.memberDepartments && member.memberDepartments.length > 0
+                    ? member.memberDepartments.map((d: any) => d.department.department_name).join(',')
+                    : (member.departments || ''),
                 leadership_role: member.leadership_role || 'None',
-                ministries: member.ministries || '',
+                ministries: member.memberMinistries
+                    ? member.memberMinistries.map((m: any) => m.ministry.ministry_name).join(',')
+                    : (member.ministries || ''),
                 baptism_status: member.baptism_status || '',
                 spiritual_growth: member.spiritual_growth || '',
                 membership_type: member.membership_type || '',
@@ -439,11 +443,16 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                                     <label className="xax-form-label">Leadership Role</label>
                                     <div className="cuttin-radio-group"
                                         style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                        {['None', 'Pastor', 'Minister', 'Group Leader'].map((role) => (
-                                            <div key={role} className="xax-radio-item">
-                                                <input type="radio" id={`edit${role.replace(' ', '')}`} name="leadership_role"
-                                                    value={role} checked={formData.leadership_role === role} onChange={handleChange} />
-                                                <label htmlFor={`edit${role.replace(' ', '')}`}>{role}</label>
+                                        {[
+                                            { label: 'None', value: 'None' },
+                                            { label: 'Pastor', value: 'Pastor' },
+                                            { label: 'Minister', value: 'Minister' },
+                                            { label: 'Group leader', value: 'Group_leader' }
+                                        ].map((role) => (
+                                            <div key={role.value} className="xax-radio-item">
+                                                <input type="radio" id={`edit${role.value}`} name="leadership_role"
+                                                    value={role.value} checked={formData.leadership_role === role.value} onChange={handleChange} />
+                                                <label htmlFor={`edit${role.value}`}>{role.label}</label>
                                             </div>
                                         ))}
                                     </div>
@@ -486,7 +495,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                                     <select className="xax-form-select" id="editBaptismStatus" name="baptism_status" value={formData.baptism_status || ''} onChange={handleChange}>
                                         <option value="">Select status</option>
                                         <option value="Baptized">Baptized</option>
-                                        <option value="Not baptized">Not Yet Baptized</option>
+                                        <option value="Not_baptized">Not Yet Baptized</option>
                                         <option value="Pending">Scheduled for Baptism</option>
                                     </select>
                                 </div>
@@ -495,7 +504,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                                     <label className="xax-form-label">Spiritual Growth Level</label>
                                     <select className="xax-form-select" id="editSpiritualGrowth" name="spiritual_growth" value={formData.spiritual_growth || ''} onChange={handleChange}>
                                         <option value="">Select level</option>
-                                        <option value="New believer">New Believer</option>
+                                        <option value="New_believer">New Believer</option>
                                         <option value="Growing">Growing Spiritually</option>
                                         <option value="Committed">Committed Member</option>
                                         <option value="Leader">Spiritually Mature / Leader</option>
@@ -506,8 +515,8 @@ export default function EditMemberModal({ isOpen, member, onClose, onSave }: Edi
                                     <label className="xax-form-label">Membership Type</label>
                                     <select className="xax-form-select" id="editMembershipType" name="membership_type" value={formData.membership_type || ''} onChange={handleChange}>
                                         <option value="">Select type</option>
-                                        <option value="Full Member">Full Member</option>
-                                        <option value="Associate Member">Associate Member</option>
+                                        <option value="Full_Member">Full Member</option>
+                                        <option value="Associate_Member">Associate Member</option>
                                         <option value="Visitor">Visitor</option>
                                     </select>
                                 </div>

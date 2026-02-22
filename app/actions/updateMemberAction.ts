@@ -3,6 +3,24 @@
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { saveBase64Image, deleteFile } from '@/lib/storage';
+import {
+    Gender,
+    MaritalStatus,
+    MemberStatus,
+    ChurchGroup,
+    LeadershipRole,
+    BaptismStatus,
+    SpiritualGrowth,
+    MembershipType
+} from '@prisma/client';
+
+const normalizeEnum = (val: string | null | undefined): any => {
+    if (!val || val === 'None' || val === 'none' || val.trim() === '') return null;
+    // Replace spaces and hyphens with underscores and capitalize properly if needed
+    // Most enums in this schema are PascalCase with underscores for spaces (e.g. New_believer)
+    // but Prisma @map handles the mapping. However, we should try to match the enum key name.
+    return val.replace(/\s+/g, '_').replace(/-/g, '_') as any;
+};
 
 export async function updateMember(memberId: number, formData: any) {
     try {
@@ -39,8 +57,8 @@ export async function updateMember(memberId: number, formData: any) {
                 first_name: formData.first_name,
                 last_name: formData.last_name,
                 date_of_birth: formData.date_of_birth ? new Date(formData.date_of_birth) : null,
-                gender: formData.gender || null,
-                marital_status: formData.marital_status || null,
+                gender: normalizeEnum(formData.gender),
+                marital_status: normalizeEnum(formData.marital_status),
                 occupation: formData.occupation || null,
                 phone: formData.phone,
                 email: formData.email,
@@ -56,12 +74,12 @@ export async function updateMember(memberId: number, formData: any) {
                         emergency_relation: formData.emergency_relation || null,
                     }
                 },
-                status: formData.status || 'Active',
-                church_group: formData.church_group || null,
-                leadership_role: formData.leadership_role || 'None',
-                baptism_status: formData.baptism_status || null,
-                spiritual_growth: formData.spiritual_growth || null,
-                membership_type: formData.membership_type || null,
+                status: (formData.status || 'Active') as MemberStatus,
+                church_group: normalizeEnum(formData.church_group),
+                leadership_role: (normalizeEnum(formData.leadership_role) || 'None') as LeadershipRole,
+                baptism_status: normalizeEnum(formData.baptism_status),
+                spiritual_growth: normalizeEnum(formData.spiritual_growth),
+                membership_type: normalizeEnum(formData.membership_type),
                 notes: formData.notes || null,
                 photo_path: photoPath,
                 birthday_thumb: birthdayThumb,
