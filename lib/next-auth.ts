@@ -37,8 +37,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
 
-                const email = credentials.email as string;
+                const email = (credentials.email as string).trim().toLowerCase();
                 const password = credentials.password as string;
+
+                console.log(`[Auth.js] Attempting login for: ${email}`);
 
                 try {
                     // 1. Check admin_accounts table first (admins login with credentials)
@@ -47,15 +49,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (admin) {
+                        console.log(`[Auth.js] Admin found: ${admin.admin_email}`);
                         const isValid = await bcrypt.compare(password, admin.admin_password);
                         if (isValid) {
+                            console.log(`[Auth.js] Admin login successful: ${admin.admin_email}`);
                             return {
                                 id: `admin-${admin.admin_id}`,
                                 email: admin.admin_email,
                                 name: admin.admin_name,
                                 role: "admin",
                             };
+                        } else {
+                            console.warn(`[Auth.js] Invalid password for admin: ${admin.admin_email}`);
                         }
+                    } else {
+                        console.log(`[Auth.js] No admin found for: ${email}`);
                     }
 
                     // 2. Check users table (members with a manual password)
