@@ -22,59 +22,6 @@ const UpcomingEvents = () => {
                 const data = await response.json();
                 if (data.success) {
                     setEvents(data.events);
-
-                    // Manually initialize slick for this container
-                    setTimeout(() => {
-                        if (typeof window !== "undefined" && (window as any).$ && (window as any).$.fn.slick) {
-                            const $ = (window as any).$;
-                            const $slider = $("#eventsCarouselContainer");
-                            if ($slider.length && !$slider.hasClass('slick-initialized')) {
-                                $slider.slick({
-                                    slidesToShow: 5,
-                                    slidesToScroll: 1,
-                                    arrows: false,
-                                    dots: false,
-                                    centerMode: true,
-                                    infinite: true,
-                                    cssEase: 'linear',
-                                    draggable: true,
-                                    autoplay: true,
-                                    autoplaySpeed: 2000,
-                                    speed: 1000,
-                                    responsive: [
-                                        {
-                                            breakpoint: 1500,
-                                            settings: {
-                                                slidesToShow: 4,
-                                                slidesToScroll: 1
-                                            }
-                                        },
-                                        {
-                                            breakpoint: 1200,
-                                            settings: {
-                                                slidesToShow: 3,
-                                                slidesToScroll: 1
-                                            }
-                                        },
-                                        {
-                                            breakpoint: 900,
-                                            settings: {
-                                                slidesToShow: 2,
-                                                slidesToScroll: 1
-                                            }
-                                        },
-                                        {
-                                            breakpoint: 600,
-                                            settings: {
-                                                slidesToShow: 1,
-                                                slidesToScroll: 1
-                                            }
-                                        }
-                                    ]
-                                });
-                            }
-                        }
-                    }, 500);
                 }
             } catch (err) {
                 console.error("Error loading events:", err);
@@ -124,20 +71,22 @@ const UpcomingEvents = () => {
             }
             
             #eventsCarouselContainer {
-                margin: 0 -8px;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                margin: 0;
             }
             
             .event {
                 position: relative;
                 overflow: hidden;
-                margin: 0 8px;
                 border-radius: 10px;
-                aspect-ratio: 2/3.2;
+                aspect-ratio: 2/2.8;
                 background: #f0f0f0;
-                max-height: 450px;
+                width: 100%;
             }
             
-            .events-carousal .event > img {
+            .events-carousal .event img {
                 width: 100%;
                 height: 100% !important;
                 object-fit: cover;
@@ -222,9 +171,22 @@ const UpcomingEvents = () => {
                 color: #fff;
             }
             
+            @media (max-width: 1200px) {
+                #eventsCarouselContainer {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
             @media (max-width: 991px) {
                 .events-carousal .heading h2 {
                     font-size: 32px;
+                }
+                #eventsCarouselContainer {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+            @media (max-width: 600px) {
+                #eventsCarouselContainer {
+                    grid-template-columns: repeat(1, 1fr);
                 }
             }
             @media (max-width: 480px) {
