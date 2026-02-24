@@ -80,7 +80,7 @@ export default function DashboardPage() {
             const [statsRes, insightsRes, activitiesRes, eventsRes] = await Promise.all([
                 fetch('/api/admin/dashboard-stats'),
                 fetch('/api/admin/insights'),
-                fetch('/api/admin/recent-activities?limit=5'),
+                fetch('/api/admin/recent-activities?limit=4'),
                 fetch('/api/admin/upcoming-events?limit=5')
             ]);
 
@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 setInsights(insightsData.data);
                 setInsightCount(insightsData.count);
             }
-            if (activitiesData.success) setActivities(activitiesData.data.slice(0, 5));
+            if (activitiesData.success) setActivities(activitiesData.data);
             if (eventsData.success) setUpcomingEvents(eventsData.data);
 
         } catch (error) {

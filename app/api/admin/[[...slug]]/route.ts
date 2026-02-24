@@ -193,11 +193,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
             }
 
             case 'recent-activities': {
-                const limit = 5;
-                const activities = await prisma.activityLog.findMany({
-                    orderBy: { created_at: 'desc' },
-                    take: limit
-                });
+                const activities = await prisma.activityLog.findMany({ orderBy: { created_at: 'desc' }, take: 10 });
                 return NextResponse.json({ success: true, data: activities.map(a => ({ ...a, id: a.activity_id, time_ago: getTimeAgo(a.created_at) })) });
             }
 
