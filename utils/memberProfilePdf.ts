@@ -118,7 +118,7 @@ export const generateMemberProfilePDF = async (memberData: any) => {
 
         let photoUrl = null;
         if (member.photoPath) {
-            photoUrl = (member.photoPath.startsWith('/') || member.photoPath.startsWith('http'))
+            photoUrl = (member.photoPath.startsWith('/') || member.photoPath.startsWith('http') || member.photoPath.startsWith('data:'))
                 ? member.photoPath
                 : `/uploads/${member.photoPath}`;
         }
