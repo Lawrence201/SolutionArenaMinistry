@@ -267,19 +267,30 @@ function RegistrationForm() {
 
             if (data.success) {
                 // Trigger profile download automatically
-                try {
-                    const { generateMemberProfilePDF } = await import('@/utils/memberProfilePdf');
-                    await generateMemberProfilePDF({
-                        ...formData,
-                        member_id: data.member_id,
-                        photo_path: photoPreview || data.photoPath, // Use local base64 preview for reliability on Vercel
-                        created_at: new Date()
-                    });
-                } catch (pdfError) {
-                    console.error('PDF generation failed:', pdfError);
-                }
+                const downloadPromise = (async () => {
+                    try {
+                        const { generateMemberProfilePDF } = await import('@/utils/memberProfilePdf');
+                        await generateMemberProfilePDF({
+                            ...formData,
+                            member_id: data.member_id,
+                            photo_path: photoPreview || data.photoPath, // Use local base64 preview for reliability on Vercel
+                            created_at: new Date()
+                        });
+                        return true;
+                    } catch (pdfError) {
+                        console.error('PDF generation failed:', pdfError);
+                        // alert('PDF download failed. You will be redirected shortly.'); // Temporary debug
+                        return false;
+                    }
+                })();
 
-                router.push('/register/success');
+                // Wait for the download to at least initiate, then navigate
+                await downloadPromise;
+
+                // Give the browser 1.5 seconds to handle the download dialog before navigating
+                setTimeout(() => {
+                    router.push('/register/success');
+                }, 1500);
             } else {
                 alert('Error: ' + data.message);
             }
