@@ -272,7 +272,7 @@ function RegistrationForm() {
                     await generateMemberProfilePDF({
                         ...formData,
                         member_id: data.member_id,
-                        photo_path: data.photoPath,
+                        photo_path: photoPreview || data.photoPath, // Use local base64 preview for reliability on Vercel
                         created_at: new Date()
                     });
                 } catch (pdfError) {

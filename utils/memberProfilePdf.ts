@@ -125,15 +125,21 @@ export const generateMemberProfilePDF = async (memberData: any) => {
 
         if (photoUrl) {
             try {
+                // If it's already a base64 data URL, we can use it more easily
                 const img = await loadImageForPDF(photoUrl);
+
                 doc.setFillColor(255, 255, 255);
                 doc.circle(imageX + imageSize / 2, imageY + imageSize / 2, imageSize / 2 + 1, 'F');
                 doc.setDrawColor(229, 231, 235);
                 doc.setLineWidth(1);
                 doc.circle(imageX + imageSize / 2, imageY + imageSize / 2, imageSize / 2 + 1, 'S');
-                doc.addImage(img, 'JPEG', imageX, imageY, imageSize, imageSize, '', 'FAST');
+
+                // Use a safer way to add image, letting jsPDF try to figure out the format
+                // or defaulting to JPEG which is common
+                const format = photoUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                doc.addImage(img, format, imageX, imageY, imageSize, imageSize, undefined, 'FAST');
             } catch (e) {
-                console.error('Image load failed', e);
+                console.error('Image load failed for PDF', e);
                 drawPlaceholder(imageX, imageY, imageSize);
             }
         } else {
