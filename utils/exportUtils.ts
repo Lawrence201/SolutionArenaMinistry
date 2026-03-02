@@ -157,7 +157,7 @@ export const exportToPDF = async (members: any[]) => {
         // Pre-load and process images
         const imageMap = new Map<number, string>();
         await Promise.all(members.map(async (member) => {
-            if (member.photo_path) {
+            if (member && member.photo_path) {
                 try {
                     let src = member.photo_path;
                     if (!src.startsWith('http') && !src.startsWith('/') && !src.startsWith('data:')) {
@@ -176,32 +176,42 @@ export const exportToPDF = async (members: any[]) => {
             }
         }));
 
-        const tableColumn = ["", "Name", "Email", "Phone", "GPS Address", "Status", "Ministry", "Emergency Name", "Emergency Phone"];
-        const tableRows: any[] = [];
+        // Define columns with dataKeys for better data binding
+        const tableColumns = [
+            { header: "", dataKey: "photo" },
+            { header: "Name", dataKey: "name" },
+            { header: "Email", dataKey: "email" },
+            { header: "Phone", dataKey: "phone" },
+            { header: "GPS Address", dataKey: "gps" },
+            { header: "Status", dataKey: "status" },
+            { header: "Ministry", dataKey: "ministry" },
+            { header: "Emergency Name", dataKey: "eName" },
+            { header: "Emergency Phone", dataKey: "ePhone" }
+        ];
 
-        members.forEach(member => {
-            // Helper to extract ministry name safely
+        // Map members to row objects
+        const tableRows = members.map(member => {
             const ministryName = member.memberMinistries && member.memberMinistries.length > 0
                 ? member.memberMinistries[0].ministry.ministry_name
                 : (member.ministries || 'No Ministry');
 
-            const memberData = [
-                '', // Placeholder for Photo
-                `${member.first_name} ${member.last_name}`,
-                member.email || '-',
-                member.phone || '-',
-                member.gps_address || '-',
-                member.status || 'Active',
-                ministryName,
-                member.emergency_name || '-',
-                member.emergency_phone || '-'
-            ];
-            tableRows.push(memberData);
+            return {
+                photo: '', // Placeholder
+                name: `${member.first_name || ''} ${member.last_name || ''}`,
+                email: member.email || '-',
+                phone: member.phone || '-',
+                gps: member.gps_address || '-',
+                status: member.status || 'Active',
+                ministry: ministryName,
+                eName: member.emergency_name || '-',
+                ePhone: member.emergency_phone || '-',
+                _member_id: member.member_id || member.id // Hidden ID for ref
+            };
         });
 
         // Generate table
         autoTable(doc, {
-            head: [tableColumn],
+            columns: tableColumns,
             body: tableRows,
             startY: 35,
             theme: 'striped',
@@ -217,14 +227,15 @@ export const exportToPDF = async (members: any[]) => {
                 fontStyle: 'bold'
             },
             columnStyles: {
-                0: { cellWidth: 18 }, // Photo column
-                1: { fontStyle: 'bold' } // Name column
+                photo: { cellWidth: 18 },
+                name: { fontStyle: 'bold', cellWidth: 35 }
             },
             didDrawCell: (data) => {
-                if (data.section === 'body' && data.column.index === 0) {
-                    const member = members[data.row.index];
-                    const id = member.member_id || member.id;
-                    const roundedImgData = imageMap.get(id);
+                // Check if this is the photo column in the body section
+                if (data.section === 'body' && (data.column as any).dataKey === 'photo') {
+                    const raw = data.row.raw as any;
+                    const id = raw?._member_id;
+                    const roundedImgData = id ? imageMap.get(id) : null;
 
                     if (roundedImgData) {
                         const cell = data.cell;
