@@ -27,7 +27,11 @@ interface TithesData {
 import ReceiptModal from './ReceiptModal';
 import EditModal from './EditModal';
 
-export default function TithesTab() {
+interface TithesTabProps {
+    refreshStats?: () => void;
+}
+
+export default function TithesTab({ refreshStats }: TithesTabProps) {
     const [data, setData] = useState<TithesData | null>(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -75,6 +79,7 @@ export default function TithesTab() {
             const json = await res.json();
             if (json.success) {
                 fetchTithes();
+                if (refreshStats) refreshStats();
             } else {
                 alert('Error deleting record: ' + json.error);
             }
@@ -96,6 +101,7 @@ export default function TithesTab() {
             const json = await res.json();
             if (json.success) {
                 fetchTithes();
+                if (refreshStats) refreshStats();
             } else {
                 throw new Error(json.error);
             }

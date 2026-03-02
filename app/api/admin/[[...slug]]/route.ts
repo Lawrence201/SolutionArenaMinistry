@@ -215,8 +215,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     try {
         const { slug: slugArr } = await params;
         const slug = (slugArr || []).join('/');
-        const formData = await req.formData().catch(() => null);
-        const body = !formData ? await req.json().catch(() => ({})) : null;
+        const contentType = req.headers.get("content-type") || "";
+        const isFormData = contentType.includes("multipart/form-data");
+        const formData = isFormData ? await req.formData().catch(() => null) : null;
+        const body = !isFormData ? await req.json().catch(() => ({})) : null;
 
         switch (slug) {
             case 'blogs/create': {
@@ -237,82 +239,112 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
             }
 
             case 'finance/create': {
-                const { type, amount, date, paymentMethod, serviceType, status, countedBy, notes, member_id, project_name, category, description, vendor_payee, payment_period } = body;
-                const trxId = `TRX-${Date.now()}`;
+                const { type, amount, date, paymentMethod, serviceType, serviceTime, status, countedBy, notes, memberId, projectName, category, description, vendor, paymentPeriod } = body;
+
+                // Legacy style transaction ID generation
+                const prefix = {
+                    offering: 'OFF',
+                    tithe: 'TXN',
+                    projectoffering: 'POFF',
+                    welfare: 'WEL',
+                    expense: 'EXP'
+                }[type as string] || 'TRX';
+                const trxId = `${prefix}-${Date.now()}`;
+
+                // Ensure amount is a number for Prisma Decimal
+                const parsedAmount = parseFloat(amount);
+                const recordDate = new Date(date);
+                const sTime = serviceTime ? new Date(`1970-01-01T${serviceTime}:00`) : null;
+
+                // Format enums for Prisma (replace spaces with underscores)
+                const formattedServiceType = serviceType ? serviceType.replace(/\s+/g, '_') : undefined;
+                const formattedPaymentMethod = paymentMethod ? paymentMethod.replace(/\s+/g, '_') : undefined;
+
                 let result;
                 if (type === 'offering') {
                     result = await prisma.offering.create({
                         data: {
                             transaction_id: trxId,
-                            date: new Date(date),
-                            service_type: serviceType as any,
-                            amount_collected: amount,
-                            collection_method: paymentMethod as any,
+                            date: recordDate,
+                            service_type: formattedServiceType as any,
+                            service_time: sTime,
+                            amount_collected: parsedAmount,
+                            collection_method: formattedPaymentMethod as any,
                             counted_by: countedBy,
                             notes: notes,
-                            status: status as any
+                            status: (status === 'Verified' ? 'Approved' : (status ? status.replace(/\s+/g, '_') : 'Approved')) as any
                         }
                     });
                 } else if (type === 'tithe') {
                     result = await prisma.tithe.create({
                         data: {
                             transaction_id: trxId,
-                            member_id: member_id,
-                            date: new Date(date),
-                            amount: amount,
-                            payment_method: paymentMethod as any,
+                            member_id: memberId,
+                            date: recordDate,
+                            amount: parsedAmount,
+                            payment_method: formattedPaymentMethod as any,
                             notes: notes,
-                            status: status as any
+                            status: (status ? status.replace(/\s+/g, '_') : 'Paid') as any
                         }
                     });
                 } else if (type === 'projectoffering') {
                     result = await prisma.projectOffering.create({
                         data: {
                             transaction_id: trxId,
-                            date: new Date(date),
-                            service_type: serviceType as any,
-                            project_name: project_name,
-                            amount_collected: amount,
-                            collection_method: paymentMethod as any,
+                            date: recordDate,
+                            service_type: formattedServiceType as any,
+                            service_time: sTime,
+                            project_name: projectName,
+                            amount_collected: parsedAmount,
+                            collection_method: formattedPaymentMethod as any,
                             counted_by: countedBy,
                             notes: notes,
-                            status: status as any
+                            status: (status === 'Verified' ? 'Approved' : (status ? status.replace(/\s+/g, '_') : 'Approved')) as any
                         }
                     });
                 } else if (type === 'welfare') {
                     result = await prisma.welfareContribution.create({
                         data: {
                             transaction_id: trxId,
-                            member_id: member_id,
-                            date: new Date(date),
-                            amount: amount,
-                            payment_method: paymentMethod as any,
-                            payment_period: payment_period as any,
+                            member_id: memberId,
+                            date: recordDate,
+                            amount: parsedAmount,
+                            payment_method: formattedPaymentMethod as any,
+                            payment_period: paymentPeriod as any,
                             notes: notes,
-                            status: status as any
+                            status: (status ? status.replace(/\s+/g, '_') : 'Paid') as any
                         }
                     });
                 } else if (type === 'expense') {
                     result = await prisma.expense.create({
                         data: {
                             transaction_id: trxId,
-                            date: new Date(date),
-                            category: category as any,
+                            date: recordDate,
+                            category: category ? category.replace(/\s+/g, '_') : (undefined as any),
                             description: description,
-                            amount: amount,
-                            payment_method: paymentMethod as any,
-                            vendor_payee: vendor_payee,
+                            amount: parsedAmount,
+                            payment_method: formattedPaymentMethod as any,
+                            vendor_payee: vendor,
                             notes: notes,
-                            status: status as any
+                            status: (status ? status.replace(/\s+/g, '_') : 'Pending') as any
                         }
                     });
                 }
+
                 await logActivity(
                     type === 'expense' ? 'other' : 'donation_recorded',
                     `New ${type} recorded`,
-                    `A new ${type} of GH₵${amount} was recorded by Admin.`
+                    `A new ${type} of GH₵${parsedAmount} was recorded by Admin.`,
+                    (result as any)?.offering_id || (result as any)?.tithe_id || (result as any)?.project_offering_id || (result as any)?.welfare_id || (result as any)?.expense_id
                 );
-                return NextResponse.json({ success: true, data: result });
+
+                const typeDisplay = type ? (type.charAt(0).toUpperCase() + type.slice(1)) : "Finance";
+                return NextResponse.json({
+                    success: true,
+                    message: `${typeDisplay} recorded successfully!`,
+                    transaction_id: trxId,
+                    data: result
+                });
             }
 
             case 'finance/withdraw': {

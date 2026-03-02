@@ -40,7 +40,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const email = (credentials.email as string).trim().toLowerCase();
                 const password = credentials.password as string;
 
-                console.log(`[Auth.js] Attempting login for: ${email}`);
+                const fs = require('fs');
+                const logPath = 'auth_debug.log';
+                const log = (msg: string) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+
+                log(`Attempting login for: [${email}]`);
+                log(`Prisma keys: ${Object.keys(prisma).join(', ')}`);
 
                 try {
                     // 1. Check admin_accounts table first (admins login with credentials)
@@ -49,10 +54,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (admin) {
-                        console.log(`[Auth.js] Admin found: ${admin.admin_email}`);
+                        log(`Admin found: [${admin.admin_email}]`);
                         const isValid = await bcrypt.compare(password, admin.admin_password);
+                        log(`Password valid? ${isValid}`);
                         if (isValid) {
-                            console.log(`[Auth.js] Admin login successful: ${admin.admin_email}`);
+                            log(`Admin login successful: ${admin.admin_email}`);
                             return {
                                 id: `admin-${admin.admin_id}`,
                                 email: admin.admin_email,
@@ -60,9 +66,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 role: "admin",
                             };
                         } else {
+                            log(`Invalid password for admin: ${admin.admin_email}`);
                             console.warn(`[Auth.js] Invalid password for admin: ${admin.admin_email}`);
                         }
                     } else {
+                        log(`No admin found for: ${email}`);
                         console.log(`[Auth.js] No admin found for: ${email}`);
                     }
 
@@ -82,7 +90,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             };
                         }
                     }
-                } catch (err) {
+                } catch (err: any) {
+                    log(`DB error in credentials authorize: ${err.message}`);
+                    log(`Stack: ${err.stack}`);
                     console.error("[Auth.js] DB error in credentials authorize:", err);
                 }
 

@@ -123,7 +123,46 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
             }
             case 'offerings': {
                 const offerings = await prisma.offering.findMany({ where: { date: { gte: start, lte: end } }, orderBy: { date: 'desc' }, take: 100 });
-                return NextResponse.json({ success: true, data: { offerings: offerings.map(o => ({ ...o, amount_collected: Number(o.amount_collected) })) } });
+
+                // Calculate summary stats
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+                const [todayRes, weekRes, monthRes, specialRes] = await Promise.all([
+                    prisma.offering.aggregate({ where: { date: { gte: today } }, _sum: { amount_collected: true }, _count: { _all: true } }),
+                    prisma.offering.aggregate({ where: { date: { gte: weekStart } }, _sum: { amount_collected: true } }),
+                    prisma.offering.aggregate({ where: { date: { gte: monthStart } }, _sum: { amount_collected: true }, _count: { _all: true } }),
+                    prisma.projectOffering.aggregate({ _sum: { amount_collected: true } }) // General special offerings
+                ]);
+
+                const total_today = Number(todayRes._sum.amount_collected || 0);
+                const total_week = Number(weekRes._sum.amount_collected || 0);
+                const total_month = Number(monthRes._sum.amount_collected || 0);
+                const special_offerings = Number(specialRes._sum.amount_collected || 0);
+
+                const today_count = todayRes._count._all || 0;
+                const month_count = monthRes._count._all || 1; // Prevent division by zero
+                const month_avg = total_month / month_count;
+
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        offerings: offerings.map(o => ({ ...o, amount_collected: Number(o.amount_collected) })),
+                        total_today,
+                        total_week,
+                        total_month,
+                        special_offerings,
+                        today_count,
+                        week_growth: "↑ Calculated weekly", // Simplified placeholder
+                        month_avg,
+                        special_description: "Various projects"
+                    }
+                });
             }
             case 'expenses': {
                 const expenses = await prisma.expense.findMany({ where: { date: { gte: start, lte: end } }, orderBy: { date: 'desc' }, take: 100 });
@@ -225,12 +264,50 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
         const body = await req.json();
         if (!id) return NextResponse.json({ success: false, message: "ID required" }, { status: 400 });
         switch (slug) {
-            case 'tithes': await prisma.tithe.update({ where: { transaction_id: id }, data: { amount: body.amount ? parseFloat(body.amount) : undefined, notes: body.notes } }); break;
-            case 'offerings': await prisma.offering.update({ where: { transaction_id: id }, data: { amount_collected: body.amount_collected ? parseFloat(body.amount_collected) : undefined, notes: body.notes } }); break;
+            case 'tithes':
+                await prisma.tithe.update({
+                    where: { transaction_id: id },
+                    data: {
+                        date: body.date ? new Date(body.date) : undefined,
+                        amount: body.amount ? parseFloat(body.amount) : undefined,
+                        payment_method: body.payment_method as any,
+                        notes: body.notes
+                    }
+                });
+                break;
+            case 'offerings':
+                await prisma.offering.update({
+                    where: { transaction_id: id },
+                    data: {
+                        date: body.date ? new Date(body.date) : undefined,
+                        service_type: body.service_type as any,
+                        service_time: body.service_time ? new Date(`1970-01-01T${body.service_time}:00`) : undefined,
+                        amount_collected: body.amount_collected ? parseFloat(body.amount_collected) : undefined,
+                        collection_method: body.collection_method as any,
+                        counted_by: body.counted_by,
+                        status: body.status as any,
+                        notes: body.notes
+                    }
+                });
+                break;
             case 'expenses': await prisma.expense.update({ where: { transaction_id: id }, data: { amount: body.amount ? parseFloat(body.amount) : undefined, status: body.status } }); break;
             case 'welfare': await prisma.welfareContribution.update({ where: { transaction_id: id }, data: { amount: body.amount ? parseFloat(body.amount) : undefined, notes: body.notes } }); break;
             case 'withdrawals': await prisma.withdrawal.update({ where: { transaction_id: id }, data: { amount: body.amount ? parseFloat(body.amount) : undefined, notes: body.notes } }); break;
-            case 'project-offerings': await prisma.projectOffering.update({ where: { transaction_id: id }, data: { amount_collected: body.amount_collected ? parseFloat(body.amount_collected) : undefined, notes: body.notes } }); break;
+            case 'project-offerings':
+                await prisma.projectOffering.update({
+                    where: { transaction_id: id },
+                    data: {
+                        date: body.date ? new Date(body.date) : undefined,
+                        project_name: body.project_name,
+                        service_type: body.service_type as any,
+                        service_time: body.service_time,
+                        amount_collected: body.amount ? parseFloat(body.amount) : body.amount_collected ? parseFloat(body.amount_collected) : undefined,
+                        collection_method: body.collection_method as any,
+                        counted_by: body.counted_by,
+                        notes: body.notes
+                    }
+                });
+                break;
             default: return NextResponse.json({ success: false, message: "Route not found" }, { status: 404 });
         }
         return NextResponse.json({ success: true, message: "Updated successfully" });
@@ -245,7 +322,21 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ s
         if (!id) return NextResponse.json({ success: false, message: "ID required" }, { status: 400 });
         switch (slug) {
             case 'tithes': await prisma.tithe.delete({ where: { transaction_id: id } }); break;
-            case 'offerings': await prisma.offering.delete({ where: { transaction_id: id } }); break;
+            case 'offerings': {
+                const offering = await prisma.offering.findUnique({ where: { transaction_id: id } });
+                if (!offering) return NextResponse.json({ success: false, message: "Offering not found" }, { status: 404 });
+                const [totalOff, totalWithd] = await Promise.all([
+                    prisma.offering.aggregate({ _sum: { amount_collected: true } }),
+                    prisma.withdrawal.aggregate({ where: { account_type: 'Offering' }, _sum: { amount: true } })
+                ]);
+                const newBalance = (Number(totalOff._sum.amount_collected) || 0) - Number(offering.amount_collected);
+                const withdrawals = Number(totalWithd._sum.amount) || 0;
+                if (newBalance < withdrawals) {
+                    return NextResponse.json({ success: false, message: `Cannot delete. Total withdrawals (₵${withdrawals.toFixed(2)}) would exceed remaining offerings (₵${newBalance.toFixed(2)}).` }, { status: 400 });
+                }
+                await prisma.offering.delete({ where: { transaction_id: id } });
+                break;
+            }
             case 'expenses': await prisma.expense.delete({ where: { transaction_id: id } }); break;
             case 'welfare': await prisma.welfareContribution.delete({ where: { transaction_id: id } }); break;
             case 'withdrawals': await prisma.withdrawal.delete({ where: { transaction_id: id } }); break;

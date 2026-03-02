@@ -17,11 +17,18 @@ export default function EditModal({ isOpen, onClose, onSave, record, type }: Edi
         if (record) {
             setFormData({
                 date: record.date ? new Date(record.date).toISOString().split('T')[0] : '',
-                amount: record.amount || 0,
-                payment_method: record.payment_method || 'Cash',
+                amount: record.amount ?? record.amount_collected ?? 0,
+                payment_method: record.payment_method || record.collection_method || 'Cash',
                 notes: record.notes || '',
-                // Welfare/Tithe specific
+                // Tithe / Welfare specific
                 member_name: record.member_name || '',
+                receipt_number: record.receipt_number || '',
+                // Project Offering specific
+                project_name: record.project_name || '',
+                service_type: record.service_type || 'Sunday_Worship',
+                service_time: record.service_time || '',
+                collection_method: record.collection_method || 'Cash',
+                counted_by: record.counted_by || '',
                 // Withdrawal specific
                 purpose: record.purpose || '',
                 recipient: record.recipient || '',
@@ -91,7 +98,7 @@ export default function EditModal({ isOpen, onClose, onSave, record, type }: Edi
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {type !== 'withdrawal' && (
+                    {(type === 'tithe' || type === 'welfare') && (
                         <div>
                             <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Member Name</label>
                             <input
@@ -101,6 +108,64 @@ export default function EditModal({ isOpen, onClose, onSave, record, type }: Edi
                                 style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
                             />
                         </div>
+                    )}
+                    {type === 'tithe' && (
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Receipt Number</label>
+                            <input
+                                type="text"
+                                value={formData.receipt_number}
+                                onChange={(e) => setFormData({ ...formData, receipt_number: e.target.value })}
+                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                            />
+                        </div>
+                    )}
+                    {type === 'project_offering' && (
+                        <>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Project Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.project_name}
+                                    onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                    required
+                                />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Service Type</label>
+                                    <select
+                                        value={formData.service_type}
+                                        onChange={(e) => setFormData({ ...formData, service_type: e.target.value })}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                    >
+                                        <option value="Sunday_Worship">Sunday Worship</option>
+                                        <option value="Wednesday_Service">Wednesday Service</option>
+                                        <option value="Prayer_Meeting">Prayer Meeting</option>
+                                        <option value="Special_Project_Offering">Special Project Offering</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Service Time</label>
+                                    <input
+                                        type="time"
+                                        value={formData.service_time}
+                                        onChange={(e) => setFormData({ ...formData, service_time: e.target.value })}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>Counted By</label>
+                                <input
+                                    type="text"
+                                    value={formData.counted_by}
+                                    onChange={(e) => setFormData({ ...formData, counted_by: e.target.value })}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                />
+                            </div>
+                        </>
                     )}
 
                     {type === 'withdrawal' && (
@@ -154,7 +219,7 @@ export default function EditModal({ isOpen, onClose, onSave, record, type }: Edi
                         <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>{type === 'withdrawal' ? 'Account Type' : 'Payment Method'}</label>
                         <select
                             value={type === 'withdrawal' ? formData.account_type : formData.payment_method}
-                            onChange={(e) => setFormData({ ...formData, [type === 'withdrawal' ? 'account_type' : 'payment_method']: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, [type === 'withdrawal' ? 'account_type' : type === 'project_offering' ? 'collection_method' : 'payment_method']: e.target.value })}
                             style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
                         >
                             {type === 'withdrawal' ? (

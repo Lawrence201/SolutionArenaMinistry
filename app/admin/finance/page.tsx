@@ -272,11 +272,11 @@ export default function FinancePage() {
             <div className="dashboard-content-tabs">
                 {activeTab === 'overview' && <OverviewTab />}
 
-                {activeTab === 'offerings' && <OfferingsTab />}
+                {activeTab === 'offerings' && <OfferingsTab refreshStats={fetchStats} />}
 
-                {activeTab === 'project-offerings' && <ProjectOfferingsTab />}
+                {activeTab === 'project-offerings' && <ProjectOfferingsTab refreshStats={fetchStats} />}
 
-                {activeTab === 'tithes' && <TithesTab />}
+                {activeTab === 'tithes' && <TithesTab refreshStats={fetchStats} />}
 
                 {activeTab === 'welfare' && <WelfareTab />}
 

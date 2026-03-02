@@ -298,6 +298,7 @@ export default function RecordDonationPage() {
             payload.amount = offeringAmount;
             payload.countedBy = offeringCountedBy;
             payload.notes = offeringNotes;
+            payload.status = "Verified"; // Matching legacy system
         } else if (activeTab === "projectoffering") {
             if (!projectAmount) return alert("Please enter amount");
             payload.serviceType = projectServiceType;
@@ -306,6 +307,7 @@ export default function RecordDonationPage() {
             payload.amount = projectAmount;
             payload.countedBy = projectCountedBy;
             payload.notes = projectNotes;
+            payload.status = "Verified"; // Matching legacy system
         } else if (activeTab === "tithe") {
             if (!titheMemberName || !titheAmount) return alert("Please enter member and amount");
             payload.memberId = titheMemberId;
@@ -313,6 +315,7 @@ export default function RecordDonationPage() {
             payload.amount = titheAmount;
             payload.receiptNumber = titheReceipt;
             payload.notes = titheNotes;
+            payload.status = "Paid";
         } else if (activeTab === "welfare") {
             if (!welfareMemberName || !welfareAmount) return alert("Please enter member and amount");
             payload.memberId = welfareMemberId;
@@ -340,7 +343,8 @@ export default function RecordDonationPage() {
             });
             const result = await res.json();
             if (result.success) {
-                alert(result.message + '\nTransaction ID: ' + result.transaction_id);
+                // Fixed: Access transaction_id directly from the response root as updated in API
+                alert(result.message + '\nTransaction ID: ' + (result.transaction_id || "N/A"));
                 if (activeTab === "tithe" && confirm("Do you want to generate a receipt?")) {
                     handleGenerateReceipt(result.data);
                 }
