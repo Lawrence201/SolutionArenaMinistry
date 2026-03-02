@@ -19,6 +19,43 @@ const loadImageForPDF = (src: string): Promise<HTMLImageElement> => {
     });
 };
 
+// Helper to create a rounded square image using canvas
+const getRoundedImage = (img: HTMLImageElement, size: number, radius: number): string => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return img.src;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, size, size);
+
+    // Create rounded rect path
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(size - radius, 0);
+    ctx.quadraticCurveTo(size, 0, size, radius);
+    ctx.lineTo(size, size - radius);
+    ctx.quadraticCurveTo(size, size, size - radius, size);
+    ctx.lineTo(radius, size);
+    ctx.quadraticCurveTo(0, size, 0, size - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.clip();
+
+    // Draw and scale image to fill the square
+    const imgWidth = img.width;
+    const imgHeight = img.height;
+    const minDim = Math.min(imgWidth, imgHeight);
+    const sx = (imgWidth - minDim) / 2;
+    const sy = (imgHeight - minDim) / 2;
+
+    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+
+    return canvas.toDataURL('image/png');
+};
+
 export const exportToExcel = (members: any[]) => {
     if (!members || members.length === 0) {
         alert('No members to export!');
@@ -117,18 +154,22 @@ export const exportToPDF = async (members: any[]) => {
         doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 22);
         doc.text(`Total Members: ${members.length}`, 14, 28);
 
-        // Pre-load images
-        const imageMap = new Map<number, HTMLImageElement>();
+        // Pre-load and process images
+        const imageMap = new Map<number, string>();
         await Promise.all(members.map(async (member) => {
             if (member.photo_path) {
                 try {
                     let src = member.photo_path;
-                    if (!src.startsWith('http') && !src.startsWith('/')) {
-                        src = `/uploads/${src}`;
+                    if (!src.startsWith('http') && !src.startsWith('/') && !src.startsWith('data:')) {
+                        src = `/uploads/members/${src}`;
                     }
                     const img = await loadImageForPDF(src);
                     const id = member.member_id || member.id;
-                    if (id) imageMap.set(id, img);
+                    if (id) {
+                        // Create a rounded version (square with rounded corners)
+                        const roundedDataUrl = getRoundedImage(img, 100, 15);
+                        imageMap.set(id, roundedDataUrl);
+                    }
                 } catch (e) {
                     console.error(`Failed to load image for member ${member.first_name}`, e);
                 }
@@ -165,10 +206,10 @@ export const exportToPDF = async (members: any[]) => {
             startY: 35,
             theme: 'striped',
             styles: {
-                fontSize: 9,
-                cellPadding: 3,
-                valign: 'middle', // Vertically align text
-                minCellHeight: 15 // Ensure row is tall enough for image
+                fontSize: 8,
+                cellPadding: 2,
+                valign: 'middle',
+                minCellHeight: 18
             },
             headStyles: {
                 fillColor: [79, 70, 229],
@@ -176,34 +217,45 @@ export const exportToPDF = async (members: any[]) => {
                 fontStyle: 'bold'
             },
             columnStyles: {
-                0: { cellWidth: 15 } // Width for Photo column
+                0: { cellWidth: 18 }, // Photo column
+                1: { fontStyle: 'bold' } // Name column
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 0) {
                     const member = members[data.row.index];
                     const id = member.member_id || member.id;
-                    const img = imageMap.get(id);
+                    const roundedImgData = imageMap.get(id);
 
-                    if (img) {
-                        // Draw image
+                    if (roundedImgData) {
                         const cell = data.cell;
-                        const padding = 2;
-                        const size = 10; // Image size (width/height)
+                        const size = 12; // Image size
 
                         // Center image in cell
                         const x = cell.x + (cell.width - size) / 2;
                         const y = cell.y + (cell.height - size) / 2;
 
-                        // Circular clip is hard in simple jsPDF addImage without context manipulation
-                        // For autoTable cell, simple square or rectangular image is safest/easiest to standard
-                        // To make it circular involves advanced canvas calls. For now standard square/rect.
-                        doc.addImage(img, 'JPEG', x, y, size, size);
+                        doc.addImage(roundedImgData, 'PNG', x, y, size, size);
+                    } else {
+                        // Draw a simple gray rounded rectangle as placeholder
+                        const cell = data.cell;
+                        const size = 10;
+                        const x = cell.x + (cell.width - size) / 2;
+                        const y = cell.y + (cell.height - size) / 2;
+
+                        doc.setDrawColor(200, 200, 200);
+                        doc.setFillColor(240, 240, 240);
+                        doc.roundedRect(x, y, size, size, 2, 2, 'FD');
+
+                        // User icon placeholder
+                        doc.setDrawColor(150, 150, 150);
+                        doc.circle(x + size / 2, y + size / 2 - 1, 2, 'S');
+                        doc.ellipse(x + size / 2, y + size / 2 + 3, 3, 2, 'S');
                     }
                 }
             }
         });
 
-        doc.save(`church_members_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`church_members_directory_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error: any) {
         console.error('Error exporting PDF:', error);
         alert('Error exporting PDF: ' + error.message);
