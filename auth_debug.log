@@ -45,3 +45,8 @@
 [2026-02-27T10:58:02.810Z] Admin found: [lawrenceantwi@gmail.com]
 [2026-02-27T10:58:02.928Z] Password valid? true
 [2026-02-27T10:58:02.929Z] Admin login successful: lawrenceantwi@gmail.com
+[2026-03-03T06:54:57.351Z] Attempting login for: [lawrenceantwi@gmail.com]
+[2026-03-03T06:54:57.355Z] Prisma keys: _originalClient, _middlewares, _createPrismaPromise, $extends, _extensions, _previewFeatures, _clientVersion, _activeProvider, _globalOmit, _tracingHelper, _errorFormat, _runtimeDataModel, _engineConfig, _accelerateEngineConfig, _engine, _requestHandler, _metrics, _appliedParent, activityLog, adminAccount, attendance, attendanceToken, blog, blogView, budgetSetting, comment, communicationSetting, contentCalendar, department, draft, draftDepartment, draftMinistry, emailLog, emergencyContact, event, eventTag, eventVolunteerRole, expense, financialSummary, galleryAlbum, galleryLike, galleryMedia, galleryView, generatedReport, hashtagPerformance, loginAttempt, member, memberDepartment, memberMinistry, message, messageGroup, messageGroupMember, messageRecipient, messageTemplate, ministry, offering, projectOffering, receivedEmail, scheduledMessage, sermon, sermonAnalytics, sermonCategory, sermonComment, sermonScripture, sermonSeries, smsLog, socialMediaAccount, socialMediaAnalytics, socialMediaCampaign, socialMediaInteraction, socialMediaPost, tithe, user, account, session, verificationToken, visitor, visitorFollowup, welcomeAction, welfareContribution, withdrawal, $parent
+[2026-03-03T06:54:57.387Z] Admin found: [lawrenceantwi@gmail.com]
+[2026-03-03T06:54:57.552Z] Password valid? true
+[2026-03-03T06:54:57.552Z] Admin login successful: lawrenceantwi@gmail.com

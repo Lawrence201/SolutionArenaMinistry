@@ -15,8 +15,13 @@ export async function POST(req: NextRequest) {
         }
 
         // 1. Check Admin Accounts
-        const admin = await prisma.adminAccount.findUnique({
-            where: { admin_email: email }
+        const admin = await prisma.adminAccount.findFirst({
+            where: {
+                admin_email: {
+                    equals: email,
+                    mode: 'insensitive'
+                }
+            }
         });
 
         if (admin) {

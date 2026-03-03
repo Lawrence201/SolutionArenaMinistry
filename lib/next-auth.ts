@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { verifyPassword } from "@/lib/auth";
 
 // Log env availability to Vercel logs on every cold start
 console.log("[Auth.js] Env Check:", {
@@ -49,13 +50,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 try {
                     // 1. Check admin_accounts table first (admins login with credentials)
-                    const admin = await prisma.adminAccount.findUnique({
-                        where: { admin_email: email }
+                    // Use findFirst with mode: 'insensitive' to handle potential casing differences in database
+                    const admin = await prisma.adminAccount.findFirst({
+                        where: {
+                            admin_email: {
+                                equals: email,
+                                mode: 'insensitive'
+                            }
+                        }
                     });
 
                     if (admin) {
                         log(`Admin found: [${admin.admin_email}]`);
-                        const isValid = await bcrypt.compare(password, admin.admin_password);
+                        // Use unified verification logic (supports both bcrypt and legacy plain-text)
+                        const isValid = await verifyPassword(password, admin.admin_password);
                         log(`Password valid? ${isValid}`);
                         if (isValid) {
                             log(`Admin login successful: ${admin.admin_email}`);
@@ -80,7 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (user && user.password) {
-                        const isValid = await bcrypt.compare(password, user.password);
+                        const isValid = await verifyPassword(password, user.password);
                         if (isValid) {
                             return {
                                 id: String(user.id),
