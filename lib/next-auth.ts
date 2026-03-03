@@ -41,12 +41,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const email = (credentials.email as string).trim().toLowerCase();
                 const password = credentials.password as string;
 
-                const fs = require('fs');
-                const logPath = 'auth_debug.log';
-                const log = (msg: string) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+                // Use console.log for both local and production (Vercel) debugging
+                const log = (msg: string) => console.log(`[Auth.js Debug] ${msg}`);
 
                 log(`Attempting login for: [${email}]`);
-                log(`Prisma keys: ${Object.keys(prisma).join(', ')}`);
 
                 try {
                     // 1. Check admin_accounts table first (admins login with credentials)
