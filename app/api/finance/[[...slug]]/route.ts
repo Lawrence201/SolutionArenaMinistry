@@ -118,8 +118,56 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                 });
             }
             case 'tithes': {
-                const tithes = await prisma.tithe.findMany({ where: { date: { gte: start, lte: end } }, include: { member: { select: { first_name: true, last_name: true } } }, orderBy: { date: 'desc' }, take: 100 });
-                return NextResponse.json({ success: true, data: { tithes: tithes.map(t => ({ ...t, member_name: t.member ? `${t.member.first_name} ${t.member.last_name}` : 'Unknown' })) } });
+                const tithes = await prisma.tithe.findMany({ 
+                    where: { date: { gte: start, lte: end } }, 
+                    include: { member: { select: { first_name: true, last_name: true, email: true, photo_path: true } } }, 
+                    orderBy: { date: 'desc' }, 
+                    take: 100 
+                });
+
+                const [total, unique, withd] = await Promise.all([
+                    prisma.tithe.aggregate({ 
+                        where: { date: { gte: start, lte: end } },
+                        _sum: { amount: true }, 
+                        _count: { _all: true } 
+                    }),
+                    prisma.tithe.groupBy({ 
+                        where: { date: { gte: start, lte: end } },
+                        by: ['member_id'] 
+                    }),
+                    prisma.withdrawal.aggregate({ 
+                        where: { 
+                            account_type: 'Tithe',
+                            date: { gte: start, lte: end }
+                        }, 
+                        _sum: { amount: true } 
+                    })
+                ]);
+
+                const grossAmount = Number(total?._sum?.amount || 0);
+                const withdAmount = Number(withd?._sum?.amount || 0);
+                const uniqueMembers = unique.length;
+
+                return NextResponse.json({ 
+                    success: true, 
+                    data: { 
+                        tithes: tithes.map(t => ({ 
+                            ...t, 
+                            amount: Number(t.amount),
+                            member_name: t.member ? `${t.member.first_name} ${t.member.last_name}` : 'Unknown',
+                            member_email: t.member?.email || '',
+                            member_photo: t.member?.photo_path || ''
+                        })),
+                        summary: {
+                            total_amount: grossAmount - withdAmount,
+                            gross_amount: grossAmount,
+                            total_withdrawals: withdAmount,
+                            total_count: total?._count?._all || 0,
+                            unique_members: uniqueMembers,
+                            avg_amount: uniqueMembers > 0 ? grossAmount / uniqueMembers : 0
+                        }
+                    } 
+                });
             }
             case 'offerings': {
                 const offerings = await prisma.offering.findMany({ where: { date: { gte: start, lte: end } }, orderBy: { date: 'desc' }, take: 100 });
@@ -169,19 +217,112 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
                 return NextResponse.json({ success: true, data: { expenses: expenses.map(e => ({ ...e, amount: Number(e.amount) })) } });
             }
             case 'welfare': {
-                const welfare = await prisma.welfareContribution.findMany({ where: { date: { gte: start, lte: end } }, include: { member: { select: { first_name: true, last_name: true, email: true, photo_path: true } } }, orderBy: { date: 'desc' }, take: 100 });
+                const welfare = await prisma.welfareContribution.findMany({ 
+                    where: { date: { gte: start, lte: end } }, 
+                    include: { member: { select: { first_name: true, last_name: true, email: true, photo_path: true } } }, 
+                    orderBy: { date: 'desc' }, 
+                    take: 100 
+                });
+
                 const [total, unique, withd] = await Promise.all([
-                    prisma.welfareContribution.aggregate({ _sum: { amount: true }, _count: { _all: true } }),
-                    prisma.welfareContribution.groupBy({ by: ['member_id'] }),
-                    prisma.withdrawal.aggregate({ where: { account_type: 'Welfare' }, _sum: { amount: true } })
+                    prisma.welfareContribution.aggregate({ 
+                        where: { date: { gte: start, lte: end } },
+                        _sum: { amount: true }, 
+                        _count: { _all: true } 
+                    }),
+                    prisma.welfareContribution.groupBy({ 
+                        where: { date: { gte: start, lte: end } },
+                        by: ['member_id'] 
+                    }),
+                    prisma.withdrawal.aggregate({ 
+                        where: { 
+                            account_type: 'Welfare',
+                            date: { gte: start, lte: end }
+                        }, 
+                        _sum: { amount: true } 
+                    })
                 ]);
-                const totalAmount = Number(total?._sum?.amount || 0);
+
+                const grossAmount = Number(total?._sum?.amount || 0);
                 const withdAmount = Number(withd?._sum?.amount || 0);
-                return NextResponse.json({ success: true, data: { welfare: welfare.map(w => ({ ...w, amount: Number(w.amount), member_name: w.member ? `${w.member.first_name} ${w.member.last_name}` : 'Unknown', member_email: w.member?.email || '', member_photo: w.member?.photo_path || '' })), summary: { total_amount: totalAmount - withdAmount, gross_amount: totalAmount, total_withdrawals: withdAmount, total_count: total?._count?._all || 0, unique_members: unique.length, avg_amount: unique.length > 0 ? totalAmount / unique.length : 0 } } });
+                const uniqueMembers = unique.length;
+
+                return NextResponse.json({ 
+                    success: true, 
+                    data: { 
+                        welfare: welfare.map(w => ({ 
+                            ...w, 
+                            amount: Number(w.amount),
+                            member_name: w.member ? `${w.member.first_name} ${w.member.last_name}` : 'Unknown',
+                            member_email: w.member?.email || '',
+                            member_photo: w.member?.photo_path || ''
+                        })),
+                        summary: {
+                            total_amount: grossAmount - withdAmount,
+                            gross_amount: grossAmount,
+                            total_withdrawals: withdAmount,
+                            total_count: total?._count?._all || 0,
+                            unique_members: uniqueMembers,
+                            avg_amount: uniqueMembers > 0 ? grossAmount / uniqueMembers : 0
+                        }
+                    } 
+                });
             }
+        
             case 'project-offerings': {
                 const records = await prisma.projectOffering.findMany({ where: { date: { gte: start, lte: end } }, orderBy: { date: 'desc' }, take: 100 });
-                return NextResponse.json({ success: true, data: { records: records.map(r => ({ ...r, amount: Number(r.amount_collected) })) } });
+                
+                // Calculate summary stats
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+                const [todayRes, weekRes, monthRes, activeProjRes] = await Promise.all([
+                    prisma.projectOffering.aggregate({ 
+                        where: { date: { gte: today } }, 
+                        _sum: { amount_collected: true }, 
+                        _count: { _all: true } 
+                    }),
+                    prisma.projectOffering.aggregate({ 
+                        where: { date: { gte: weekStart } }, 
+                        _sum: { amount_collected: true } 
+                    }),
+                    prisma.projectOffering.aggregate({ 
+                        where: { date: { gte: monthStart } }, 
+                        _sum: { amount_collected: true }, 
+                        _count: { _all: true } 
+                    }),
+                    prisma.projectOffering.groupBy({
+                        by: ['project_name'],
+                        _count: { _all: true }
+                    })
+                ]);
+
+                const total_today = Number(todayRes._sum.amount_collected || 0);
+                const total_week = Number(weekRes._sum.amount_collected || 0);
+                const total_month = Number(monthRes._sum.amount_collected || 0);
+                const today_count = todayRes._count._all || 0;
+                const month_count = monthRes._count._all || 1;
+                const month_avg = total_month / month_count;
+                const active_projects = activeProjRes.length;
+
+                return NextResponse.json({ 
+                    success: true, 
+                    data: { 
+                        records: records.map(r => ({ ...r, amount: Number(r.amount_collected) })),
+                        total_today,
+                        total_week,
+                        total_month,
+                        today_count,
+                        week_growth: "↑ 0.0% from last week",
+                        month_avg,
+                        active_projects
+                    } 
+                });
             }
             case 'withdrawals': {
                 const account = searchParams.get('account_type');

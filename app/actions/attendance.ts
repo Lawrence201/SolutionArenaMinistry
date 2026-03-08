@@ -163,7 +163,7 @@ export async function getAttendanceStats(serviceId?: string, checkInDate?: strin
                 absentCount,
                 malesCount: maleAttendance,
                 femalesCount: femaleAttendance,
-                childrenCount,
+                childrenCount: 0,
                 avgArrival
             }
         };

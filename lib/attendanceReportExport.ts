@@ -68,6 +68,10 @@ export const exportAttendanceReportToPDF = async (
     const doc = new jsPDF() as any;
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
+    
+    // Reverse data for chronological order (first check-in at the top)
+    const reversedAttendanceData = [...attendanceData].reverse();
+    const reversedVisitorsData = [...visitorsData].reverse();
 
     // Header with colored banner
     doc.setFillColor(30, 41, 59); // Dark blue (#1e293b)
@@ -146,10 +150,10 @@ export const exportAttendanceReportToPDF = async (
     };
 
     // Live Attendance Table
-    if (attendanceData.length > 0) {
-        addSectionHeader('Live Attendance - Members', [30, 41, 59], attendanceData.length);
+    if (reversedAttendanceData.length > 0) {
+        addSectionHeader('Live Attendance - Members', [30, 41, 59], reversedAttendanceData.length);
 
-        const tableData = await Promise.all(attendanceData.map(async (r) => {
+        const tableData = await Promise.all(reversedAttendanceData.map(async (r) => {
             const imgData = r.photo ? await getImageBase64(r.photo) : null;
             return {
                 ...r,
@@ -218,12 +222,12 @@ export const exportAttendanceReportToPDF = async (
     }
 
     // Visitors Table
-    if (visitorsData.length > 0) {
-        addSectionHeader('Visitors', [139, 92, 246], visitorsData.length);
+    if (reversedVisitorsData.length > 0) {
+        addSectionHeader('Visitors', [139, 92, 246], reversedVisitorsData.length);
         autoTable(doc, {
             startY: yPosition,
             head: [['Name', 'Phone Number', 'Email', 'Check-In', 'Source']],
-            body: visitorsData.map(r => [r.name, r.phone, r.email || '-', r.checkInTime, r.source || '-']),
+            body: reversedVisitorsData.map(r => [r.name, r.phone, r.email || '-', r.checkInTime, r.source || '-']),
             theme: 'striped',
             headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255], fontSize: 9, fontStyle: 'bold' },
             bodyStyles: { fontSize: 9, textColor: [0, 0, 0], minCellHeight: 10 },
