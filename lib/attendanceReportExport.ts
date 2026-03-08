@@ -175,34 +175,42 @@ export const exportAttendanceReportToPDF = async (
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 0) {
-                    const r = tableData[data.row.index];
-                    const x = data.cell.x + 2;
-                    const y = data.cell.y + 1;
+                    try {
+                        const rowIndex = data.row?.index;
+                        if (rowIndex === undefined || !tableData[rowIndex]) return;
 
-                    if (r.imgData) {
-                        try {
-                            doc.saveGraphicsState();
-                            doc.circle(x + 4, y + 4, 4, 'S');
-                            doc.addImage(r.imgData, 'JPEG', x, y, 8, 8, undefined, 'FAST');
-                            doc.restoreGraphicsState();
-                        } catch (e) {
+                        const r = tableData[rowIndex];
+                        const x = data.cell.x + 2;
+                        const y = data.cell.y + 1;
+
+                        if (r.imgData) {
+                            try {
+                                doc.saveGraphicsState();
+                                doc.circle(x + 4, y + 4, 4, 'S');
+                                doc.addImage(r.imgData, 'JPEG', x, y, 8, 8, undefined, 'FAST');
+                                doc.restoreGraphicsState();
+                            } catch (error) {
+                                console.warn('Failed to add image to PDF for:', r.name, error);
+                                doc.setFillColor(102, 126, 234);
+                                doc.circle(x + 4, y + 4, 4, 'F');
+                                doc.setTextColor(255, 255, 255);
+                                doc.setFontSize(6);
+                                doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
+                            }
+                        } else {
                             doc.setFillColor(102, 126, 234);
                             doc.circle(x + 4, y + 4, 4, 'F');
                             doc.setTextColor(255, 255, 255);
                             doc.setFontSize(6);
                             doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
                         }
-                    } else {
-                        doc.setFillColor(102, 126, 234);
-                        doc.circle(x + 4, y + 4, 4, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(6);
-                        doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
+                        doc.setTextColor(0, 0, 0);
+                        doc.setFontSize(9);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(r.name, x + 10, y + 5);
+                    } catch (err) {
+                        console.error('Error drawing cell in PDF:', err);
                     }
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(9);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(r.name, x + 10, y + 5);
                 }
             }
         });
@@ -261,34 +269,42 @@ export const exportAttendanceReportToPDF = async (
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 0) {
-                    const r = absentTableData[data.row.index];
-                    const x = data.cell.x + 2;
-                    const y = data.cell.y + 1;
+                    try {
+                        const rowIndex = data.row?.index;
+                        if (rowIndex === undefined || !absentTableData[rowIndex]) return;
 
-                    if (r.imgData) {
-                        try {
-                            doc.saveGraphicsState();
-                            doc.circle(x + 4, y + 4, 4, 'S');
-                            doc.addImage(r.imgData, 'JPEG', x, y, 8, 8, undefined, 'FAST');
-                            doc.restoreGraphicsState();
-                        } catch (e) {
+                        const r = absentTableData[rowIndex];
+                        const x = data.cell.x + 2;
+                        const y = data.cell.y + 1;
+
+                        if (r.imgData) {
+                            try {
+                                doc.saveGraphicsState();
+                                doc.circle(x + 4, y + 4, 4, 'S');
+                                doc.addImage(r.imgData, 'JPEG', x, y, 8, 8, undefined, 'FAST');
+                                doc.restoreGraphicsState();
+                            } catch (error) {
+                                console.warn('Failed to add absent image to PDF for:', r.name, error);
+                                doc.setFillColor(203, 213, 225);
+                                doc.circle(x + 4, y + 4, 4, 'F');
+                                doc.setTextColor(71, 85, 105);
+                                doc.setFontSize(6);
+                                doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
+                            }
+                        } else {
                             doc.setFillColor(203, 213, 225);
                             doc.circle(x + 4, y + 4, 4, 'F');
                             doc.setTextColor(71, 85, 105);
                             doc.setFontSize(6);
                             doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
                         }
-                    } else {
-                        doc.setFillColor(203, 213, 225);
-                        doc.circle(x + 4, y + 4, 4, 'F');
-                        doc.setTextColor(71, 85, 105);
-                        doc.setFontSize(6);
-                        doc.text(getInitials(r.name), x + 4, y + 4.5, { align: 'center', baseline: 'middle' });
+                        doc.setTextColor(0, 0, 0);
+                        doc.setFontSize(9);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(r.name, x + 10, y + 5);
+                    } catch (err) {
+                        console.error('Error drawing absent cell in PDF:', err);
                     }
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(9);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(r.name, x + 10, y + 5);
                 }
             }
         });

@@ -107,7 +107,7 @@ export default function AttendanceClient() {
     const [absentSearch, setAbsentSearch] = useState('');
 
     // Pagination
-    const [currentPage, setCurrentPage] = useState({ live: 1, visitors: 1, absent: 1 });
+    const [currentPage, setCurrentPage] = useState({ live: 1, visitors: 1, absent: 1, recent: 1 });
     const rowsPerPage = 10;
 
     // QR Code State
@@ -406,13 +406,59 @@ export default function AttendanceClient() {
         !absentSearch || item.name.toLowerCase().includes(absentSearch.toLowerCase())
     );
 
+    // Reset pagination when search or filters change
+    useEffect(() => {
+        setCurrentPage(prev => ({ ...prev, live: 1 }));
+    }, [searchInput, statusFilter, ministryFilter]);
+
+    useEffect(() => {
+        setCurrentPage(prev => ({ ...prev, visitors: 1 }));
+    }, [visitorSearch]);
+
+    useEffect(() => {
+        setCurrentPage(prev => ({ ...prev, absent: 1 }));
+    }, [absentSearch]);
+
     // Pagination helpers
     const getPaginatedData = (data: any[], type: 'live' | 'visitors' | 'absent') => {
         const start = (currentPage[type] - 1) * rowsPerPage;
         return data.slice(start, start + rowsPerPage);
     };
 
-    const getTotalPages = (dataLength: number) => Math.ceil(dataLength / rowsPerPage);
+    const handlePageChange = (type: 'live' | 'visitors' | 'absent', newPage: number) => {
+        setCurrentPage(prev => ({ ...prev, [type]: newPage }));
+    };
+
+    const renderPagination = (dataLength: number, type: 'live' | 'visitors' | 'absent') => {
+        const totalPages = Math.ceil(dataLength / rowsPerPage);
+        if (totalPages <= 1) return null;
+
+        return (
+            <div className="pagination">
+                <button
+                    onClick={() => handlePageChange(type, currentPage[type] - 1)}
+                    disabled={currentPage[type] === 1}
+                >
+                    Previous
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                    <button
+                        key={i + 1}
+                        onClick={() => handlePageChange(type, i + 1)}
+                        className={currentPage[type] === i + 1 ? 'active' : ''}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+                <button
+                    onClick={() => handlePageChange(type, currentPage[type] + 1)}
+                    disabled={currentPage[type] === totalPages}
+                >
+                    Next
+                </button>
+            </div>
+        );
+    };
 
     return (
         <div className="attendance-page">
@@ -685,62 +731,63 @@ export default function AttendanceClient() {
                                     <div className="title-underline"></div>
                                 </div>
 
-                                <div className="table-wrap">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>NAME</th>
-                                                <th>CHECK-IN TIME</th>
-                                                <th>PHONE NUMBER</th>
-                                                <th>ACTION</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {attendanceData.slice(0, 5).map((item) => (
-                                                <tr key={item.attendanceId}>
-                                                    <td>
-                                                        <div className="member-cell">
-                                                            {item.photo ? (
-                                                                // eslint-disable-next-line @next/next/no-img-element
-                                                                <img
-                                                                    src={item.photo}
-                                                                    alt={item.name}
-                                                                    className="member-avatar"
-                                                                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/Logo.PNG' }}
-                                                                />
-                                                            ) : (
-                                                                <div className="visitor-avatar">
-                                                                    {getInitials(item.name)}
-                                                                </div>
-                                                            )}
-                                                            <div className="member-info">
-                                                                <span className="member-name">{item.name}</span>
-                                                                <span className="member-role">{item.email || 'No email'}</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td><span className="time-badge">{item.checkInTime}</span></td>
-                                                    <td><span className="phone-text">{item.phone || 'N/A'}</span></td>
-                                                    <td>
-                                                        <button
-                                                            className="vox-btn vox-btn-alert vox-btn-tiny"
-                                                            onClick={() => handleDelete(item.attendanceId)}
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {attendanceData.length === 0 && (
+                                    <div className="table-wrap">
+                                        <table>
+                                            <thead>
                                                 <tr>
-                                                    <td colSpan={4} className="text-center py-10 italic text-slate-400">
-                                                        No recent check-ins found.
-                                                    </td>
+                                                    <th>NAME</th>
+                                                    <th>CHECK-IN TIME</th>
+                                                    <th>PHONE NUMBER</th>
+                                                    <th>ACTION</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {attendanceData.map((item: any) => (
+                                                    <tr key={item.attendanceId}>
+                                                        <td>
+                                                            <div className="member-cell">
+                                                                {item.photo ? (
+                                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                                    <img
+                                                                        src={item.photo}
+                                                                        alt={item.name}
+                                                                        className="member-avatar"
+                                                                        onError={(e) => { (e.target as HTMLImageElement).src = '/assets/Logo.PNG' }}
+                                                                    />
+                                                                ) : (
+                                                                    <div className="visitor-avatar">
+                                                                        {getInitials(item.name)}
+                                                                    </div>
+                                                                )}
+                                                                <div className="member-info">
+                                                                    <span className="member-name">{item.name}</span>
+                                                                    <span className="member-role">{item.email || 'No email'}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td><span className="time-badge">{item.checkInTime}</span></td>
+                                                        <td><span className="phone-text">{item.phone || 'N/A'}</span></td>
+                                                        <td>
+                                                            <button
+                                                                className="vox-btn vox-btn-alert vox-btn-tiny"
+                                                                onClick={() => handleDelete(item.attendanceId)}
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {attendanceData.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={4} className="text-center py-10 italic text-slate-400">
+                                                            No recent check-ins found.
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {renderPagination(attendanceData.length, 'recent')}
                             </div>
 
                         </div>
@@ -779,7 +826,7 @@ export default function AttendanceClient() {
                                             <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>No records found</td>
                                         </tr>
                                     ) : (
-                                        filteredAttendance.map(item => (
+                                        getPaginatedData(filteredAttendance, 'live').map((item: any) => (
                                             <tr key={item.attendanceId}>
                                                 <td>
                                                     <div className="member-cell">
@@ -816,7 +863,7 @@ export default function AttendanceClient() {
                                 </tbody>
                             </table>
                         </div>
-
+                        {renderPagination(filteredAttendance.length, 'live')}
                     </div>
                 )}
 
@@ -858,7 +905,7 @@ export default function AttendanceClient() {
                                             <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>No visitor records found</td>
                                         </tr>
                                     ) : (
-                                        filteredVisitors.map(item => (
+                                        getPaginatedData(filteredVisitors, 'visitors').map((item: any) => (
                                             <tr key={item.id}>
                                                 <td>
                                                     <div className="member-cell">
@@ -882,7 +929,7 @@ export default function AttendanceClient() {
                                 </tbody>
                             </table>
                         </div>
-
+                        {renderPagination(filteredVisitors.length, 'visitors')}
                     </div>
                 )}
 
@@ -917,7 +964,7 @@ export default function AttendanceClient() {
                                             <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>Everyone is present!</td>
                                         </tr>
                                     ) : (
-                                        filteredAbsent.map(item => (
+                                        getPaginatedData(filteredAbsent, 'absent').map((item: any) => (
                                             <tr key={item.memberId}>
                                                 <td>
                                                     <div className="member-cell">
@@ -953,6 +1000,7 @@ export default function AttendanceClient() {
                                 </tbody>
                             </table>
                         </div>
+                        {renderPagination(filteredAbsent.length, 'absent')}
                     </div>
                 )}
             </div>
