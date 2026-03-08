@@ -787,7 +787,6 @@ export default function AttendanceClient() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {renderPagination(attendanceData.length, 'recent')}
                             </div>
 
                         </div>
